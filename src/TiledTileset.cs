@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Xml;
-using Reapenshaw.Core;
 
-namespace Reapenshaw.Tiled
+namespace TiledSharp
 {
     public class TiledTileset
     {

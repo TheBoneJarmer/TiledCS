@@ -3,47 +3,67 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
-using Reapenshaw.Core;
 
-namespace Reapenshaw.Tiled
+namespace TiledSharp
 {
     public class TiledMap
     {
-        public Dictionary<string, string> Properties { get; set; }
-        public Dictionary<int, string> Tilesets { get; set; }
-        public List<TiledLayer> Layers { get; private set; }
-        public List<TiledObjectGroup> ObjectGroups { get; private set; }
-        public int Width { get; private set; }
-        public int Height { get; private set; }
-        public int TileWidth { get; private set; }
-        public int TileHeight { get; private set; }
+        public TiledVersion TiledVersion { get; set; }
+        public TiledVersion Version { get; set; }
+        public List<TiledProperty> Properties { get; set; }
+        public List<TiledMapTileset> Tilesets { get; set; }
+        public List<TiledLayer> Layers { get; set; }
+        public List<TiledObjectGroup> ObjectGroups { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public int TileWidth { get; set; }
+        public int TileHeight { get; set; }
         
         public TiledMap()
         {
             Layers = new List<TiledLayer>();
             ObjectGroups = new List<TiledObjectGroup>();
-            Properties = new Dictionary<string, string>();
-            Tilesets = new Dictionary<int, string>();
+            Properties = new List<TiledProperty>();
+            Tilesets = new List<TiledMapTileset>();
         }
 
         public void Load(string path)
         {
+            var content = "";
+
             // Check the file
             if (!File.Exists(path))
             {
-                throw new TiledException("Map not found");
+                throw new TiledException($"{path} not found");
             }
-            if (!path.EndsWith(".tmx"))
+            else
             {
-                throw new TiledException("Invalid Tiled map format");
+                content = File.ReadAllText(path);
             }
 
-            Parse(File.ReadAllText(path));
+            if (path.EndsWith(".tmx"))
+            {
+                ParseTMX(content);
+            }
+            else if (path.EndsWith(".json"))
+            {
+                ParseJson(content);
+            }
+            else
+            {
+                throw new TiledException("Unsupported file format");
+            }
         }
 
-        public void Parse(string xml)
+        private void ParseJson(string json)
+        {
+
+        }
+
+        private void ParseTMX(string xml)
         {
             try
             {
@@ -56,6 +76,9 @@ namespace Reapenshaw.Tiled
                 var nodesLayers = nodeMap.SelectNodes("layer");
                 var nodesObjectGroups = nodeMap.SelectNodes("objectgroup");
                 var nodesTilesets = nodeMap.SelectNodes("tileset");
+
+                this.Version = ParseVersion(nodeMap.Attributes["version"].Value);
+                this.TiledVersion = ParseVersion(nodeMap.Attributes["tiledversion"].Value);
 
                 this.Width = int.Parse(nodeMap.Attributes["width"].Value);
                 this.Height = int.Parse(nodeMap.Attributes["height"].Value);
@@ -79,6 +102,30 @@ namespace Reapenshaw.Tiled
             }
         }
 
+        private TiledVersion ParseVersion(string value)
+        {
+            TiledVersion version = new TiledVersion();
+
+            if (Regex.IsMatch(value, @"[0-9]+\.[0-9]+\.\[0-9]"))
+            {
+                version.major = int.Parse(value.Split('.')[0]);
+                version.minor = int.Parse(value.Split('.')[1]);
+                version.patch = int.Parse(value.Split('.')[2]);
+            }
+            else if (Regex.IsMatch(value, @"[0-9]+\.[0-9]+"))
+            {
+                version.major = int.Parse(value.Split('.')[0]);
+                version.minor = int.Parse(value.Split('.')[1]);
+                version.patch = 0;
+            }
+            else
+            {
+                throw new TiledException($"Version string {value} is not a Major.Minor.Patch format");
+            }
+
+            return version;
+        }
+
         private void ParseProperties(XmlNode node)
         {
             var nodesProperty = node.SelectNodes("property");
@@ -86,10 +133,12 @@ namespace Reapenshaw.Tiled
             for (var i=0; i<nodesProperty.Count; i++)
             {
                 var nodeProperty = nodesProperty[i];
-                var propertyName = nodeProperty.Attributes["name"].Value;
-                var propertyValue = nodeProperty.Attributes["value"].Value;
 
-                Properties.Add(propertyName, propertyValue);
+                TiledProperty property = new TiledProperty();
+                property.name = nodeProperty.Attributes["name"].Value;
+                property.value = nodeProperty.Attributes["value"].Value;
+
+                Properties.Add(property);
             }
         }
 
@@ -97,10 +146,11 @@ namespace Reapenshaw.Tiled
         {
             foreach (XmlNode node in nodeList)
             {
-                int firstgid = int.Parse(node.Attributes["firstgid"].Value);
-                string source = node.Attributes["source"].Value;
+                TiledMapTileset tileset = new TiledMapTileset();
+                tileset.firstgid = int.Parse(node.Attributes["firstgid"].Value);
+                tileset.source = node.Attributes["source"].Value;
 
-                Tilesets.Add(firstgid, source);
+                Tilesets.Add(tileset);
             }
         }
 
@@ -109,13 +159,19 @@ namespace Reapenshaw.Tiled
             foreach (XmlNode node in nodeList)
             {
                 var nodeData = node.SelectSingleNode("data");
+                var encoding = nodeData.Attributes["encoding"].Value;
+
+                if (encoding != "csv")
+                {
+                    throw new TiledException($"Only CSV encoding is currently supported");
+                }
 
                 TiledLayer tiledLayer = new TiledLayer();
-                tiledLayer.Id = int.Parse(node.Attributes["id"].Value);
-                tiledLayer.Name = node.Attributes["name"].Value;
-                tiledLayer.Width = int.Parse(node.Attributes["width"].Value);
-                tiledLayer.Height = int.Parse(node.Attributes["height"].Value);
-                tiledLayer.Data = nodeData.InnerText.Replace("\n", "").Split(',').AsIntArray();
+                tiledLayer.id = int.Parse(node.Attributes["id"].Value);
+                tiledLayer.name = node.Attributes["name"].Value;
+                tiledLayer.height = int.Parse(node.Attributes["height"].Value);
+                tiledLayer.width = int.Parse(node.Attributes["width"].Value);
+                tiledLayer.data = nodeData.InnerText.Replace("\n", "").Split(',').AsIntArray();
 
                 Layers.Add(tiledLayer);
             }
@@ -126,46 +182,42 @@ namespace Reapenshaw.Tiled
             for (var i=0; i<nodeList.Count; i++) {
                 var nodeGroup = nodeList[i];
                 var nodesObjects = nodeGroup.SelectNodes("object");
-
-                var group = new TiledObjectGroup();
-                group.Id = int.Parse(nodeGroup.Attributes["id"].Value);
-                group.Name = nodeGroup.Attributes["name"].Value;
+                
+                TiledObjectGroup group = new TiledObjectGroup();
+                group.id = int.Parse(nodeGroup.Attributes["id"].Value);
+                group.name = nodeGroup.Attributes["name"].Value;
+                group.objects = new List<TiledObject>();
 
                 for (var j=0; j<nodesObjects.Count; j++) {
                     var nodeObject = nodesObjects[j];
                     var nodesProperties = nodeObject.SelectNodes("properties/property");
-
-                    var obj = new TiledObject();
-                    obj.Id = int.Parse(nodeObject.Attributes["id"].Value);
-                    obj.Name = nodeObject.Attributes["name"].Value;
-                    obj.X = int.Parse(nodeObject.Attributes["x"].Value);
-                    obj.Y = int.Parse(nodeObject.Attributes["y"].Value);
-
-                    if (nodeObject.Attributes["width"] != null)
-                    {
-                        obj.Width = int.Parse(nodeObject.Attributes["width"].Value);
-                    }
-                    if (nodeObject.Attributes["height"] != null)
-                    {
-                        obj.Height = int.Parse(nodeObject.Attributes["height"].Value);
-                    }
+                    
+                    TiledObject obj = new TiledObject();
+                    obj.id = int.Parse(nodeObject.Attributes["id"].Value);
+                    obj.name = nodeObject.Attributes["name"]?.Value;
+                    obj.type = nodeObject.Attributes["type"]?.Value;
+                    obj.x = int.Parse(nodeObject.Attributes["x"].Value);
+                    obj.y = int.Parse(nodeObject.Attributes["y"].Value);
+                    obj.width = int.Parse(nodeObject.Attributes["width"]?.Value);
+                    obj.height = int.Parse(nodeObject.Attributes["height"]?.Value);
+                    obj.properties = new List<TiledProperty>();
 
                     for (var k=0; k<nodesProperties.Count; k++) {
                         var nodeProperty = nodesProperties[k];
-                        var attribName = nodeProperty.Attributes["name"];
-                        var attribValue = nodeProperty.Attributes["value"];
+                        
+                        TiledProperty property = new TiledProperty();
+                        property.name = nodeProperty.Attributes["name"].Value;
+                        property.value = nodeProperty.Attributes["value"]?.Value;
 
-                        if (attribValue != null)
+                        if (property.value == null && nodeProperty.InnerText != null)
                         {
-                            obj.Properties.Add(attribName.Value, attribValue.Value);
+                            property.value = nodeProperty.InnerText;
                         }
-                        else
-                        {
-                            obj.Properties.Add(attribName.Value, nodeProperty.InnerText);
-                        }
+
+                        obj.properties.Add(property);
                     }
 
-                    group.Objects.Add(obj);
+                    group.objects.Add(obj);
                 }
 
                 ObjectGroups.Add(group);

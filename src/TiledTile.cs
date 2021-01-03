@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Reapenshaw.Tiled
+namespace TiledSharp
 {
     public class TiledTile
     {
