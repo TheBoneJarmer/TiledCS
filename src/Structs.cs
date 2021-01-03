@@ -41,14 +41,14 @@ namespace TiledSharp
         public int y;
         public int width;
         public int height;
-        public List<TiledProperty> properties;
+        public TiledProperty[] properties;
     }
 
     public struct TiledObjectGroup
     {
         public int id;
         public string name;
-        public List<TiledObject> objects;
+        public TiledObject[] objects;
     }
 
     public struct TiledTile

@@ -13,22 +13,14 @@ namespace TiledSharp
     {
         public TiledVersion TiledVersion { get; set; }
         public TiledVersion Version { get; set; }
-        public List<TiledProperty> Properties { get; set; }
-        public List<TiledMapTileset> Tilesets { get; set; }
-        public List<TiledLayer> Layers { get; set; }
-        public List<TiledObjectGroup> ObjectGroups { get; set; }
+        public TiledProperty[] Properties { get; set; }
+        public TiledMapTileset[] Tilesets { get; set; }
+        public TiledLayer[] Layers { get; set; }
+        public TiledObjectGroup[] ObjectGroups { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
         public int TileWidth { get; set; }
         public int TileHeight { get; set; }
-        
-        public TiledMap()
-        {
-            Layers = new List<TiledLayer>();
-            ObjectGroups = new List<TiledObjectGroup>();
-            Properties = new List<TiledProperty>();
-            Tilesets = new List<TiledMapTileset>();
-        }
 
         public void Load(string path)
         {
@@ -63,10 +55,10 @@ namespace TiledSharp
                 document.LoadXml(xml);
 
                 var nodeMap = document.SelectSingleNode("map");
-                var nodeProperties = nodeMap.SelectSingleNode("properties");
-                var nodesLayers = nodeMap.SelectNodes("layer");
-                var nodesObjectGroups = nodeMap.SelectNodes("objectgroup");
-                var nodesTilesets = nodeMap.SelectNodes("tileset");
+                var nodesProperty = nodeMap.SelectNodes("properties/property");
+                var nodesLayer = nodeMap.SelectNodes("layer");
+                var nodesObjectGroup = nodeMap.SelectNodes("objectgroup");
+                var nodesTileset = nodeMap.SelectNodes("tileset");
 
                 this.Version = ParseVersion(nodeMap.Attributes["version"].Value);
                 this.TiledVersion = ParseVersion(nodeMap.Attributes["tiledversion"].Value);
@@ -76,16 +68,10 @@ namespace TiledSharp
                 this.TileWidth = int.Parse(nodeMap.Attributes["tilewidth"].Value);
                 this.TileHeight = int.Parse(nodeMap.Attributes["tileheight"].Value);
 
-                // Import the properties
-                if (nodeProperties != null)
-                {
-                    ParseProperties(nodeProperties);
-                }
-
-                // Import everything else
-                ParseTilesets(nodesTilesets);
-                ParseLayers(nodesLayers);
-                ParseObjectGroups(nodesObjectGroups);
+                if (nodesProperty != null) Properties = ParseProperties(nodesProperty);
+                if (nodesTileset != null) Tilesets = ParseTilesets(nodesTileset);
+                if (nodesLayer != null) Layers = ParseLayers(nodesLayer);
+                if (nodesObjectGroup != null) ObjectGroups = ParseObjectGroups(nodesObjectGroup);
             }
             catch (Exception ex)
             {
@@ -117,42 +103,48 @@ namespace TiledSharp
             return version;
         }
 
-        private void ParseProperties(XmlNode node)
+        private TiledProperty[] ParseProperties(XmlNodeList nodeList)
         {
-            var nodesProperty = node.SelectNodes("property");
-                
-            for (var i=0; i<nodesProperty.Count; i++)
+            var result = new List<TiledProperty>();
+
+            foreach (XmlNode node in nodeList)
             {
-                var nodeProperty = nodesProperty[i];
+                var property = new TiledProperty();
+                property.name = node.Attributes["name"].Value;
+                property.type = node.Attributes["type"]?.Value;
+                property.value = node.Attributes["value"]?.Value;
 
-                TiledProperty property = new TiledProperty();
-                property.name = nodeProperty.Attributes["name"].Value;
-                property.type = nodeProperty.Attributes["type"]?.Value;
-                property.value = nodeProperty.Attributes["value"]?.Value;
-
-                if (property.value == null && nodeProperty.InnerText != null)
+                if (property.value == null && node.InnerText != null)
                 {
-                    property.value = nodeProperty.InnerText;
+                    property.value = node.InnerText;
                 }
 
-                Properties.Add(property);
+                result.Add(property);
             }
+
+            return result.ToArray();
         }
 
-        private void ParseTilesets(XmlNodeList nodeList)
+        private TiledMapTileset[] ParseTilesets(XmlNodeList nodeList)
         {
+            var result = new List<TiledMapTileset>();
+
             foreach (XmlNode node in nodeList)
             {
                 TiledMapTileset tileset = new TiledMapTileset();
                 tileset.firstgid = int.Parse(node.Attributes["firstgid"].Value);
                 tileset.source = node.Attributes["source"].Value;
 
-                Tilesets.Add(tileset);
+                result.Add(tileset);
             }
+
+            return result.ToArray();
         }
 
-        private void ParseLayers(XmlNodeList nodeList)
+        private TiledLayer[] ParseLayers(XmlNodeList nodeList)
         {
+            var result = new List<TiledLayer>();
+
             foreach (XmlNode node in nodeList)
             {
                 var nodeData = node.SelectSingleNode("data");
@@ -170,56 +162,53 @@ namespace TiledSharp
                 tiledLayer.width = int.Parse(node.Attributes["width"].Value);
                 tiledLayer.data = nodeData.InnerText.Replace("\n", "").Split(',').AsIntArray();
 
-                Layers.Add(tiledLayer);
+                result.Add(tiledLayer);
             }
+
+            return result.ToArray();
         }
 
-        private void ParseObjectGroups(XmlNodeList nodeList)
+        private TiledObjectGroup[] ParseObjectGroups(XmlNodeList nodeList)
         {
-            for (var i=0; i<nodeList.Count; i++) {
-                var nodeGroup = nodeList[i];
-                var nodesObjects = nodeGroup.SelectNodes("object");
+            var result = new List<TiledObjectGroup>();
+
+            foreach (XmlNode node in nodeList)
+            {
+                var nodesObject = node.SelectNodes("object");
                 
                 TiledObjectGroup group = new TiledObjectGroup();
-                group.id = int.Parse(nodeGroup.Attributes["id"].Value);
-                group.name = nodeGroup.Attributes["name"].Value;
-                group.objects = new List<TiledObject>();
+                group.id = int.Parse(node.Attributes["id"].Value);
+                group.name = node.Attributes["name"].Value;
+                group.objects = ParseObjects(nodesObject);
 
-                for (var j=0; j<nodesObjects.Count; j++) {
-                    var nodeObject = nodesObjects[j];
-                    var nodesProperties = nodeObject.SelectNodes("properties/property");
-                    
-                    TiledObject obj = new TiledObject();
-                    obj.id = int.Parse(nodeObject.Attributes["id"].Value);
-                    obj.name = nodeObject.Attributes["name"]?.Value;
-                    obj.type = nodeObject.Attributes["type"]?.Value;
-                    obj.x = int.Parse(nodeObject.Attributes["x"].Value);
-                    obj.y = int.Parse(nodeObject.Attributes["y"].Value);
-                    obj.width = int.Parse(nodeObject.Attributes["width"]?.Value);
-                    obj.height = int.Parse(nodeObject.Attributes["height"]?.Value);
-                    obj.properties = new List<TiledProperty>();
-
-                    for (var k=0; k<nodesProperties.Count; k++) {
-                        var nodeProperty = nodesProperties[k];
-                        
-                        TiledProperty property = new TiledProperty();
-                        property.name = nodeProperty.Attributes["name"].Value;
-                        property.type = nodeProperty.Attributes["type"]?.Value;
-                        property.value = nodeProperty.Attributes["value"]?.Value;
-
-                        if (property.value == null && nodeProperty.InnerText != null)
-                        {
-                            property.value = nodeProperty.InnerText;
-                        }
-
-                        obj.properties.Add(property);
-                    }
-
-                    group.objects.Add(obj);
-                }
-
-                ObjectGroups.Add(group);
+                result.Add(group);
             }
+
+            return result.ToArray();
+        }
+
+        private TiledObject[] ParseObjects(XmlNodeList nodeList)
+        {
+            var result = new List<TiledObject>();
+
+            foreach (XmlNode node in nodeList)
+            {
+                var nodesProperty = node.SelectNodes("properties/property");
+                    
+                TiledObject obj = new TiledObject();
+                obj.id = int.Parse(node.Attributes["id"].Value);
+                obj.name = node.Attributes["name"]?.Value;
+                obj.type = node.Attributes["type"]?.Value;
+                obj.x = int.Parse(node.Attributes["x"].Value);
+                obj.y = int.Parse(node.Attributes["y"].Value);
+                obj.width = int.Parse(node.Attributes["width"]?.Value);
+                obj.height = int.Parse(node.Attributes["height"]?.Value);
+                obj.properties = ParseProperties(nodesProperty);
+
+                result.Add(obj);
+            }
+
+            return result.ToArray();
         }
     }
 }
