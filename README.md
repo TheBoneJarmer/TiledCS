@@ -18,11 +18,8 @@ namespace TestApp
     public class Program(string[] args)
     {
         // For loading maps in XML format
-        var map = new TiledMap();
-        map.Load("path-to-map.tmx");
-        
-        var tileset = new TiledTileset();
-        tileset.Load("path-to-tileset.tsx");
+        var map = new TiledMap("path-to-map.tmx");        
+        var tileset = new TiledTileset("path-to-tileset.tsx");
            
         // For loading maps in JSON format
         var json1 = File.ReadAllText("path-to-map.json");

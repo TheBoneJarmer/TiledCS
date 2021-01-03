@@ -22,7 +22,12 @@ namespace TiledCS
         public int TileWidth { get; set; }
         public int TileHeight { get; set; }
 
-        public void Load(string path)
+        public TiledMap()
+        {
+
+        }
+
+        public TiledMap(string path)
         {
             var content = "";
 

@@ -22,8 +22,13 @@ namespace TiledCS
         public TiledTile[] Tiles { get; set; }
         public TiledTerrain[] Terrains { get; set; }
         public TiledProperty[] Properties { get; set; }
-        
-        public void Load(string path)
+
+        public TiledTileset()
+        {
+
+        }
+
+        public TiledTileset(string path)
         {
             var content = "";
 
