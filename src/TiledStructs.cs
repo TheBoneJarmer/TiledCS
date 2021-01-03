@@ -29,7 +29,10 @@ namespace TiledCS
         public string name;
         public int width;
         public int height;
+        public string type;
+        public bool visible;
         public int[] data;
+        public TiledObject[] objects;
     }
 
     public struct TiledObject
@@ -39,16 +42,10 @@ namespace TiledCS
         public string type;
         public int x;
         public int y;
+        public int rotation;
         public int width;
         public int height;
         public TiledProperty[] properties;
-    }
-
-    public struct TiledObjectGroup
-    {
-        public int id;
-        public string name;
-        public TiledObject[] objects;
     }
 
     public struct TiledTile

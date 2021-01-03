@@ -1,18 +1,25 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Xml;
 
 namespace TiledCS
 {
     public class TiledTileset
     {
+        public TiledVersion TiledVersion { get; set; }
+        public TiledVersion Version { get; set; }
         public string Name { get; set; }
         public int TileWidth { get; set; }
         public int TileHeight { get; set; }
         public int TileCount { get; set; }
         public int Columns { get; set; }
-        public string ImageSource { get; set; }
+        public string Image { get; set; }
+        public int ImageWidth { get; set; }
+        public int ImageHeight { get; set; }
+        public int Spacing { get; set; }
+        public int Margin { get; set; }
         public TiledTile[] Tiles { get; set; }
         public TiledTerrain[] Terrains { get; set; }
         public TiledProperty[] Properties { get; set; }
@@ -54,12 +61,26 @@ namespace TiledCS
                 var nodesProperty = nodeTileset.SelectNodes("properties/property");
                 var nodesTerrain = nodeTileset.SelectNodes("terraintypes/terrain");
 
-                Name = nodeTileset.Attributes["name"].Value;
+                Version = ParseVersion(nodeTileset.Attributes["version"].Value);
+                TiledVersion = ParseVersion(nodeTileset.Attributes["tiledversion"].Value);
+                Name = nodeTileset.Attributes["name"]?.Value;
                 TileWidth = int.Parse(nodeTileset.Attributes["tilewidth"].Value);
                 TileHeight = int.Parse(nodeTileset.Attributes["tileheight"].Value);
                 TileCount = int.Parse(nodeTileset.Attributes["tilecount"].Value);
                 Columns = int.Parse(nodeTileset.Attributes["columns"].Value);
-                ImageSource = nodeImage.Attributes["source"].Value;
+
+                if (nodeTileset.Attributes["margin"] != null)
+                {
+                    Margin = int.Parse(nodeTileset.Attributes["margin"].Value);
+                }
+                if (nodeTileset.Attributes["spacing"] != null)
+                {
+                    Spacing = int.Parse(nodeTileset.Attributes["spacing"].Value);
+                }
+
+                Image = nodeImage.Attributes["source"].Value;
+                ImageWidth = int.Parse(nodeImage.Attributes["width"].Value);
+                ImageHeight = int.Parse(nodeImage.Attributes["height"].Value);
 
                 Tiles = ParseTiles(nodesTile);
                 Properties = ParseProperties(nodesProperty);
@@ -69,6 +90,30 @@ namespace TiledCS
             {
                 throw new TiledException("Unable to parse xml data, make sure the xml data represents a valid Tiled tileset", ex);
             }
+        }
+
+        private TiledVersion ParseVersion(string value)
+        {
+            TiledVersion version = new TiledVersion();
+
+            if (Regex.IsMatch(value, @"[0-9]+\.[0-9]+\.\[0-9]"))
+            {
+                version.major = int.Parse(value.Split('.')[0]);
+                version.minor = int.Parse(value.Split('.')[1]);
+                version.patch = int.Parse(value.Split('.')[2]);
+            }
+            else if (Regex.IsMatch(value, @"[0-9]+\.[0-9]+"))
+            {
+                version.major = int.Parse(value.Split('.')[0]);
+                version.minor = int.Parse(value.Split('.')[1]);
+                version.patch = 0;
+            }
+            else
+            {
+                throw new TiledException($"Version string {value} is not a Major.Minor.Patch format");
+            }
+
+            return version;
         }
 
         private TiledProperty[] ParseProperties(XmlNodeList nodeList)

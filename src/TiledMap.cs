@@ -16,7 +16,6 @@ namespace TiledCS
         public TiledProperty[] Properties { get; set; }
         public TiledMapTileset[] Tilesets { get; set; }
         public TiledLayer[] Layers { get; set; }
-        public TiledObjectGroup[] ObjectGroups { get; set; }
         public Orientation Orientation { get; set; }
         public RenderOrder RenderOrder { get; set; }
         public int Width { get; set; }
@@ -74,8 +73,7 @@ namespace TiledCS
 
                 if (nodesProperty != null) Properties = ParseProperties(nodesProperty);
                 if (nodesTileset != null) Tilesets = ParseTilesets(nodesTileset);
-                if (nodesLayer != null) Layers = ParseLayers(nodesLayer);
-                if (nodesObjectGroup != null) ObjectGroups = ParseObjectGroups(nodesObjectGroup);
+                if (nodesLayer != null) Layers = ParseLayers(nodesLayer, nodesObjectGroup);
             }
             catch (Exception ex)
             {
@@ -164,11 +162,11 @@ namespace TiledCS
             return result.ToArray();
         }
 
-        private TiledLayer[] ParseLayers(XmlNodeList nodeList)
+        private TiledLayer[] ParseLayers(XmlNodeList nodeListLayers, XmlNodeList nodeListObjGroups)
         {
             var result = new List<TiledLayer>();
 
-            foreach (XmlNode node in nodeList)
+            foreach (XmlNode node in nodeListLayers)
             {
                 var nodeData = node.SelectSingleNode("data");
                 var encoding = nodeData.Attributes["encoding"].Value;
@@ -184,27 +182,24 @@ namespace TiledCS
                 tiledLayer.height = int.Parse(node.Attributes["height"].Value);
                 tiledLayer.width = int.Parse(node.Attributes["width"].Value);
                 tiledLayer.data = nodeData.InnerText.Replace("\n", "").Split(',').AsIntArray();
+                tiledLayer.type = "tilelayer";
+                tiledLayer.visible = true;
 
                 result.Add(tiledLayer);
             }
 
-            return result.ToArray();
-        }
-
-        private TiledObjectGroup[] ParseObjectGroups(XmlNodeList nodeList)
-        {
-            var result = new List<TiledObjectGroup>();
-
-            foreach (XmlNode node in nodeList)
+            foreach (XmlNode node in nodeListObjGroups)
             {
                 var nodesObject = node.SelectNodes("object");
-                
-                TiledObjectGroup group = new TiledObjectGroup();
-                group.id = int.Parse(node.Attributes["id"].Value);
-                group.name = node.Attributes["name"].Value;
-                group.objects = ParseObjects(nodesObject);
 
-                result.Add(group);
+                TiledLayer tiledLayer = new TiledLayer();
+                tiledLayer.id = int.Parse(node.Attributes["id"].Value);
+                tiledLayer.name = node.Attributes["name"].Value;
+                tiledLayer.objects = ParseObjects(nodesObject);
+                tiledLayer.type = "objectgroup";
+                tiledLayer.visible = true;
+
+                result.Add(tiledLayer);
             }
 
             return result.ToArray();
@@ -224,9 +219,16 @@ namespace TiledCS
                 obj.type = node.Attributes["type"]?.Value;
                 obj.x = int.Parse(node.Attributes["x"].Value);
                 obj.y = int.Parse(node.Attributes["y"].Value);
-                obj.width = int.Parse(node.Attributes["width"]?.Value);
-                obj.height = int.Parse(node.Attributes["height"]?.Value);
                 obj.properties = ParseProperties(nodesProperty);
+
+                if (node.Attributes["width"] != null)
+                {
+                    obj.width = int.Parse(node.Attributes["width"].Value);
+                }
+                if (node.Attributes["height"] != null)
+                {
+                    obj.height = int.Parse(node.Attributes["height"].Value);
+                }               
 
                 result.Add(obj);
             }
