@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace TiledSharp
+namespace TiledCS
 {
     public struct TiledVersion
     {

@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace TiledSharp
+namespace TiledCS
 {
     public static class Extensions
     {

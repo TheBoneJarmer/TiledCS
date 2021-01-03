@@ -1,6 +1,6 @@
 using System;
 
-namespace TiledSharp
+namespace TiledCS
 {
     public class TiledException : Exception
     {

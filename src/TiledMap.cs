@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
 
-namespace TiledSharp
+namespace TiledCS
 {
     public class TiledMap
     {
@@ -17,6 +17,8 @@ namespace TiledSharp
         public TiledMapTileset[] Tilesets { get; set; }
         public TiledLayer[] Layers { get; set; }
         public TiledObjectGroup[] ObjectGroups { get; set; }
+        public Orientation Orientation { get; set; }
+        public RenderOrder RenderOrder { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
         public int TileWidth { get; set; }
@@ -62,6 +64,8 @@ namespace TiledSharp
 
                 this.Version = ParseVersion(nodeMap.Attributes["version"].Value);
                 this.TiledVersion = ParseVersion(nodeMap.Attributes["tiledversion"].Value);
+                this.Orientation = ParseOrientation(nodeMap.Attributes["orientation"].Value);
+                this.RenderOrder = ParseRenderOrder(nodeMap.Attributes["renderorder"].Value);
 
                 this.Width = int.Parse(nodeMap.Attributes["width"].Value);
                 this.Height = int.Parse(nodeMap.Attributes["height"].Value);
@@ -77,6 +81,25 @@ namespace TiledSharp
             {
                 throw new TiledException("Unable to parse xml data, make sure the xml data represents a valid Tiled map", ex);
             }
+        }
+
+        private Orientation ParseOrientation(string value)
+        {
+            if (value == "orthogonal") return Orientation.Orthogonal;
+            if (value == "hexagonal") return Orientation.Hexagonal;
+            if (value == "isometric") return Orientation.Isometric;
+            if (value == "staggered") return Orientation.Staggered;
+
+            return Orientation.Unknown;
+        }
+        private RenderOrder ParseRenderOrder(string value)
+        {
+            if (value == "right-down") return RenderOrder.RightDown;
+            if (value == "right-up") return RenderOrder.RightUp;
+            if (value == "left-down") return RenderOrder.LeftDown;
+            if (value == "left-up") return RenderOrder.LeftUp;
+
+            return RenderOrder.Unknown;
         }
 
         private TiledVersion ParseVersion(string value)

@@ -1,11 +1,12 @@
-namespace TiledSharp
+namespace TiledCS
 {
     public enum Orientation
     {
         Orthogonal,
         Isometric,
         Staggered,
-        Hexagonal
+        Hexagonal,
+        Unknown
     }
 
     public enum RenderOrder
@@ -13,6 +14,7 @@ namespace TiledSharp
         RightDown,
         RightUp,
         LeftDown,
-        LeftUp
+        LeftUp,
+        Unknown
     }
 }
