@@ -19,6 +19,7 @@ namespace TiledSharp
     public struct TiledProperty
     {
         public string name;
+        public string type;
         public string value;
     }
 
@@ -48,5 +49,18 @@ namespace TiledSharp
         public int id;
         public string name;
         public List<TiledObject> objects;
+    }
+
+    public struct TiledTile
+    {
+        public int id;
+        public int[] terrain;
+        public TiledProperty[] properties;
+    }
+
+    public struct TiledTerrain
+    {
+        public string name;
+        public int tile;
     }
 }

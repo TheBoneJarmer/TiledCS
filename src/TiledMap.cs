@@ -46,11 +46,7 @@ namespace TiledSharp
 
             if (path.EndsWith(".tmx"))
             {
-                ParseTMX(content);
-            }
-            else if (path.EndsWith(".json"))
-            {
-                ParseJson(content);
+                Parse(content);
             }
             else
             {
@@ -58,12 +54,7 @@ namespace TiledSharp
             }
         }
 
-        private void ParseJson(string json)
-        {
-
-        }
-
-        private void ParseTMX(string xml)
+        private void Parse(string xml)
         {
             try
             {
@@ -136,7 +127,13 @@ namespace TiledSharp
 
                 TiledProperty property = new TiledProperty();
                 property.name = nodeProperty.Attributes["name"].Value;
-                property.value = nodeProperty.Attributes["value"].Value;
+                property.type = nodeProperty.Attributes["type"]?.Value;
+                property.value = nodeProperty.Attributes["value"]?.Value;
+
+                if (property.value == null && nodeProperty.InnerText != null)
+                {
+                    property.value = nodeProperty.InnerText;
+                }
 
                 Properties.Add(property);
             }
@@ -207,6 +204,7 @@ namespace TiledSharp
                         
                         TiledProperty property = new TiledProperty();
                         property.name = nodeProperty.Attributes["name"].Value;
+                        property.type = nodeProperty.Attributes["type"]?.Value;
                         property.value = nodeProperty.Attributes["value"]?.Value;
 
                         if (property.value == null && nodeProperty.InnerText != null)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Xml;
 
 namespace TiledSharp
@@ -12,30 +13,46 @@ namespace TiledSharp
         public int TileCount { get; set; }
         public int Columns { get; set; }
         public string ImageSource { get; set; }
-        public List<TiledTile> Tiles { get; set; }
-        public Dictionary<string, string> Properties { get; set; }
-
-        public TiledTileset()
+        public TiledTile[] Tiles { get; set; }
+        public TiledTerrain[] Terrains { get; set; }
+        public TiledProperty[] Properties { get; set; }
+        
+        public void Load(string path)
         {
-            Tiles = new List<TiledTile>();
-            Properties = new Dictionary<string, string>();
-        }
-        public TiledTileset(string xml) : this()
-        {
-            Parse(xml);
+            var content = "";
+
+            // Check the file
+            if (!File.Exists(path))
+            {
+                throw new TiledException($"{path} not found");
+            }
+            else
+            {
+                content = File.ReadAllText(path);
+            }
+
+            if (path.EndsWith(".tsx"))
+            {
+                Parse(content);
+            }
+            else
+            {
+                throw new TiledException("Unsupported file format");
+            }
         }
 
-        public void Parse(string xml)
+        private void Parse(string xml)
         {
             try
             {
-                XmlDocument document = new XmlDocument();
+                var document = new XmlDocument();
                 document.LoadXml(xml);
 
-                XmlNode nodeTileset = document.SelectSingleNode("tileset");
-                XmlNode nodeImage = nodeTileset.SelectSingleNode("image");
-                XmlNodeList nodesTile = nodeTileset.SelectNodes("tile");
-                XmlNodeList nodesProperty = nodeTileset.SelectNodes("properties/property");
+                var nodeTileset = document.SelectSingleNode("tileset");
+                var nodeImage = nodeTileset.SelectSingleNode("image");
+                var nodesTile = nodeTileset.SelectNodes("tile");
+                var nodesProperty = nodeTileset.SelectNodes("properties/property");
+                var nodesTerrain = nodeTileset.SelectNodes("terraintypes/terrain");
 
                 Name = nodeTileset.Attributes["name"].Value;
                 TileWidth = int.Parse(nodeTileset.Attributes["tilewidth"].Value);
@@ -44,36 +61,71 @@ namespace TiledSharp
                 Columns = int.Parse(nodeTileset.Attributes["columns"].Value);
                 ImageSource = nodeImage.Attributes["source"].Value;
 
-                foreach (XmlNode nodeTile in nodesTile)
-                {
-                    TiledTile tiledTile = new TiledTile();
-                    XmlNodeList nodeProperties = nodeTile.SelectNodes("properties/property");
-
-                    tiledTile.Id = int.Parse(nodeTile.Attributes["id"].Value);
-
-                    foreach (XmlNode nodeProperty in nodeProperties)
-                    {
-                        string propertyName = nodeProperty.Attributes["name"].Value;
-                        string propertyValue = nodeProperty.Attributes["value"].Value;
-
-                        tiledTile.Properties.Add(propertyName, propertyValue);
-                    }
-
-                    Tiles.Add(tiledTile);
-                }
-
-                foreach (XmlNode nodeProperty in nodesProperty)
-                {
-                    string propertyName = nodeProperty.Attributes["name"].Value;
-                    string propertyValue = nodeProperty.Attributes["value"].Value;
-
-                    Properties.Add(propertyName, propertyValue);
-                }
+                Tiles = ParseTiles(nodesTile);
+                Properties = ParseProperties(nodesProperty);
+                Terrains = ParseTerrains(nodesTerrain);
             }
             catch (Exception ex)
             {
                 throw new TiledException("Unable to parse xml data, make sure the xml data represents a valid Tiled tileset", ex);
             }
+        }
+
+        private TiledProperty[] ParseProperties(XmlNodeList nodeList)
+        {
+            var result = new List<TiledProperty>();
+
+            foreach (XmlNode node in nodeList)
+            {
+                var property = new TiledProperty();
+                property.name = node.Attributes["name"].Value;
+                property.type = node.Attributes["type"]?.Value;
+                property.value = node.Attributes["value"]?.Value;
+
+                if (property.value == null && node.InnerText != null)
+                {
+                    property.value = node.InnerText;
+                }
+
+                result.Add(property);
+            }
+
+            return result.ToArray();
+        }
+
+        private TiledTile[] ParseTiles(XmlNodeList nodeList)
+        {
+            var result = new List<TiledTile>();
+
+            foreach (XmlNode node in nodeList)
+            {
+                var nodesProperty = node.SelectNodes("properties/property");
+
+                var tile = new TiledTile();
+                tile.id = int.Parse(node.Attributes["id"].Value);
+                tile.terrain = node.Attributes["terrain"]?.Value.Split(',').AsIntArray();
+                tile.properties = ParseProperties(nodesProperty);
+
+                result.Add(tile);
+            }
+
+            return result.ToArray();
+        }
+
+        private TiledTerrain[] ParseTerrains(XmlNodeList nodeList)
+        {
+            var result = new List<TiledTerrain>();
+
+            foreach (XmlNode node in nodeList)
+            {
+                var terrain = new TiledTerrain();
+                terrain.name = node.Attributes["name"].Value;
+                terrain.tile = int.Parse(node.Attributes["tile"].Value);
+
+                result.Add(terrain);
+            }
+
+            return result.ToArray();
         }
     }
 }
