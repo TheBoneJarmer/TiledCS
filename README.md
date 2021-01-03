@@ -25,7 +25,7 @@ namespace TestApp
         tileset.Load("path-to-tileset.tsx");
            
         // For loading maps in JSON format
-        var json1 = File.ReadAllText("path-to-mapjson");
+        var json1 = File.ReadAllText("path-to-map.json");
         var json2 = File.ReadAllText("path-to-tileset.json");
         var map = JsonConvert.DeserializeObject<TiledMap>(json1);
         var tileset = JsonConvert.DeserializeObject<TiledTileset>(json2);
