@@ -11,13 +11,12 @@ namespace TiledCS
 {
     public class TiledMap
     {
-        public TiledVersion TiledVersion { get; set; }
-        public TiledVersion Version { get; set; }
+        public string TiledVersion { get; set; }
         public TiledProperty[] Properties { get; set; }
         public TiledMapTileset[] Tilesets { get; set; }
         public TiledLayer[] Layers { get; set; }
-        public Orientation Orientation { get; set; }
-        public RenderOrder RenderOrder { get; set; }
+        public string Orientation { get; set; }
+        public string RenderOrder { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
         public int TileWidth { get; set; }
@@ -61,10 +60,9 @@ namespace TiledCS
                 var nodesObjectGroup = nodeMap.SelectNodes("objectgroup");
                 var nodesTileset = nodeMap.SelectNodes("tileset");
 
-                this.Version = ParseVersion(nodeMap.Attributes["version"].Value);
-                this.TiledVersion = ParseVersion(nodeMap.Attributes["tiledversion"].Value);
-                this.Orientation = ParseOrientation(nodeMap.Attributes["orientation"].Value);
-                this.RenderOrder = ParseRenderOrder(nodeMap.Attributes["renderorder"].Value);
+                this.TiledVersion = nodeMap.Attributes["tiledversion"].Value;
+                this.Orientation = nodeMap.Attributes["orientation"].Value;
+                this.RenderOrder = nodeMap.Attributes["renderorder"].Value;
 
                 this.Width = int.Parse(nodeMap.Attributes["width"].Value);
                 this.Height = int.Parse(nodeMap.Attributes["height"].Value);
@@ -79,49 +77,6 @@ namespace TiledCS
             {
                 throw new TiledException("Unable to parse xml data, make sure the xml data represents a valid Tiled map", ex);
             }
-        }
-
-        private Orientation ParseOrientation(string value)
-        {
-            if (value == "orthogonal") return Orientation.Orthogonal;
-            if (value == "hexagonal") return Orientation.Hexagonal;
-            if (value == "isometric") return Orientation.Isometric;
-            if (value == "staggered") return Orientation.Staggered;
-
-            return Orientation.Unknown;
-        }
-        private RenderOrder ParseRenderOrder(string value)
-        {
-            if (value == "right-down") return RenderOrder.RightDown;
-            if (value == "right-up") return RenderOrder.RightUp;
-            if (value == "left-down") return RenderOrder.LeftDown;
-            if (value == "left-up") return RenderOrder.LeftUp;
-
-            return RenderOrder.Unknown;
-        }
-
-        private TiledVersion ParseVersion(string value)
-        {
-            TiledVersion version = new TiledVersion();
-
-            if (Regex.IsMatch(value, @"[0-9]+\.[0-9]+\.\[0-9]"))
-            {
-                version.major = int.Parse(value.Split('.')[0]);
-                version.minor = int.Parse(value.Split('.')[1]);
-                version.patch = int.Parse(value.Split('.')[2]);
-            }
-            else if (Regex.IsMatch(value, @"[0-9]+\.[0-9]+"))
-            {
-                version.major = int.Parse(value.Split('.')[0]);
-                version.minor = int.Parse(value.Split('.')[1]);
-                version.patch = 0;
-            }
-            else
-            {
-                throw new TiledException($"Version string {value} is not a Major.Minor.Patch format");
-            }
-
-            return version;
         }
 
         private TiledProperty[] ParseProperties(XmlNodeList nodeList)

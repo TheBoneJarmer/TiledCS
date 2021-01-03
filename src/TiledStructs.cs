@@ -3,13 +3,6 @@ using System.Collections.Generic;
 
 namespace TiledCS
 {
-    public struct TiledVersion
-    {
-        public int major;
-        public int minor;
-        public int patch;
-    }
-
     public struct TiledMapTileset
     {
         public int firstgid;
