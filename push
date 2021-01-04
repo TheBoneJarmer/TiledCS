@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Get data from git
+BRANCH="`git branch --show-current`"
+
+# Determine if to push and to where
+if [ $BRANCH = "main" ]
+then
+    echo "Pushing to nuget.org"
+	dotnet nuget push *.nupkg -s nuget.org 1> /dev/null
+	exit
+fi
+
+if [ $BRANCH = "develop" ]
+then
+    echo "Pushing to github"
+	dotnet nuget push *.nupkg -s github 1> /dev/null
+	exit 
+fi
+
+echo "Pushing package not allowed on branch $BRANCH"
+exit 1
