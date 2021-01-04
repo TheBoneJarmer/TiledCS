@@ -16,4 +16,5 @@ PACKAGE_AUTHORS="Ruben Labruyere"
 PACKAGE_REPO="$REPO"
 
 # Build the package
+rm *.nupkg &> /dev/null
 dotnet pack -c Release -o . /p:PackageId="$PACKAGE_ID" /p:Version="$PACKAGE_VERSION" /p:Description="$PACKAGE_DESCRIPTION" /p:Authors="$PACKAGE_AUTHORS" /p:RepositoryUrl="$PACKAGE_REPO" src/*.csproj 1> /dev/null
