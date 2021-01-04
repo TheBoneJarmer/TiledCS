@@ -12,7 +12,7 @@ then
     echo "Pushing to nuget.org"
 	git tag "tiled-$TILED_VERSION"
 	git push origin "tiled-$TILED_VERSION"
-	dotnet nuget push *.nupkg -s nuget.org 1> /dev/null
+	dotnet nuget push *.nupkg -s nuget.org -k $NUGET_API_KEY 1> /dev/null
 	exit
 fi
 
