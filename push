@@ -3,10 +3,15 @@
 # Get data from git
 BRANCH="`git branch --show-current`"
 
+# Get conf data
+TILED_VERSION="`cat conf/TILED_VERSION`"
+
 # Determine if to push and to where
 if [ $BRANCH = "main" ]
 then
     echo "Pushing to nuget.org"
+	git tag "tiled-$TILED_VERSION"
+	git push origin "tiled-$TILED_VERSION"
 	dotnet nuget push *.nupkg -s nuget.org 1> /dev/null
 	exit
 fi

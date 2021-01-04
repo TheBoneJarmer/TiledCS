@@ -30,6 +30,9 @@ namespace TestApp
 }
 ```
 
+## Version support
+If you want to know what package supports your version of Tiled, please read the package's description. The most recent package always supports the current Tiled version.
+
 ## Contribution
 Feel free to open up an issue with your question or request. If you do plan to make modifications to the code please open up an issue first with more details about what you'd like to change and why.
 
