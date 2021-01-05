@@ -1,21 +1,5 @@
 #!/bin/bash
 
-# Git
-REPO="`git remote get-url origin`"
-
-# Conf
-TILED_VERSION="`cat conf/TILED_VERSION`"
-VERSION="`cat conf/VERSION`"
-
-# Package metadata
-PACKAGE_ID="TiledCS"
-PACKAGE_VERSION="$VERSION"
-PACKAGE_TAGS="tiledcs,tiled,tmx,tsx"
-PACKAGE_DESCRIPTION="$PACKAGE_ID is a library for loading Tiled maps and tilesets. This version supports Tiled $TILED_VERSION"
-PACKAGE_AUTHORS="Ruben Labruyere"
-PACKAGE_REPO="$REPO"
-
-# Build the package
 rm *.nupkg &> /dev/null
-echo "Building package $PACKAGE_ID.$PACKAGE_VERSION.nuget"
-dotnet pack -c Release -o . /p:PackageId="$PACKAGE_ID" /p:Version="$PACKAGE_VERSION" /p:Description="$PACKAGE_DESCRIPTION" /p:Authors="$PACKAGE_AUTHORS" /p:RepositoryUrl="$PACKAGE_REPO" src/*.csproj 1> /dev/null
+echo "Building package"
+dotnet pack -c Release -o . src/*.csproj 1> /dev/null

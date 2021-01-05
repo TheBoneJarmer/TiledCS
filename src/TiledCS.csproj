@@ -1,6 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+      <Version>0.1.1</Version>
+      <Authors>Ruben Labruyere</Authors>
+      <Company>Ruben Labruyere</Company>
+      <PackageId>TiledCS</PackageId>
+      <Description>
+        TiledCS is a library for loading Tiled maps and tilesets. This version supports Tiled 1.4.3.
+      </Description>
+      <RepositoryUrl>https://github.com/thebonejarmer/tiledcs.git</RepositoryUrl>
+      <PackageTags>tiled,tmx,tsx</PackageTags>
+    </PropertyGroup>
+
+    <PropertyGroup>
       <TargetFramework>netstandard2.0</TargetFramework>
     </PropertyGroup>
 
