@@ -2,4 +2,4 @@
 
 rm *.nupkg &> /dev/null
 echo "Building package"
-dotnet pack -c Release -o . src/*.csproj 1> /dev/null
+dotnet pack -c Release -o . src/*.csproj
