@@ -7,14 +7,14 @@ BRANCH="`git branch --show-current`"
 if [ $BRANCH = "main" ]
 then
     echo "Pushing to nuget.org"
-	dotnet nuget push *.nupkg -s nuget.org -k $NUGET_API_KEY 1> /dev/null
+	dotnet nuget push *.nupkg -s nuget.org -k $NUGET_API_KEY
 	exit
 fi
 
 if [ $BRANCH = "develop" ]
 then
     echo "Pushing to github"
-	dotnet nuget push *.nupkg -s github 1> /dev/null
+	dotnet nuget push *.nupkg -s github
 	exit
 fi
 
