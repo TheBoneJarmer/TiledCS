@@ -130,6 +130,7 @@ namespace TiledCS
             {
                 var nodeData = node.SelectSingleNode("data");
                 var encoding = nodeData.Attributes["encoding"].Value;
+                var attrVisible = node.Attributes["visible"];
 
                 if (encoding != "csv")
                 {
@@ -143,7 +144,12 @@ namespace TiledCS
                 tiledLayer.width = int.Parse(node.Attributes["width"].Value);
                 tiledLayer.data = nodeData.InnerText.Replace("\n", "").Split(',').AsIntArray();
                 tiledLayer.type = "tilelayer";
-                tiledLayer.visible = node.Attributes["visible"].Value == "1" ? true : false;
+                tiledLayer.visible = true;
+
+                if (attrVisible != null)
+                {
+                    tiledLayer.visible = attrVisible.Value == "1" ? true : false;
+                }
 
                 result.Add(tiledLayer);
             }
