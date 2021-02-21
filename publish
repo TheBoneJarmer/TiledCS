@@ -1,0 +1,21 @@
+#!/bin/bash
+
+branch=`git branch --show-current`
+
+rm *.nupkg
+dotnet pack -c Release -o . ./src/*.csproj
+
+if [ $branch = "develop" ]
+then
+	dotnet nuget push -s github *.nupkg
+	exit
+fi
+
+if [ $branch = "main" ]
+then
+	dotnet nuget push -s nuget.org *.nupkg
+	exit
+fi
+
+echo "Can only publish on branch develop or main"
+exit 1

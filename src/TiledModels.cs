@@ -3,20 +3,20 @@ using System.Collections.Generic;
 
 namespace TiledCS
 {
-    public struct TiledMapTileset
+    public class TiledMapTileset
     {
         public int firstgid;
         public string source;
     }
 
-    public struct TiledProperty
+    public class TiledProperty
     {
         public string name;
         public string type;
         public string value;
     }
 
-    public struct TiledLayer
+    public class TiledLayer
     {
         public int id;
         public string name;
@@ -28,7 +28,7 @@ namespace TiledCS
         public TiledObject[] objects;
     }
 
-    public struct TiledObject
+    public class TiledObject
     {
         public int id;
         public string name;
@@ -41,14 +41,21 @@ namespace TiledCS
         public TiledProperty[] properties;
     }
 
-    public struct TiledTile
+    public class TiledTile
     {
         public int id;
         public int[] terrain;
         public TiledProperty[] properties;
+        public TiledTileAnimation[] animation;
     }
 
-    public struct TiledTerrain
+    public class TiledTileAnimation
+    {
+        public int tileid;
+        public int duration;
+    }
+
+    public class TiledTerrain
     {
         public string name;
         public int tile;

@@ -95,6 +95,22 @@ namespace TiledCS
             }
         }
 
+        private TiledTileAnimation[] ParseAnimations(XmlNodeList nodeList)
+        {
+            var result = new List<TiledTileAnimation>();
+
+            foreach (XmlNode node in nodeList)
+            {
+                var animation = new TiledTileAnimation();
+                animation.tileid = int.Parse(node.Attributes["tileid"].Value);
+                animation.duration = int.Parse(node.Attributes["duration"].Value);
+                
+                result.Add(animation);
+            }
+            
+            return result.ToArray();
+        }
+
         private TiledProperty[] ParseProperties(XmlNodeList nodeList)
         {
             var result = new List<TiledProperty>();
@@ -124,11 +140,13 @@ namespace TiledCS
             foreach (XmlNode node in nodeList)
             {
                 var nodesProperty = node.SelectNodes("properties/property");
+                var nodesAnimation = node.SelectNodes("animation/frame");
 
                 var tile = new TiledTile();
                 tile.id = int.Parse(node.Attributes["id"].Value);
                 tile.terrain = node.Attributes["terrain"]?.Value.Split(',').AsIntArray();
                 tile.properties = ParseProperties(nodesProperty);
+                tile.animation = ParseAnimations(nodesAnimation);
 
                 result.Add(tile);
             }
