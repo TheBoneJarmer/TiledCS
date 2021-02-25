@@ -183,17 +183,17 @@ namespace TiledCS
                 obj.id = int.Parse(node.Attributes["id"].Value);
                 obj.name = node.Attributes["name"]?.Value;
                 obj.type = node.Attributes["type"]?.Value;
-                obj.x = int.Parse(node.Attributes["x"].Value);
-                obj.y = int.Parse(node.Attributes["y"].Value);
+                obj.x = float.Parse(node.Attributes["x"].Value);
+                obj.y = float.Parse(node.Attributes["y"].Value);
                 obj.properties = ParseProperties(nodesProperty);
 
                 if (node.Attributes["width"] != null)
                 {
-                    obj.width = int.Parse(node.Attributes["width"].Value);
+                    obj.width = float.Parse(node.Attributes["width"].Value);
                 }
                 if (node.Attributes["height"] != null)
                 {
-                    obj.height = int.Parse(node.Attributes["height"].Value);
+                    obj.height = float.Parse(node.Attributes["height"].Value);
                 }               
 
                 result.Add(obj);

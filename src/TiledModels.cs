@@ -33,11 +33,11 @@ namespace TiledCS
         public int id;
         public string name;
         public string type;
-        public int x;
-        public int y;
+        public float x;
+        public float y;
         public int rotation;
-        public int width;
-        public int height;
+        public float width;
+        public float height;
         public TiledProperty[] properties;
     }
 
