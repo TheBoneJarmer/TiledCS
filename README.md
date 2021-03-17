@@ -7,6 +7,8 @@ dotnet add package tiledcs
 ```
 
 ## Usage
+TiledCS has been created with as mindset being as comfortable and easy to use as possible. The structure of the classes and properties are similar to the JSON map format and can therefore be deserialized like that.
+
 ```csharp
 using System;
 using System.IO;
@@ -26,6 +28,17 @@ namespace TestApp
         var json2 = File.ReadAllText("path-to-tileset.json");
         var map = JsonConvert.DeserializeObject<TiledMap>(json1);
         var tileset = JsonConvert.DeserializeObject<TiledTileset>(json2);
+        
+        // Retrieving objects or layers can be done using Linq or a for loop
+        var myLayer = map.layers.First(l => l.name == "monsters");
+        var myObj = myLayer.objects.First(o => o.name == "monster");
+        
+        // Since they are classes and not structs, you can do null checks to figure out if an object exists or not
+        if (myObj != null)
+        {
+        	var xx = myObj.x * 16;
+        	var yy = myObj.y * 16;
+        }
     }
 }
 ```
