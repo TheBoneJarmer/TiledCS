@@ -1,5 +1,5 @@
 # TiledCS
-TiledCS is a dotnet library for loading Tiled maps and tilesets. It supports both XML as JSON map formats. The library has no 3rd-party dependencies except for Newtonsoft.Json. This way the library can be used with popular game engines like Unity3D, MonoGame and Godot.
+TiledCS is a dotnet library for loading Tiled maps and tilesets. It supports both XML as JSON map formats. The library requires no 3rd-party dependencies except for Newtonsoft.Json or another JSON parsing library. This way the library can be used with popular game engines like Unity3D, MonoGame and Godot.
 
 ## Installation
 ```
