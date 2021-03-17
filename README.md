@@ -36,8 +36,8 @@ namespace TestApp
         // Since they are classes and not structs, you can do null checks to figure out if an object exists or not
         if (myObj != null)
         {
-        	var xx = myObj.x * 16;
-        	var yy = myObj.y * 16;
+            var xx = myObj.x * 16;
+            var yy = myObj.y * 16;
         }
     }
 }
