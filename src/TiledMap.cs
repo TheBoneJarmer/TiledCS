@@ -1,32 +1,69 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Xml;
 
 namespace TiledCS
 {
+    /// <summary>
+    /// Represents a Tiled map
+    /// </summary>
     public class TiledMap
     {
+        /// <summary>
+        /// Returns the Tiled version used to create this map
+        /// </summary>
         public string TiledVersion { get; set; }
+        /// <summary>
+        /// Returns an array of properties defined in the map
+        /// </summary>
         public TiledProperty[] Properties { get; set; }
+        /// <summary>
+        /// Returns an array of tileset definitions in the map
+        /// </summary>
         public TiledMapTileset[] Tilesets { get; set; }
+        /// <summary>
+        /// Returns an array of layers or null if none were defined
+        /// </summary>
         public TiledLayer[] Layers { get; set; }
+        /// <summary>
+        /// Returns the defined map orientation as a string
+        /// </summary>
         public string Orientation { get; set; }
+        /// <summary>
+        /// Returns the render order as a string
+        /// </summary>
         public string RenderOrder { get; set; }
+        /// <summary>
+        /// The amount of horizontal tiles
+        /// </summary>
         public int Width { get; set; }
+        /// <summary>
+        /// The amount of vertical tiles
+        /// </summary>
         public int Height { get; set; }
+        /// <summary>
+        /// The tile width in pixels
+        /// </summary>
         public int TileWidth { get; set; }
+        /// <summary>
+        /// The tile height in pixels
+        /// </summary>
         public int TileHeight { get; set; }
 
+        /// <summary>
+        /// Returns an empty instance of TiledMap
+        /// </summary>
         public TiledMap()
         {
 
         }
 
+        /// <summary>
+        /// Loads a Tiled map in TMX format and parses it
+        /// </summary>
+        /// <param name="path">The path to the tmx file</param>
+        /// <exception cref="TiledException">Thrown when the map could not be loaded or is not in a correct format</exception>
         public TiledMap(string path)
         {
             var content = "";
@@ -148,7 +185,7 @@ namespace TiledCS
 
                 if (attrVisible != null)
                 {
-                    tiledLayer.visible = attrVisible.Value == "1" ? true : false;
+                    tiledLayer.visible = attrVisible.Value == "1";
                 }
 
                 result.Add(tiledLayer);
@@ -185,21 +222,145 @@ namespace TiledCS
                 obj.type = node.Attributes["type"]?.Value;
                 obj.x = float.Parse(node.Attributes["x"].Value);
                 obj.y = float.Parse(node.Attributes["y"].Value);
-                obj.properties = ParseProperties(nodesProperty);
+
+                if (nodesProperty != null)
+                {
+                    obj.properties = ParseProperties(nodesProperty);
+                }
 
                 if (node.Attributes["width"] != null)
                 {
                     obj.width = float.Parse(node.Attributes["width"].Value);
                 }
+                
                 if (node.Attributes["height"] != null)
                 {
                     obj.height = float.Parse(node.Attributes["height"].Value);
-                }               
+                }
 
+                if (node.Attributes["rotation"] != null)
+                {
+                    obj.rotation = int.Parse(node.Attributes["rotation"].Value);
+                }
+                
                 result.Add(obj);
             }
 
             return result.ToArray();
+        }
+        
+        /* HELPER METHODS */
+        /// <summary>
+        /// Locates the right TiledMapTileset object for you within the Tilesets array
+        /// </summary>
+        /// <param name="gid">A value from the TiledLayer.data array</param>
+        /// <returns>An element within the Tilesets array or null if no match was found</returns>
+        public TiledMapTileset GetTiledMapTileset(int gid)
+        {
+            if (Tilesets == null)
+            {
+                return null;
+            }
+            
+            for (var i = 0; i < Tilesets.Length; i++)
+            {
+                if (i < Tilesets.Length - 1)
+                {
+                    int gid1 = Tilesets[i + 0].firstgid;
+                    int gid2 = Tilesets[i + 1].firstgid;
+
+                    if (gid >= gid1 && gid < gid2)
+                    {
+                        return Tilesets[i];
+                    }
+                }
+                else
+                {
+                    return Tilesets[i];
+                }
+            }
+
+            return new TiledMapTileset();
+        }
+        /// <summary>
+        /// Loads external tilesets and matches them to firstGids from elements within the Tilesets array
+        /// </summary>
+        /// <param name="src">The folder where the TiledMap file is located</param>
+        /// <returns>A dictionary where the key represents the firstGid of the associated TiledMapTileset and the value the TiledTileset object</returns>
+        public Dictionary<int, TiledTileset> GetTiledTilesets(string src)
+        {
+            var tilesets = new Dictionary<int, TiledTileset>();
+            var info = new FileInfo(src);
+            var srcFolder = info.Directory;
+
+            if (Tilesets == null)
+            {
+                return tilesets;
+            }
+
+            foreach (var mapTileset in Tilesets)
+            {
+                var path = $"{srcFolder}/{mapTileset.source}";
+
+                if (File.Exists(path))
+                {
+                    tilesets.Add(mapTileset.firstgid, new TiledTileset(path));
+                }
+            }
+
+            return tilesets;
+        }
+        /// <summary>
+        /// Locates a specific TiledTile object
+        /// </summary>
+        /// <param name="mapTileset">An element within the Tilesets array</param>
+        /// <param name="tileset">An instance of the TiledTileset class</param>
+        /// <param name="gid">An element from within a TiledLayer.data array</param>
+        /// <returns></returns>
+        /// <remarks>Tip: Use the GetTiledMapTileset and GetTiledTilesets methods for retrieving the correct TiledMapTileset and TiledTileset objects</remarks>
+        public TiledTile GetTiledTile(TiledMapTileset mapTileset, TiledTileset tileset, int gid)
+        {
+            foreach (var tile in tileset.Tiles)
+            {
+                if (tile.id == gid - mapTileset.firstgid)
+                {
+                    return tile;
+                }
+            }
+
+            return null;
+        }
+        /// <summary>
+        /// This method can be used to figure out the x and y position on a Tileset image for rendering tiles. 
+        /// </summary>
+        /// <param name="mapTileset">An element of the Tilesets array</param>
+        /// <param name="tileset">An instance of the TiledTileset class</param>
+        /// <param name="gid">An element within a TiledLayer.data array</param>
+        /// <returns>An int array of length 2 containing the x and y position. Returns null if the gid was not found</returns>
+        /// <remarks>This method currently doesn't take margin into account</remarks>
+        public int[] GetSourceVector(TiledMapTileset mapTileset, TiledTileset tileset, int gid)
+        {
+            var x = 0;
+            var y = 0;
+
+            for (var i = 0; i < tileset.TileCount; i++)
+            {
+                if (i == gid - mapTileset.firstgid)
+                {
+                    return new[] {x, y};
+                }
+
+                // Update x and y position
+                x++;
+
+                if (x == tileset.ImageWidth / tileset.TileWidth)
+                {
+                    x = 0;
+                    y++;
+                }
+            }
+
+            return null;
         }
     }
 }

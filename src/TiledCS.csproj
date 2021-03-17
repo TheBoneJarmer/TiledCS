@@ -10,6 +10,7 @@
       </Description>
       <RepositoryUrl>https://github.com/thebonejarmer/tiledcs.git</RepositoryUrl>
       <PackageTags>tiled,tmx,tsx</PackageTags>
+      <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <PropertyGroup>

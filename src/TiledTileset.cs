@@ -1,33 +1,86 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Xml;
 
 namespace TiledCS
 {
+    /// <summary>
+    /// Represents a Tiled tileset
+    /// </summary>
     public class TiledTileset
     {
+        /// <summary>
+        /// The Tiled version used to create this tileset
+        /// </summary>
         public string TiledVersion { get; set; }
+        /// <summary>
+        /// The tileset name
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// The tile width in pixels
+        /// </summary>
         public int TileWidth { get; set; }
+        /// <summary>
+        /// The tile height in pixels
+        /// </summary>
         public int TileHeight { get; set; }
+        /// <summary>
+        /// The total amount of tiles
+        /// </summary>
         public int TileCount { get; set; }
+        /// <summary>
+        /// The amount of horizontal tiles
+        /// </summary>
         public int Columns { get; set; }
+        /// <summary>
+        /// The file path to the image used for this tileset
+        /// </summary>
         public string Image { get; set; }
+        /// <summary>
+        /// The image width in pixels
+        /// </summary>
         public int ImageWidth { get; set; }
+        /// <summary>
+        /// The image height in pixels
+        /// </summary>
         public int ImageHeight { get; set; }
+        /// <summary>
+        /// The amount of spacing between the tiles in pixels
+        /// </summary>
         public int Spacing { get; set; }
+        /// <summary>
+        /// The amount of margin between the tiles in pixels
+        /// </summary>
         public int Margin { get; set; }
+        /// <summary>
+        /// An array of tile definitions
+        /// </summary>
+        /// <remarks>Not all tiles within a tileset have definitions. Only those with properties, animations, terrains, ...</remarks>
         public TiledTile[] Tiles { get; set; }
+        /// <summary>
+        /// An array of terrain definitions
+        /// </summary>
         public TiledTerrain[] Terrains { get; set; }
+        /// <summary>
+        /// An array of tileset properties
+        /// </summary>
         public TiledProperty[] Properties { get; set; }
 
+        /// <summary>
+        /// Returns an empty instance of TiledTileset
+        /// </summary>
         public TiledTileset()
         {
 
         }
 
+        /// <summary>
+        /// Loads a tileset in TSX format and parses it
+        /// </summary>
+        /// <param name="path">The file path of the TSX file</param>
+        /// <exception cref="TiledException">Thrown when the file could not be found or parsed</exception>
         public TiledTileset(string path)
         {
             var content = "";
