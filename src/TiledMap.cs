@@ -179,7 +179,7 @@ namespace TiledCS
                 tiledLayer.name = node.Attributes["name"].Value;
                 tiledLayer.height = int.Parse(node.Attributes["height"].Value);
                 tiledLayer.width = int.Parse(node.Attributes["width"].Value);
-                tiledLayer.data = nodeData.InnerText.Replace("\n", "").Split(',').AsIntArray();
+                tiledLayer.ReadGids(nodeData.InnerText);
                 tiledLayer.type = "tilelayer";
                 tiledLayer.visible = true;
 
