@@ -17,27 +17,30 @@ using TiledCS;
 
 namespace TestApp
 {
-    public class Program(string[] args)
+    public class Program
     {
-        // For loading maps in XML format
-        var map = new TiledMap("path-to-map.tmx");        
-        var tileset = new TiledTileset("path-to-tileset.tsx");
-           
-        // For loading maps in JSON format
-        var json1 = File.ReadAllText("path-to-map.json");
-        var json2 = File.ReadAllText("path-to-tileset.json");
-        var map = JsonConvert.DeserializeObject<TiledMap>(json1);
-        var tileset = JsonConvert.DeserializeObject<TiledTileset>(json2);
-        
-        // Retrieving objects or layers can be done using Linq or a for loop
-        var myLayer = map.layers.First(l => l.name == "monsters");
-        var myObj = myLayer.objects.First(o => o.name == "monster");
-        
-        // Since they are classes and not structs, you can do null checks to figure out if an object exists or not
-        if (myObj != null)
+        private static void Main(string[] args)
         {
-            var xx = myObj.x * 16;
-            var yy = myObj.y * 16;
+            // For loading maps in XML format
+            var map = new TiledMap("path-to-map.tmx");        
+            var tileset = new TiledTileset("path-to-tileset.tsx");
+            
+            // For loading maps in JSON format
+            var json1 = File.ReadAllText("path-to-map.json");
+            var json2 = File.ReadAllText("path-to-tileset.json");
+            var map = JsonConvert.DeserializeObject<TiledMap>(json1);
+            var tileset = JsonConvert.DeserializeObject<TiledTileset>(json2);
+            
+            // Retrieving objects or layers can be done using Linq or a for loop
+            var myLayer = map.layers.First(l => l.name == "monsters");
+            var myObj = myLayer.objects.First(o => o.name == "monster");
+            
+            // Since they are classes and not structs, you can do null checks to figure out if an object exists or not
+            if (myObj != null)
+            {
+                var xx = myObj.x * 16;
+                var yy = myObj.y * 16;
+            }
         }
     }
 }
