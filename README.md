@@ -52,7 +52,7 @@ If you are using MonoGame and you would like to import Tiled maps and tilesets I
 If you want to know what package supports your version of Tiled, please read the package's description. The most recent package always supports the current Tiled version.
 
 ## Contribution
-Feel free to open up an issue with your question or request. If you do plan to make modifications to the code please open up an issue first with more details about what you'd like to change and why.
+Feel free to open up an issue with your question or request. If you do plan to make modifications to the code please open up an issue first with more details about what you'd like to change and why. If you open a pull request, please target the **develop** branch. I follow the [GitFlow branching model](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow).
 
 ## Credits
 A huge thanks to DelightedCat who created a MonoGame pipeline. Although the pipeline isn't officially included in this library (as we both agreed to keep it standalone and not engine-based), you can ask help and questions here as DelightedCat is an official maintainer.
