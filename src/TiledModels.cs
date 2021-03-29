@@ -68,9 +68,69 @@ namespace TiledCS
         /// </summary>
         public int[] data;
         /// <summary>
+        /// A parallel array to data which stores the rotation flags of the tile.
+        /// Bit 3 is is horizontal flip,
+        /// bit 2 is vertical flip, and
+        /// bit 1 is (anti) diagonal flip.
+        /// Is null when the layer is not a tilelayer.
+        /// </summary>
+        public byte[] dataRotationFlags;
+        /// <summary>
         /// The list of objects in case of an objectgroup layer. Is null when the layer has no objects.
         /// </summary>
         public TiledObject[] objects;
+
+        const uint FLIPPED_HORIZONTALLY_FLAG = 0b10000000000000000000000000000000;
+        const uint FLIPPED_VERTICALLY_FLAG   = 0b01000000000000000000000000000000;
+        const uint FLIPPED_DIAGONALLY_FLAG   = 0b00100000000000000000000000000000;
+        /// <summary>
+        /// How many times we shift the FLIPPED flags to the right in order to store it in a byte.
+        /// For example: 0b10100000000000000000000000000000 >> SHIFT_FLIP_FLAG_TO_BYTE = 0b00000101
+        /// </summary>
+        const int SHIFT_FLIP_FLAG_TO_BYTE = 29;
+        /// <summary>
+        /// Reads the data from the comma separated values into data and rotationFlags.
+        /// </summary>
+        public void ReadGids(string csvText)
+        {
+            string[] csvs = csvText.Split(',');
+            data = new int[csvs.Length];
+            dataRotationFlags = new byte[csvs.Length];
+
+            for (int i = 0; i < csvs.Length; i++)
+            {
+                uint rawID = uint.Parse(csvs[i]);
+                uint hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
+                uint ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
+                uint dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
+                dataRotationFlags[i] = (byte)((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE);
+
+                // assign data to rawID with the rotation flags cleared
+                data[i] = (int)(rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG));
+            }
+        }
+
+        private void _GetTileRotation(int dataIndex, out bool horizontal, out bool vertical, out bool diagonal)
+        {
+            horizontal = (dataRotationFlags[dataIndex] & (FLIPPED_HORIZONTALLY_FLAG >> SHIFT_FLIP_FLAG_TO_BYTE)) > 0;
+            vertical = (dataRotationFlags[dataIndex] & (FLIPPED_VERTICALLY_FLAG >> SHIFT_FLIP_FLAG_TO_BYTE)) > 0;
+            diagonal = (dataRotationFlags[dataIndex] & (FLIPPED_DIAGONALLY_FLAG >> SHIFT_FLIP_FLAG_TO_BYTE)) > 0;
+        }
+
+        /// <summary>
+        /// Retrieves the rotations of a tile at the given index.
+        /// </summary>
+        public void GetTileRotation(int dataIndex, out bool horizontal, out bool vertical, out bool diagonal) {
+            _GetTileRotation(dataIndex, out horizontal, out vertical, out diagonal);
+        }
+
+        /// <summary>
+        /// Retrieves the rotations of a tile at the given x and y coordinates.
+        /// </summary>
+        public void GetTileRotation(int x, int y, out bool horizontal, out bool vertical, out bool diagonal) {
+            int dataIndex = x + (y * width);
+            _GetTileRotation(dataIndex, out horizontal, out vertical, out diagonal);
+        }
     }
 
     /// <summary>
