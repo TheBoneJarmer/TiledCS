@@ -28,8 +28,8 @@ namespace TestApp
             // For loading maps in JSON format
             var json1 = File.ReadAllText("path-to-map.json");
             var json2 = File.ReadAllText("path-to-tileset.json");
-            var map = JsonConvert.DeserializeObject<TiledMap>(json1);
-            var tileset = JsonConvert.DeserializeObject<TiledTileset>(json2);
+            var mapJson = JsonConvert.DeserializeObject<TiledMap>(json1);
+            var tilesetJson = JsonConvert.DeserializeObject<TiledTileset>(json2);
             
             // Retrieving objects or layers can be done using Linq or a for loop
             var myLayer = map.layers.First(l => l.name == "monsters");
@@ -41,6 +41,17 @@ namespace TestApp
                 var xx = myObj.x * 16;
                 var yy = myObj.y * 16;
             }
+            
+            // You can use the helper methods to get useful information to generate maps
+            if (map.IsTileFlippedHorizontal(myLayer, 3, 5))
+            {
+                // Do something
+            }
+            
+            var mapTileset = map.Tilesets.First();
+            
+            // Used for retrieving the tile horizontal and vertical position of the source rect of the tileset image which you can use to draw tiles with. This way you won't have to manually figure that one out yourself.
+            var srcVector = map.GetSourceVector(mapTileset, tileset, 478);
         }
     }
 }
