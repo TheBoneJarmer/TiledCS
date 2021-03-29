@@ -1,7 +1,7 @@
 ﻿$branch = git branch --show-current;
 
 Remove-Item *.nupkg
-dotnet pack -c Release -o . ./src/*.csproj
+dotnet pack -c Release -o . ./src/TiledCS.csproj
 
 if ($branch -eq "develop")
 {
