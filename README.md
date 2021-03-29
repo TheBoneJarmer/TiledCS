@@ -61,7 +61,8 @@ If you want to know what package supports your version of Tiled, please read the
 Feel free to open up an issue with your question or request. If you do plan to make modifications to the code please open up an issue first with more details about what you'd like to change and why. If you open a pull request, please target the **develop** branch. I follow the [GitFlow branching model](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow).
 
 ## Credits
-A huge thanks to DelightedCat who created a MonoGame pipeline. Although the pipeline isn't officially included in this library (as we both agreed to keep it standalone and not engine-based), you can ask help and questions here as DelightedCat is an official maintainer.
+* A huge thanks to @DelightedCat who created a MonoGame pipeline. Although the pipeline isn't officially included in this library (as we both agreed to keep it standalone and not engine-based), you can ask help and questions here as DelightedCat is an official maintainer.
+* A very respectful thank you to user @Goodlyay who introduced support for tile rotations aka flipped tiles and taught me about bitwise operators in C#.
 
 ## License
 [MIT](LICENSE)
