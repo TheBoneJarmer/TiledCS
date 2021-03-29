@@ -51,6 +51,9 @@ namespace TestApp
 
 If you are using MonoGame and you would like to import Tiled maps and tilesets I recommend taking a look at [DelightedCat's example project](https://github.com/DelightedCat/TiledCS.MonoGame). He created a custom pipeline which allows the import of Tiled maps and tilesets.
 
+## Building
+You need the latest stable dotnet sdk to compile TiledCS as it makes use of modern C# features that may or may not be included in earlier versions.
+
 ## Version support
 If you want to know what package supports your version of Tiled, please read the package's description. The most recent package always supports the current Tiled version.
 
