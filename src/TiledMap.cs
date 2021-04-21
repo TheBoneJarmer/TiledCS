@@ -363,6 +363,7 @@ namespace TiledCS
         /// <param name="gid">An element within a TiledLayer.data array</param>
         /// <returns>An int array of length 2 containing the x and y position of the source rect of the tileset image. Multiply the values by the tile width and height in pixels to get the actual x and y position. Returns null if the gid was not found</returns>
         /// <remarks>This method currently doesn't take margin into account</remarks>
+        [Obsolete("Please use GetSourceRect instead because with future versions of Tiled this method may no longer be sufficient")]
         public int[] GetSourceVector(TiledMapTileset mapTileset, TiledTileset tileset, int gid)
         {
             var tileHor = 0;
@@ -373,6 +374,44 @@ namespace TiledCS
                 if (i == gid - mapTileset.firstgid)
                 {
                     return new[] {tileHor, tileVert};
+                }
+
+                // Update x and y position
+                tileHor++;
+
+                if (tileHor == tileset.ImageWidth / tileset.TileWidth)
+                {
+                    tileHor = 0;
+                    tileVert++;
+                }
+            }
+
+            return null;
+        }
+        
+        /// <summary>
+        /// This method can be used to figure out the source rect on a Tileset image for rendering tiles.
+        /// </summary>
+        /// <param name="mapTileset"></param>
+        /// <param name="tileset"></param>
+        /// <param name="gid"></param>
+        /// <returns>An instance of the class TiledSourceRect that represents a rectangle. Returns null if the provided gid was not found within the tileset.</returns>
+        public TiledSourceRect GetSourceRect(TiledMapTileset mapTileset, TiledTileset tileset, int gid)
+        {
+            var tileHor = 0;
+            var tileVert = 0;
+
+            for (var i = 0; i < tileset.TileCount; i++)
+            {
+                if (i == gid - mapTileset.firstgid)
+                {
+                    var result = new TiledSourceRect();
+                    result.x = tileHor * tileset.TileWidth;
+                    result.y = tileVert * tileset.TileHeight;
+                    result.width = tileset.TileWidth;
+                    result.height = tileset.TileHeight;
+
+                    return result;
                 }
 
                 // Update x and y position
