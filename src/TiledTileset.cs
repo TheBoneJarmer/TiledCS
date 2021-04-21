@@ -134,9 +134,12 @@ namespace TiledCS
                     Spacing = int.Parse(nodeTileset.Attributes["spacing"].Value);
                 }
 
-                Image = nodeImage.Attributes["source"].Value;
-                ImageWidth = int.Parse(nodeImage.Attributes["width"].Value);
-                ImageHeight = int.Parse(nodeImage.Attributes["height"].Value);
+                if (nodeImage != null)
+                {
+                    Image = nodeImage.Attributes["source"].Value;
+                    ImageWidth = int.Parse(nodeImage.Attributes["width"].Value);
+                    ImageHeight = int.Parse(nodeImage.Attributes["height"].Value);
+                }
 
                 Tiles = ParseTiles(nodesTile);
                 Properties = ParseProperties(nodesProperty);
@@ -194,12 +197,23 @@ namespace TiledCS
             {
                 var nodesProperty = node.SelectNodes("properties/property");
                 var nodesAnimation = node.SelectNodes("animation/frame");
+                var nodeImage = node.SelectSingleNode("image");
 
                 var tile = new TiledTile();
                 tile.id = int.Parse(node.Attributes["id"].Value);
                 tile.terrain = node.Attributes["terrain"]?.Value.Split(',').AsIntArray();
                 tile.properties = ParseProperties(nodesProperty);
                 tile.animation = ParseAnimations(nodesAnimation);
+
+                if (nodeImage != null)
+                {
+                    var tileImage = new TiledTileImage();
+                    tileImage.width = int.Parse(nodeImage.Attributes["width"].Value);
+                    tileImage.height = int.Parse(nodeImage.Attributes["height"].Value);
+                    tileImage.source = nodeImage.Attributes["source"].Value;
+
+                    tile.image = tileImage;
+                }
 
                 result.Add(tile);
             }

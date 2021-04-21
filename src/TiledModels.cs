@@ -147,6 +147,31 @@ namespace TiledCS
         /// An array of tile animations. Is null if none were defined. 
         /// </summary>
         public TiledTileAnimation[] animation;
+        /// <summary>
+        /// The individual tile image
+        /// </summary>
+        public TiledTileImage image;
+    }
+
+    /// <summary>
+    /// Represents an image within a tile
+    /// </summary>
+    public class TiledTileImage
+    {
+        /// <summary>
+        /// The image width
+        /// </summary>
+        public int width;
+        
+        /// <summary>
+        /// The image height
+        /// </summary>
+        public int height;
+        
+        /// <summary>
+        /// The image source path
+        /// </summary>
+        public string source;
     }
 
     /// <summary>
