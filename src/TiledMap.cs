@@ -90,7 +90,7 @@ namespace TiledCS
 
             if (path.EndsWith(".tmx"))
             {
-                Parse(content);
+                ParseXml(content);
             }
             else
             {
@@ -98,7 +98,12 @@ namespace TiledCS
             }
         }
 
-        private void Parse(string xml)
+        /// <summary>
+        /// Can be used to parse the content of a TMX map manually instead of loading it using the constructor
+        /// </summary>
+        /// <param name="xml">The tmx file content as string</param>
+        /// <exception cref="TiledException"></exception>
+        public void ParseXml(string xml)
         {
             try
             {
