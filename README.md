@@ -60,7 +60,7 @@ namespace TestApp
 ### MonoGame
 > **Note! The MonoGame content pipeline only supports loading maps in TMX and TSX format**
 
-If you are using MonoGame and you would like to import Tiled maps and tilesets I recommend taking a look at [DelightedCat's example project](https://github.com/DelightedCat/TiledCS.MonoGame). He created a custom pipeline which allows the import of Tiled maps and tilesets.
+If you are using MonoGame and you would like to import Tiled maps and tilesets I recommend taking a look at [DelightedCat's extension project](https://github.com/DelightedCat/TiledCS.Extensions.MonoGame). He created a custom pipeline which allows the import of Tiled maps and tilesets.
 
 ## Building
 You need the latest stable dotnet sdk to compile TiledCS as it makes use of modern C# features that may or may not be included in earlier versions.
