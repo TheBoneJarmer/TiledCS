@@ -247,12 +247,14 @@ namespace TiledCS
                             // Should an external library be used instead of this hack?
                             base64DataStream.ReadByte();
                             base64DataStream.ReadByte();
+                            
                             using (var decompressionStream = new DeflateStream(base64DataStream, CompressionMode.Decompress))
                             {
                                 // Parse the raw decompressed bytes and update the inner data as well as the data rotation flags
                                 var decompressedDataBuffer = new byte[4]; // size of each tile
                                 var dataRotationFlagsList = new List<byte>();
                                 var layerDataList = new List<int>();
+                                
                                 while (decompressionStream.Read(decompressedDataBuffer, 0, decompressedDataBuffer.Length) == decompressedDataBuffer.Length)
                                 {
                                     var rawID = BitConverter.ToUInt32(decompressedDataBuffer, 0);
@@ -277,12 +279,14 @@ namespace TiledCS
                                 var decompressedDataBuffer = new byte[4]; // size of each tile
                                 var dataRotationFlagsList = new List<byte>();
                                 var layerDataList = new List<int>();
+                                
                                 while (decompressionStream.Read(decompressedDataBuffer, 0, decompressedDataBuffer.Length) == decompressedDataBuffer.Length)
                                 {
                                     var rawID = BitConverter.ToUInt32(decompressedDataBuffer, 0);
                                     var hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
                                     var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
                                     var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
+                                    
                                     dataRotationFlagsList.Add((byte)((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE));
 
                                     // assign data to rawID with the rotation flags cleared
