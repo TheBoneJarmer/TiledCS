@@ -192,7 +192,11 @@ namespace TiledCS
                 tiledLayer.height = int.Parse(node.Attributes["height"].Value);
                 tiledLayer.width = int.Parse(node.Attributes["width"].Value);
                 tiledLayer.type = "tilelayer";
-                tiledLayer.visible = attrVisible?.Value == "1";
+                tiledLayer.visible = true;
+
+                if (attrVisible != null) {
+                    tiledLayer.visible = attrVisible.Value == "1";
+                }
 
                 if (encoding == "csv")
                 {
