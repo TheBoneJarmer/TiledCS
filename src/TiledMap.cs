@@ -318,6 +318,7 @@ namespace TiledCS
             foreach (XmlNode node in nodeListObjGroups)
             {
                 var nodesObject = node.SelectNodes("object");
+                var attrVisible = node.Attributes["visible"];
 
                 var tiledLayer = new TiledLayer();
                 tiledLayer.id = int.Parse(node.Attributes["id"].Value);
@@ -325,6 +326,10 @@ namespace TiledCS
                 tiledLayer.objects = ParseObjects(nodesObject);
                 tiledLayer.type = "objectgroup";
                 tiledLayer.visible = true;
+
+                if (attrVisible != null) {
+                    tiledLayer.visible = attrVisible.Value == "1";
+                }
 
                 result.Add(tiledLayer);
             }
