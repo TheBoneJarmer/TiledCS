@@ -206,6 +206,7 @@ namespace TiledCS
 
                 var tile = new TiledTile();
                 tile.id = int.Parse(node.Attributes["id"].Value);
+                tile.type = node.Attributes["type"]?.Value;
                 tile.terrain = node.Attributes["terrain"]?.Value.Split(',').AsIntArray();
                 tile.properties = ParseProperties(nodesProperty);
                 tile.animation = ParseAnimations(nodesAnimation);
