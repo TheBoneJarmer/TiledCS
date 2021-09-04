@@ -119,6 +119,10 @@ namespace TiledCS
         /// </summary>
         public float height;
         /// <summary>
+        /// The tileset gid when the object is linked to a tile
+        /// </summary>
+        public int gid;
+        /// <summary>
         /// An array of properties. Is null if none were defined.
         /// </summary>
         public TiledProperty[] properties;
