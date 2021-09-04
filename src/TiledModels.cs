@@ -79,6 +79,10 @@ namespace TiledCS
         /// The list of objects in case of an objectgroup layer. Is null when the layer has no objects.
         /// </summary>
         public TiledObject[] objects;
+        /// <summary>
+        /// The layer properties if set
+        /// </summary>
+        public TiledProperty[] properties;
     }
 
     /// <summary>

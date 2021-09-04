@@ -183,6 +183,7 @@ namespace TiledCS
             foreach (XmlNode node in nodeListLayers)
             {
                 var nodeData = node.SelectSingleNode("data");
+                var nodesProperty = node.SelectNodes("properties/property");
                 var encoding = nodeData.Attributes["encoding"].Value;
                 var attrVisible = node.Attributes["visible"];
 
@@ -194,8 +195,13 @@ namespace TiledCS
                 tiledLayer.type = "tilelayer";
                 tiledLayer.visible = true;
 
-                if (attrVisible != null) {
+                if (attrVisible != null)
+                {
                     tiledLayer.visible = attrVisible.Value == "1";
+                }
+                if (nodesProperty != null)
+                {
+                    tiledLayer.properties = ParseProperties(nodesProperty);
                 }
 
                 if (encoding == "csv")
@@ -317,6 +323,7 @@ namespace TiledCS
 
             foreach (XmlNode node in nodeListObjGroups)
             {
+                var nodesProperty = node.SelectNodes("properties/property");
                 var nodesObject = node.SelectNodes("object");
                 var attrVisible = node.Attributes["visible"];
 
@@ -327,8 +334,13 @@ namespace TiledCS
                 tiledLayer.type = "objectgroup";
                 tiledLayer.visible = true;
 
-                if (attrVisible != null) {
+                if (attrVisible != null)
+                {
                     tiledLayer.visible = attrVisible.Value == "1";
+                }
+                if (nodesProperty != null)
+                {
+                    tiledLayer.properties = ParseProperties(nodesProperty);
                 }
 
                 result.Add(tiledLayer);
