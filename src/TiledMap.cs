@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Text;
 using System.Xml;
 
 namespace TiledCS
@@ -38,6 +37,10 @@ namespace TiledCS
         /// Returns an array of layers or null if none were defined
         /// </summary>
         public TiledLayer[] Layers { get; set; }
+        /// <summary>
+        /// Returns an array of groups or null if none were defined
+        /// </summary>
+        public TiledGroup[] Groups { get; set; }
         /// <summary>
         /// Returns the defined map orientation as a string
         /// </summary>
@@ -116,8 +119,10 @@ namespace TiledCS
                 var nodeMap = document.SelectSingleNode("map");
                 var nodesProperty = nodeMap.SelectNodes("properties/property");
                 var nodesLayer = nodeMap.SelectNodes("layer");
+                var nodesImageLayer = nodeMap.SelectNodes("imagelayer");
                 var nodesObjectGroup = nodeMap.SelectNodes("objectgroup");
                 var nodesTileset = nodeMap.SelectNodes("tileset");
+                var nodesGroup = nodeMap.SelectNodes("group");
 
                 this.TiledVersion = nodeMap.Attributes["tiledversion"].Value;
                 this.Orientation = nodeMap.Attributes["orientation"].Value;
@@ -130,7 +135,8 @@ namespace TiledCS
 
                 if (nodesProperty != null) Properties = ParseProperties(nodesProperty);
                 if (nodesTileset != null) Tilesets = ParseTilesets(nodesTileset);
-                if (nodesLayer != null) Layers = ParseLayers(nodesLayer, nodesObjectGroup);
+                if (nodesLayer != null) Layers = ParseLayers(nodesLayer, nodesObjectGroup, nodesImageLayer);
+                if (nodesGroup != null) Groups = ParseGroups(nodesGroup);
             }
             catch (Exception ex)
             {
@@ -176,16 +182,49 @@ namespace TiledCS
             return result.ToArray();
         }
 
-        private TiledLayer[] ParseLayers(XmlNodeList nodeListLayers, XmlNodeList nodeListObjGroups)
+        private TiledGroup[] ParseGroups(XmlNodeList nodeListGroups)
+        {
+            var result = new List<TiledGroup>();
+
+            foreach (XmlNode node in nodeListGroups)
+            {
+                var nodesProperty = node.SelectNodes("properties/property");
+                var nodesGroup = node.SelectNodes("group");
+                var nodesLayer = node.SelectNodes("layer");
+                var nodesObjectGroup = node.SelectNodes("objectgroup");
+                var nodesImageLayer = node.SelectNodes("imagelayer");
+                var attrVisible = node.Attributes["visible"];
+                var attrLocked = node.Attributes["locked"];
+
+                var tiledGroup = new TiledGroup();
+                tiledGroup.id = int.Parse(node.Attributes["id"].Value);
+                tiledGroup.name = node.Attributes["name"].Value;
+                
+                if (attrVisible != null) tiledGroup.visible = attrVisible.Value == "1";
+                if (attrLocked != null) tiledGroup.locked = attrLocked.Value == "1";
+                if (nodesProperty != null) tiledGroup.properties = ParseProperties(nodesProperty);
+                if (nodesGroup != null) tiledGroup.groups = ParseGroups(nodesGroup);
+                if (nodesLayer != null) tiledGroup.layers = ParseLayers(nodesLayer, nodesObjectGroup, nodesImageLayer);
+                
+                result.Add(tiledGroup);
+            }
+            
+            return result.ToArray();
+        }
+        private TiledLayer[] ParseLayers(XmlNodeList nodesLayer, XmlNodeList nodesObjectGroup, XmlNodeList nodesImageLayer)
         {
             var result = new List<TiledLayer>();
 
-            foreach (XmlNode node in nodeListLayers)
+            foreach (XmlNode node in nodesLayer)
             {
                 var nodeData = node.SelectSingleNode("data");
                 var nodesProperty = node.SelectNodes("properties/property");
                 var encoding = nodeData.Attributes["encoding"].Value;
                 var attrVisible = node.Attributes["visible"];
+                var attrLocked = node.Attributes["locked"];
+                var attrTint = node.Attributes["tintcolor"];
+                var attrOffsetX = node.Attributes["offsetx"];
+                var attrOffsetY = node.Attributes["offsety"];
 
                 var tiledLayer = new TiledLayer();
                 tiledLayer.id = int.Parse(node.Attributes["id"].Value);
@@ -195,14 +234,12 @@ namespace TiledCS
                 tiledLayer.type = "tilelayer";
                 tiledLayer.visible = true;
 
-                if (attrVisible != null)
-                {
-                    tiledLayer.visible = attrVisible.Value == "1";
-                }
-                if (nodesProperty != null)
-                {
-                    tiledLayer.properties = ParseProperties(nodesProperty);
-                }
+                if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
+                if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
+                if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
+                if (attrOffsetX != null) tiledLayer.offsetX = int.Parse(attrOffsetX.Value);
+                if (attrOffsetY != null) tiledLayer.offsetY = int.Parse(attrOffsetY.Value);
+                if (nodesProperty != null) tiledLayer.properties = ParseProperties(nodesProperty);
 
                 if (encoding == "csv")
                 {
@@ -321,11 +358,15 @@ namespace TiledCS
                 result.Add(tiledLayer);
             }
 
-            foreach (XmlNode node in nodeListObjGroups)
+            foreach (XmlNode node in nodesObjectGroup)
             {
                 var nodesProperty = node.SelectNodes("properties/property");
                 var nodesObject = node.SelectNodes("object");
                 var attrVisible = node.Attributes["visible"];
+                var attrLocked = node.Attributes["locked"];
+                var attrTint = node.Attributes["tintcolor"];
+                var attrOffsetX = node.Attributes["offsetx"];
+                var attrOffsetY = node.Attributes["offsety"];
 
                 var tiledLayer = new TiledLayer();
                 tiledLayer.id = int.Parse(node.Attributes["id"].Value);
@@ -334,19 +375,54 @@ namespace TiledCS
                 tiledLayer.type = "objectgroup";
                 tiledLayer.visible = true;
 
-                if (attrVisible != null)
-                {
-                    tiledLayer.visible = attrVisible.Value == "1";
-                }
-                if (nodesProperty != null)
-                {
-                    tiledLayer.properties = ParseProperties(nodesProperty);
-                }
+                if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
+                if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
+                if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
+                if (attrOffsetX != null) tiledLayer.offsetX = int.Parse(attrOffsetX.Value);
+                if (attrOffsetY != null) tiledLayer.offsetY = int.Parse(attrOffsetY.Value);
+                if (nodesProperty != null) tiledLayer.properties = ParseProperties(nodesProperty);
 
                 result.Add(tiledLayer);
             }
 
+            foreach (XmlNode node in nodesImageLayer)
+            {
+                var nodesProperty = node.SelectNodes("properties/property");
+                var nodeImage = node.SelectSingleNode("image");
+                var attrVisible = node.Attributes["visible"];
+                var attrLocked = node.Attributes["locked"];
+                var attrTint = node.Attributes["tintcolor"];
+                var attrOffsetX = node.Attributes["offsetx"];
+                var attrOffsetY = node.Attributes["offsety"];
+                
+                var tiledLayer = new TiledLayer();
+                tiledLayer.id = int.Parse(node.Attributes["id"].Value);
+                tiledLayer.name = node.Attributes["name"].Value;
+                tiledLayer.type = "imagelayer";
+                tiledLayer.visible = true;
+                
+                if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
+                if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
+                if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
+                if (attrOffsetX != null) tiledLayer.offsetX = int.Parse(attrOffsetX.Value);
+                if (attrOffsetY != null) tiledLayer.offsetY = int.Parse(attrOffsetY.Value);
+                if (nodesProperty != null) tiledLayer.properties = ParseProperties(nodesProperty);
+                if (nodeImage != null) tiledLayer.image = ParseImage(nodeImage);
+                
+                result.Add(tiledLayer);
+            }
+
             return result.ToArray();
+        }
+        
+        private TiledImage ParseImage(XmlNode node)
+        {
+            var tiledImage = new TiledImage();
+            tiledImage.source = node.Attributes["source"].Value;
+            tiledImage.width = int.Parse(node.Attributes["width"].Value);
+            tiledImage.height = int.Parse(node.Attributes["height"].Value);
+
+            return tiledImage;
         }
 
         private TiledObject[] ParseObjects(XmlNodeList nodeList)
@@ -496,7 +572,7 @@ namespace TiledCS
                 // Update x and y position
                 tileHor++;
 
-                if (tileHor == tileset.ImageWidth / tileset.TileWidth)
+                if (tileHor == tileset.Image.width / tileset.TileWidth)
                 {
                     tileHor = 0;
                     tileVert++;
@@ -534,7 +610,7 @@ namespace TiledCS
                 // Update x and y position
                 tileHor++;
 
-                if (tileHor == tileset.ImageWidth / tileset.TileWidth)
+                if (tileHor == tileset.Image.width / tileset.TileWidth)
                 {
                     tileHor = 0;
                     tileVert++;

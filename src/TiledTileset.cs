@@ -35,17 +35,9 @@ namespace TiledCS
         /// </summary>
         public int Columns { get; set; }
         /// <summary>
-        /// The file path to the image used for this tileset
+        /// The image definition used by the tileset
         /// </summary>
-        public string Image { get; set; }
-        /// <summary>
-        /// The image width in pixels
-        /// </summary>
-        public int ImageWidth { get; set; }
-        /// <summary>
-        /// The image height in pixels
-        /// </summary>
-        public int ImageHeight { get; set; }
+        public TiledImage Image { get; set; }
         /// <summary>
         /// The amount of spacing between the tiles in pixels
         /// </summary>
@@ -123,6 +115,9 @@ namespace TiledCS
                 var nodesProperty = nodeTileset.SelectNodes("properties/property");
                 var nodesTerrain = nodeTileset.SelectNodes("terraintypes/terrain");
 
+                var attrMargin = nodeTileset.Attributes["margin"];
+                var attrSpacing = nodeTileset.Attributes["spacing"];
+
                 TiledVersion = nodeTileset.Attributes["tiledversion"].Value;
                 Name = nodeTileset.Attributes["name"]?.Value;
                 TileWidth = int.Parse(nodeTileset.Attributes["tilewidth"].Value);
@@ -130,21 +125,9 @@ namespace TiledCS
                 TileCount = int.Parse(nodeTileset.Attributes["tilecount"].Value);
                 Columns = int.Parse(nodeTileset.Attributes["columns"].Value);
 
-                if (nodeTileset.Attributes["margin"] != null)
-                {
-                    Margin = int.Parse(nodeTileset.Attributes["margin"].Value);
-                }
-                if (nodeTileset.Attributes["spacing"] != null)
-                {
-                    Spacing = int.Parse(nodeTileset.Attributes["spacing"].Value);
-                }
-
-                if (nodeImage != null)
-                {
-                    Image = nodeImage.Attributes["source"].Value;
-                    ImageWidth = int.Parse(nodeImage.Attributes["width"].Value);
-                    ImageHeight = int.Parse(nodeImage.Attributes["height"].Value);
-                }
+                if (attrMargin != null) Margin = int.Parse(nodeTileset.Attributes["margin"].Value);
+                if (attrSpacing != null) Spacing = int.Parse(nodeTileset.Attributes["spacing"].Value);
+                if (nodeImage != null) Image = ParseImage(nodeImage);
 
                 Tiles = ParseTiles(nodesTile);
                 Properties = ParseProperties(nodesProperty);
@@ -154,6 +137,16 @@ namespace TiledCS
             {
                 throw new TiledException("Unable to parse xml data, make sure the xml data represents a valid Tiled tileset", ex);
             }
+        }
+
+        private TiledImage ParseImage(XmlNode node)
+        {
+            var tiledImage = new TiledImage();
+            tiledImage.source = node.Attributes["source"].Value;
+            tiledImage.width = int.Parse(node.Attributes["width"].Value);
+            tiledImage.height = int.Parse(node.Attributes["height"].Value);
+
+            return tiledImage;
         }
 
         private TiledTileAnimation[] ParseAnimations(XmlNodeList nodeList)
@@ -213,7 +206,7 @@ namespace TiledCS
 
                 if (nodeImage != null)
                 {
-                    var tileImage = new TiledTileImage();
+                    var tileImage = new TiledImage();
                     tileImage.width = int.Parse(nodeImage.Attributes["width"].Value);
                     tileImage.height = int.Parse(nodeImage.Attributes["height"].Value);
                     tileImage.source = nodeImage.Attributes["source"].Value;

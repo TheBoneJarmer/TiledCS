@@ -60,9 +60,25 @@ namespace TiledCS
         /// </summary>
         public string type;
         /// <summary>
+        /// The tint color set by the user in hex code
+        /// </summary>
+        public string tintcolor;
+        /// <summary>
         /// Defines if the layer is visible in the editor
         /// </summary>
         public bool visible;
+        /// <summary>
+        /// Is true when the layer is locked
+        /// </summary>
+        public bool locked;
+        /// <summary>
+        /// The horizontal offset
+        /// </summary>
+        public int offsetX;
+        /// <summary>
+        /// The vertical offset
+        /// </summary>
+        public int offsetY;
         /// <summary>
         /// An int array of gid numbers which define which tile is being used where. The length of the array equals the layer width * the layer height. Is null when the layer is not a tilelayer.
         /// </summary>
@@ -83,6 +99,8 @@ namespace TiledCS
         /// The layer properties if set
         /// </summary>
         public TiledProperty[] properties;
+
+        public TiledImage image;
     }
 
     /// <summary>
@@ -162,13 +180,13 @@ namespace TiledCS
         /// <summary>
         /// The individual tile image
         /// </summary>
-        public TiledTileImage image;
+        public TiledImage image;
     }
 
     /// <summary>
-    /// Represents an image within a tile
+    /// Represents an image
     /// </summary>
-    public class TiledTileImage
+    public class TiledImage
     {
         /// <summary>
         /// The image width
@@ -237,5 +255,44 @@ namespace TiledCS
         /// The height in pixels from the tile in the source image
         /// </summary>
         public int height;
+    }
+
+    /// <summary>
+    /// Represents a layer or object group
+    /// </summary>
+    public class TiledGroup
+    {
+        /// <summary>
+        /// The group's id
+        /// </summary>
+        public int id;
+        /// <summary>
+        /// The group's name
+        /// </summary>
+        public string name;
+        /// <summary>
+        /// The group's visibility
+        /// </summary>
+        public bool visible;
+        /// <summary>
+        /// The group's locked state
+        /// </summary>
+        public bool locked;
+        /// <summary>
+        /// The group's user properties
+        /// </summary>
+        public TiledProperty[] properties;
+        /// <summary>
+        /// The group's layers
+        /// </summary>
+        public TiledLayer[] layers;
+        /// <summary>
+        /// The group's objects
+        /// </summary>
+        public TiledObject[] objects;
+        /// <summary>
+        /// The group's subgroups
+        /// </summary>
+        public TiledGroup[] groups;
     }
 }
