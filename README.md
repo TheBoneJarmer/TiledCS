@@ -7,8 +7,7 @@ dotnet add package tiledcs
 ```
 
 ## Usage
-```
-**Warning!** _JSON support may not be fully functioning for now due to the differences between how nodes differ between the TMX format and the JSON format. This will be fixed in a later version_
+> :warning: **JSON support may not be fully functioning for now due to the differences between how nodes differ between the TMX format and the JSON format. This will be fixed in a later version**
 ```
 TiledCS has been created with as mindset being as comfortable and easy to use as possible. The structure of the classes and properties are similar to the JSON map format and can therefore be deserialized like that.
 
