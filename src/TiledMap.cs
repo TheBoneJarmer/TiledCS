@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Xml;
@@ -438,8 +439,8 @@ namespace TiledCS
                 obj.name = node.Attributes["name"]?.Value;
                 obj.type = node.Attributes["type"]?.Value;
                 obj.gid = int.Parse(node.Attributes["gid"]?.Value ?? "0");
-                obj.x = float.Parse(node.Attributes["x"].Value);
-                obj.y = float.Parse(node.Attributes["y"].Value);
+                obj.x = float.Parse(node.Attributes["x"].Value, CultureInfo.InvariantCulture);
+                obj.y = float.Parse(node.Attributes["y"].Value, CultureInfo.InvariantCulture);
 
                 if (nodesProperty != null)
                 {
@@ -448,12 +449,12 @@ namespace TiledCS
 
                 if (node.Attributes["width"] != null)
                 {
-                    obj.width = float.Parse(node.Attributes["width"].Value);
+                    obj.width = float.Parse(node.Attributes["width"].Value, CultureInfo.InvariantCulture);
                 }
 
                 if (node.Attributes["height"] != null)
                 {
-                    obj.height = float.Parse(node.Attributes["height"].Value);
+                    obj.height = float.Parse(node.Attributes["height"].Value, CultureInfo.InvariantCulture);
                 }
 
                 if (node.Attributes["rotation"] != null)
