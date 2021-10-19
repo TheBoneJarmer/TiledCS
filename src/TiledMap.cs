@@ -290,7 +290,7 @@ namespace TiledCS
                                 if (compression == null)
                                     throw new TiledException("Infinite tiled layers are only supported with zlib and gzip compression types with base64 encoding.");
 
-                                LoadChunk(child.InnerText.Trim(), tiledLayer, compression, int.Parse(child.Attributes["x"].Value), int.Parse(child.Attributes["y"].Value), int.Parse(child.Attributes["width"].Value), int.Parse(child.Attributes["height"].Value));
+                                LoadChunk(child.InnerText, tiledLayer, compression, int.Parse(child.Attributes["x"].Value), int.Parse(child.Attributes["y"].Value), int.Parse(child.Attributes["width"].Value), int.Parse(child.Attributes["height"].Value));
                             }
                         }
                     }
@@ -415,7 +415,7 @@ namespace TiledCS
                             layerDataList.Add((int)(rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG)));
                         }
 
-                        AddChunk(tiledLayer, layerDataList, dataRotationFlagsList);
+                        AddChunk(tiledLayer, layerDataList, dataRotationFlagsList, x, y, width, height);
                     }
                 }
                 else if (compression == "gzip")
@@ -440,7 +440,7 @@ namespace TiledCS
                             layerDataList.Add((int)(rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG)));
                         }
 
-                        AddChunk(tiledLayer, layerDataList, dataRotationFlagsList);
+                        AddChunk(tiledLayer, layerDataList, dataRotationFlagsList, x, y, width, height);
                     }
                 }
                 else
