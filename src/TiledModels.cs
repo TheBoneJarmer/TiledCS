@@ -74,11 +74,11 @@ namespace TiledCS
         /// <summary>
         /// The horizontal offset
         /// </summary>
-        public int offsetX;
+        public double offsetX;
         /// <summary>
         /// The vertical offset
         /// </summary>
-        public int offsetY;
+        public double offsetY;
         /// <summary>
         /// An int array of gid numbers which define which tile is being used where. The length of the array equals the layer width * the layer height. Is null when the layer is not a tilelayer.
         /// </summary>
