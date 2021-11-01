@@ -66,7 +66,14 @@ namespace TiledCS
         /// The tile height in pixels
         /// </summary>
         public int TileHeight { get; set; }
-
+        /// <summary>
+        /// Returns true if the map is configured as infinite
+        /// </summary>
+        public bool Infinite { get; set; }
+        /// <summary>
+        /// Returns the defined map background color as a hex string
+        /// </summary>
+        public string BackgroundColor { get; set; }
         /// <summary>
         /// Returns an empty instance of TiledMap
         /// </summary>
@@ -128,6 +135,8 @@ namespace TiledCS
                 this.TiledVersion = nodeMap.Attributes["tiledversion"].Value;
                 this.Orientation = nodeMap.Attributes["orientation"].Value;
                 this.RenderOrder = nodeMap.Attributes["renderorder"].Value;
+                this.BackgroundColor = nodeMap.Attributes["backgroundcolor"]?.Value;
+                this.Infinite = nodeMap.Attributes["infinite"].Value == "1";
 
                 this.Width = int.Parse(nodeMap.Attributes["width"].Value);
                 this.Height = int.Parse(nodeMap.Attributes["height"].Value);

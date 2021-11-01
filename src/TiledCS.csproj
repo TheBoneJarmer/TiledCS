@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-      <Version>2.4.1</Version>
+      <Version>2.4.2</Version>
       <Authors>Ruben Labruyere</Authors>
       <Company>Ruben Labruyere</Company>
       <PackageId>TiledCS</PackageId>
