@@ -442,6 +442,9 @@ namespace TiledCS
             foreach (XmlNode node in nodeList)
             {
                 var nodesProperty = node.SelectNodes("properties/property");
+                var nodePolygon = node.SelectSingleNode("polygon");
+                var nodePoint = node.SelectSingleNode("point");
+                var nodeEllipse = node.SelectSingleNode("ellipse");
 
                 var obj = new TiledObject();
                 obj.id = int.Parse(node.Attributes["id"].Value);
@@ -454,6 +457,33 @@ namespace TiledCS
                 if (nodesProperty != null)
                 {
                     obj.properties = ParseProperties(nodesProperty);
+                }
+
+                if (nodePolygon != null)
+                {
+                    var points = nodePolygon.Attributes["points"].Value;
+                    var vertices = points.Split(' ');
+
+                    var polygon = new TiledPolygon();
+                    polygon.points = new float[vertices.Length * 2];
+
+                    for (var i = 0; i < vertices.Length; i++)
+                    {
+                        polygon.points[(i * 2) + 0] = float.Parse(vertices[i].Split(',')[0], CultureInfo.InvariantCulture);
+                        polygon.points[(i * 2) + 1] = float.Parse(vertices[i].Split(',')[1], CultureInfo.InvariantCulture);
+                    }
+
+                    obj.polygon = polygon;
+                }
+
+                if (nodeEllipse != null)
+                {
+                    obj.ellipse = new TiledEllipse();
+                }
+
+                if (nodePoint != null)
+                {
+                    obj.point = new TiledPoint();
                 }
 
                 if (node.Attributes["width"] != null)

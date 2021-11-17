@@ -148,6 +148,45 @@ namespace TiledCS
         /// An array of properties. Is null if none were defined.
         /// </summary>
         public TiledProperty[] properties;
+        /// <summary>
+        /// If an object was set to a polygon shape, this property will be set and can be used to access the polygon's data
+        /// </summary>
+        public TiledPolygon polygon;
+        /// <summary>
+        /// If an object was set to a point shape, this property will be set
+        /// </summary>
+        public TiledPoint point;
+        /// <summary>
+        /// If an object was set to an ellipse shape, this property will be set
+        /// </summary>
+        public TiledEllipse ellipse;
+    }
+
+    /// <summary>
+    /// Represents a polygon shape
+    /// </summary>
+    public class TiledPolygon
+    {
+        /// <summary>
+        /// The array of vertices where each two elements represent an x and y position. Like 'x,y,x,y,x,y,x,y'.
+        /// </summary>
+        public float[] points;
+    }
+
+    /// <summary>
+    /// Represents a point shape
+    /// </summary>
+    public class TiledPoint
+    {
+        
+    }
+
+    /// <summary>
+    /// Represents an ellipse shape
+    /// </summary>
+    public class TiledEllipse
+    {
+        
     }
 
     /// <summary>
