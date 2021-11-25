@@ -12,9 +12,9 @@ namespace TiledCS
     /// </summary>
     public class TiledMap
     {
-        const uint FLIPPED_HORIZONTALLY_FLAG = 0b10000000000000000000000000000000;
-        const uint FLIPPED_VERTICALLY_FLAG = 0b01000000000000000000000000000000;
-        const uint FLIPPED_DIAGONALLY_FLAG = 0b00100000000000000000000000000000;
+        const uint FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
+        const uint FLIPPED_VERTICALLY_FLAG = 0x40000000;
+        const uint FLIPPED_DIAGONALLY_FLAG = 0x20000000;
 
         /// <summary>
         /// How many times we shift the FLIPPED flags to the right in order to store it in a byte.
@@ -89,12 +89,12 @@ namespace TiledCS
         /// <exception cref="TiledException">Thrown when the map could not be loaded or is not in a correct format</exception>
         public TiledMap(string path)
         {
-            var content = "";
+            var content = string.Empty;
 
             // Check the file
             if (!File.Exists(path))
             {
-                throw new TiledException($"{path} not found");
+                throw new TiledException(path + " not found");
             }
             else
             {
@@ -132,14 +132,13 @@ namespace TiledCS
                 var nodesTileset = nodeMap.SelectNodes("tileset");
                 var nodesGroup = nodeMap.SelectNodes("group");
 
-                this.TiledVersion = nodeMap.Attributes["tiledversion"]?.Value
-                    ?? nodeMap.Attributes["version"]?.Value
-                    ?? "Unknown";
+                var version = nodeMap.Attributes.GetStringOrDefault("version", "Unknown");
+                this.TiledVersion = nodeMap.Attributes.GetStringOrDefault("tiledversion", version);
 
                 this.Orientation = nodeMap.Attributes["orientation"].Value;
-                this.RenderOrder = nodeMap.Attributes["renderorder"]?.Value ?? string.Empty;
-                this.BackgroundColor = nodeMap.Attributes["backgroundcolor"]?.Value;
-                this.Infinite = (nodeMap.Attributes["infinite"]?.Value ?? "0") == "1";
+                this.RenderOrder = nodeMap.Attributes.GetStringOrDefault("renderorder", string.Empty);
+                this.BackgroundColor = nodeMap.Attributes.GetStringOrDefault("backgroundcolor", null);
+                this.Infinite = nodeMap.Attributes.GetStringOrDefault("infinite","0") == "1";
 
                 this.Width = int.Parse(nodeMap.Attributes["width"].Value);
                 this.Height = int.Parse(nodeMap.Attributes["height"].Value);
@@ -165,8 +164,8 @@ namespace TiledCS
             {
                 var property = new TiledProperty();
                 property.name = node.Attributes["name"].Value;
-                property.type = node.Attributes["type"]?.Value;
-                property.value = node.Attributes["value"]?.Value;
+                property.type = node.Attributes.GetStringOrDefault("type", null);
+                property.value = node.Attributes.GetStringOrDefault("value", null);
 
                 if (property.value == null && node.InnerText != null)
                 {
@@ -240,7 +239,7 @@ namespace TiledCS
                 var attrOffsetY = node.Attributes["offsety"];
 
                 var tiledLayer = new TiledLayer();
-                tiledLayer.id = int.Parse(node.Attributes["id"]?.Value ?? "0");
+                tiledLayer.id = int.Parse(node.Attributes.GetStringOrDefault("id","0"));
                 tiledLayer.name = node.Attributes["name"].Value;
                 tiledLayer.height = int.Parse(node.Attributes["height"].Value);
                 tiledLayer.width = int.Parse(node.Attributes["width"].Value);
@@ -276,7 +275,7 @@ namespace TiledCS
                 }
                 else if (encoding == "base64")
                 {
-                    var compression = nodeData.Attributes["compression"]?.Value;
+                    var compression = nodeData.Attributes.GetStringOrDefault("compression",null);
 
                     using (var base64DataStream = new MemoryStream(Convert.FromBase64String(nodeData.InnerText)))
                     {
@@ -382,7 +381,7 @@ namespace TiledCS
                 var attrOffsetY = node.Attributes["offsety"];
 
                 var tiledLayer = new TiledLayer();
-                tiledLayer.id = int.Parse(node.Attributes["id"]?.Value ?? "0" );
+                tiledLayer.id = node.Attributes.GetIntegerOrDefault("id", 0);
                 tiledLayer.name = node.Attributes["name"].Value;
                 tiledLayer.objects = ParseObjects(nodesObject);
                 tiledLayer.type = "objectgroup";
@@ -409,7 +408,7 @@ namespace TiledCS
                 var attrOffsetY = node.Attributes["offsety"];
                 
                 var tiledLayer = new TiledLayer();
-                tiledLayer.id = int.Parse(node.Attributes["id"].Value);
+                tiledLayer.id = node.Attributes.GetIntegerOrDefault("id", 0);
                 tiledLayer.name = node.Attributes["name"].Value;
                 tiledLayer.type = "imagelayer";
                 tiledLayer.visible = true;
@@ -450,12 +449,12 @@ namespace TiledCS
                 var nodeEllipse = node.SelectSingleNode("ellipse");
 
                 var obj = new TiledObject();
-                obj.id = int.Parse(node.Attributes["id"]?.Value ?? "0");
-                obj.name = node.Attributes["name"]?.Value;
-                obj.type = node.Attributes["type"]?.Value;
-                obj.gid = int.Parse(node.Attributes["gid"]?.Value ?? "0");
-                obj.x = float.Parse(node.Attributes["x"].Value, CultureInfo.InvariantCulture);
-                obj.y = float.Parse(node.Attributes["y"].Value, CultureInfo.InvariantCulture);
+                obj.id = node.Attributes.GetIntegerOrDefault("id", 0);
+                obj.name = node.Attributes.GetStringOrDefault("name", null);
+                obj.type = node.Attributes.GetStringOrDefault("type", null);
+                obj.gid = node.Attributes.GetIntegerOrDefault("gid", 0);
+                obj.x = node.Attributes.GetSingleOrDefault("x", float.NaN);
+                obj.y = node.Attributes.GetSingleOrDefault("y", float.NaN);
 
                 if (nodesProperty != null)
                 {
@@ -561,7 +560,7 @@ namespace TiledCS
 
             foreach (var mapTileset in Tilesets)
             {
-                var path = $"{srcFolder}/{mapTileset.source}";
+                var path = srcFolder + "/" + mapTileset.source;
 
                 if (File.Exists(path))
                 {

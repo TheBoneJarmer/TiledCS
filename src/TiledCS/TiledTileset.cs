@@ -80,7 +80,7 @@ namespace TiledCS
             // Check the file
             if (!File.Exists(path))
             {
-                throw new TiledException($"{path} not found");
+                throw new TiledException(path + " not found");
             }
             else
             {
@@ -119,7 +119,7 @@ namespace TiledCS
                 var attrSpacing = nodeTileset.Attributes["spacing"];
 
                 TiledVersion = nodeTileset.Attributes["tiledversion"].Value;
-                Name = nodeTileset.Attributes["name"]?.Value;
+                Name = nodeTileset.Attributes.GetStringOrDefault("name", null);
                 TileWidth = int.Parse(nodeTileset.Attributes["tilewidth"].Value);
                 TileHeight = int.Parse(nodeTileset.Attributes["tileheight"].Value);
                 TileCount = int.Parse(nodeTileset.Attributes["tilecount"].Value);
@@ -173,8 +173,8 @@ namespace TiledCS
             {
                 var property = new TiledProperty();
                 property.name = node.Attributes["name"].Value;
-                property.type = node.Attributes["type"]?.Value;
-                property.value = node.Attributes["value"]?.Value;
+                property.type = node.Attributes.GetStringOrDefault("type", null);
+                property.value = node.Attributes.GetStringOrDefault("value", null);
 
                 if (property.value == null && node.InnerText != null)
                 {
@@ -199,8 +199,8 @@ namespace TiledCS
 
                 var tile = new TiledTile();
                 tile.id = int.Parse(node.Attributes["id"].Value);
-                tile.type = node.Attributes["type"]?.Value;
-                tile.terrain = node.Attributes["terrain"]?.Value.Split(',').AsIntArray();
+                tile.type = node.Attributes.GetStringOrDefault("type", null);
+                tile.terrain = node.Attributes.GetStringOrDefault("terrain", string.Empty).Split(',').AsIntArray();
                 tile.properties = ParseProperties(nodesProperty);
                 tile.animation = ParseAnimations(nodesAnimation);
 

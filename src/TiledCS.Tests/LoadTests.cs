@@ -5,6 +5,7 @@ namespace TiledCS
     public class LoadTests
     {
         [TestCase("Resources\\automapping\\1\\1.tmx")]
+        [TestCase("Resources\\automapping\\1\\1.ver172.tmx")]
         [TestCase("Resources\\automapping\\2\\2.tmx")]
         [TestCase("Resources\\automapping\\3\\3.tmx")]
         [TestCase("Resources\\automapping\\4\\4.tmx")]

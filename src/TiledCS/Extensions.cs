@@ -25,5 +25,29 @@ namespace TiledCS
         {
             return src.Select(x => int.Parse(x.Length == 0 ? "-1" : x)).ToArray();
         }
+
+        internal static string GetStringOrDefault(this System.Xml.XmlAttributeCollection attributes, string name, string defval)
+        {
+            var att = attributes[name];
+            return att != null
+                ? att.Value
+                : defval;
+        }
+
+        internal static int GetIntegerOrDefault(this System.Xml.XmlAttributeCollection attributes, string name, int defval)
+        {
+            var att = attributes[name];
+            return att != null
+                ? int.Parse(att.Value)
+                : defval;
+        }
+
+        internal static float GetSingleOrDefault(this System.Xml.XmlAttributeCollection attributes, string name, float defval)
+        {
+            var att = attributes[name];
+            return att != null
+                ? float.Parse(att.Value, System.Globalization.CultureInfo.InvariantCulture)
+                : defval;
+        }
     }
 }
