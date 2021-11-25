@@ -132,11 +132,14 @@ namespace TiledCS
                 var nodesTileset = nodeMap.SelectNodes("tileset");
                 var nodesGroup = nodeMap.SelectNodes("group");
 
-                this.TiledVersion = nodeMap.Attributes["tiledversion"].Value;
+                this.TiledVersion = nodeMap.Attributes["tiledversion"]?.Value
+                    ?? nodeMap.Attributes["version"]?.Value
+                    ?? "Unknown";
+
                 this.Orientation = nodeMap.Attributes["orientation"].Value;
-                this.RenderOrder = nodeMap.Attributes["renderorder"].Value;
+                this.RenderOrder = nodeMap.Attributes["renderorder"]?.Value ?? string.Empty;
                 this.BackgroundColor = nodeMap.Attributes["backgroundcolor"]?.Value;
-                this.Infinite = nodeMap.Attributes["infinite"].Value == "1";
+                this.Infinite = (nodeMap.Attributes["infinite"]?.Value ?? "0") == "1";
 
                 this.Width = int.Parse(nodeMap.Attributes["width"].Value);
                 this.Height = int.Parse(nodeMap.Attributes["height"].Value);
@@ -237,7 +240,7 @@ namespace TiledCS
                 var attrOffsetY = node.Attributes["offsety"];
 
                 var tiledLayer = new TiledLayer();
-                tiledLayer.id = int.Parse(node.Attributes["id"].Value);
+                tiledLayer.id = int.Parse(node.Attributes["id"]?.Value ?? "0");
                 tiledLayer.name = node.Attributes["name"].Value;
                 tiledLayer.height = int.Parse(node.Attributes["height"].Value);
                 tiledLayer.width = int.Parse(node.Attributes["width"].Value);
@@ -379,7 +382,7 @@ namespace TiledCS
                 var attrOffsetY = node.Attributes["offsety"];
 
                 var tiledLayer = new TiledLayer();
-                tiledLayer.id = int.Parse(node.Attributes["id"].Value);
+                tiledLayer.id = int.Parse(node.Attributes["id"]?.Value ?? "0" );
                 tiledLayer.name = node.Attributes["name"].Value;
                 tiledLayer.objects = ParseObjects(nodesObject);
                 tiledLayer.type = "objectgroup";
@@ -447,7 +450,7 @@ namespace TiledCS
                 var nodeEllipse = node.SelectSingleNode("ellipse");
 
                 var obj = new TiledObject();
-                obj.id = int.Parse(node.Attributes["id"].Value);
+                obj.id = int.Parse(node.Attributes["id"]?.Value ?? "0");
                 obj.name = node.Attributes["name"]?.Value;
                 obj.type = node.Attributes["type"]?.Value;
                 obj.gid = int.Parse(node.Attributes["gid"]?.Value ?? "0");

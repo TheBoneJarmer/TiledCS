@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31911.196
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiledCS", "TiledCS.csproj", "{7F211D4D-8803-4074-B58D-7F471EB19C72}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TiledCS", "TiledCS\TiledCS.csproj", "{7F211D4D-8803-4074-B58D-7F471EB19C72}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiledCS.Tests", "TiledCS.Tests\TiledCS.Tests.csproj", "{0C59E319-5CC6-4B1C-B66C-24C90D9E221C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,9 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{7F211D4D-8803-4074-B58D-7F471EB19C72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -30,5 +29,23 @@ Global
 		{7F211D4D-8803-4074-B58D-7F471EB19C72}.Release|x64.Build.0 = Release|Any CPU
 		{7F211D4D-8803-4074-B58D-7F471EB19C72}.Release|x86.ActiveCfg = Release|Any CPU
 		{7F211D4D-8803-4074-B58D-7F471EB19C72}.Release|x86.Build.0 = Release|Any CPU
+		{0C59E319-5CC6-4B1C-B66C-24C90D9E221C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C59E319-5CC6-4B1C-B66C-24C90D9E221C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C59E319-5CC6-4B1C-B66C-24C90D9E221C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0C59E319-5CC6-4B1C-B66C-24C90D9E221C}.Debug|x64.Build.0 = Debug|Any CPU
+		{0C59E319-5CC6-4B1C-B66C-24C90D9E221C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0C59E319-5CC6-4B1C-B66C-24C90D9E221C}.Debug|x86.Build.0 = Debug|Any CPU
+		{0C59E319-5CC6-4B1C-B66C-24C90D9E221C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C59E319-5CC6-4B1C-B66C-24C90D9E221C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C59E319-5CC6-4B1C-B66C-24C90D9E221C}.Release|x64.ActiveCfg = Release|Any CPU
+		{0C59E319-5CC6-4B1C-B66C-24C90D9E221C}.Release|x64.Build.0 = Release|Any CPU
+		{0C59E319-5CC6-4B1C-B66C-24C90D9E221C}.Release|x86.ActiveCfg = Release|Any CPU
+		{0C59E319-5CC6-4B1C-B66C-24C90D9E221C}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D31BAC9A-CF45-4496-BED6-203BC27271FF}
 	EndGlobalSection
 EndGlobal
