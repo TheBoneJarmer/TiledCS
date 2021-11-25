@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using System.Linq;
 
 namespace TiledCS
@@ -24,6 +26,11 @@ namespace TiledCS
         public static int[] AsIntArray(this string[] src)
         {
             return src.Select(x => int.Parse(x.Length == 0 ? "-1" : x)).ToArray();
+        }
+
+        internal static MemoryStream OpenReadBase64(this string base64text)
+        {
+            return new MemoryStream(Convert.FromBase64String(base64text));
         }
 
         internal static string GetStringOrDefault(this System.Xml.XmlAttributeCollection attributes, string name, string defval)

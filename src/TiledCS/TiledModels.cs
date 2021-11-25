@@ -3,6 +3,7 @@ namespace TiledCS
     /// <summary>
     /// Represents an element within the Tilesets array of a TiledMap object
     /// </summary>
+    [System.Diagnostics.DebuggerDisplay("TiledMap {source} {firstgid}")]
     public class TiledMapTileset
     {
         /// <summary>
@@ -18,6 +19,7 @@ namespace TiledCS
     /// <summary>
     /// Represents a property object in both tilesets, maps, layers and objects. Values are all in string but you can use the 'type' property for conversions
     /// </summary>
+    [System.Diagnostics.DebuggerDisplay("Property {type,nq} {name} {value}")]
     public class TiledProperty
     {
         /// <summary>
@@ -37,6 +39,7 @@ namespace TiledCS
     /// <summary>
     /// Represents a tile layer as well as an object layer within a tile map
     /// </summary>
+    [System.Diagnostics.DebuggerDisplay("{type,nq} {name} {width}x{height}")]
     public class TiledLayer
     {
         /// <summary>
@@ -106,6 +109,7 @@ namespace TiledCS
     /// <summary>
     /// Represents an tiled object defined in object layers
     /// </summary>
+    [System.Diagnostics.DebuggerDisplay("Object {type,nq} {name} ({x},{y})")]
     public class TiledObject
     {
         /// <summary>
@@ -165,6 +169,7 @@ namespace TiledCS
     /// <summary>
     /// Represents a polygon shape
     /// </summary>
+    [System.Diagnostics.DebuggerDisplay("Polygon")]
     public class TiledPolygon
     {
         /// <summary>
@@ -176,6 +181,7 @@ namespace TiledCS
     /// <summary>
     /// Represents a point shape
     /// </summary>
+    [System.Diagnostics.DebuggerDisplay("Point")]
     public class TiledPoint
     {
         
@@ -184,6 +190,7 @@ namespace TiledCS
     /// <summary>
     /// Represents an ellipse shape
     /// </summary>
+    [System.Diagnostics.DebuggerDisplay("Ellipse")]
     public class TiledEllipse
     {
         
@@ -193,6 +200,7 @@ namespace TiledCS
     /// Represents a tile within a tileset
     /// </summary>
     /// <remarks>These are not defined for all tiles within a tileset, only the ones with properties, terrains and animations.</remarks>
+    [System.Diagnostics.DebuggerDisplay("Tile {id} {type,nq}")]
     public class TiledTile
     {
         /// <summary>
@@ -225,6 +233,7 @@ namespace TiledCS
     /// <summary>
     /// Represents an image
     /// </summary>
+    [System.Diagnostics.DebuggerDisplay("Image {source} {width}x{height}")]
     public class TiledImage
     {
         /// <summary>
@@ -246,6 +255,7 @@ namespace TiledCS
     /// <summary>
     /// Represents a tile animation. Tile animations are a group of tiles which act as frames for an animation.
     /// </summary>
+    [System.Diagnostics.DebuggerDisplay("Animation {tileid} {duration}")]
     public class TiledTileAnimation
     {
         /// <summary>
@@ -261,6 +271,7 @@ namespace TiledCS
     /// <summary>
     /// Represents a terrain definition.
     /// </summary>
+    [System.Diagnostics.DebuggerDisplay("Terrain {name} {tile}")]
     public class TiledTerrain
     {
         /// <summary>
@@ -276,6 +287,7 @@ namespace TiledCS
     /// <summary>
     /// Used as data type for the GetSourceRect method. Represents basically a rectangle.
     /// </summary>
+    [System.Diagnostics.DebuggerDisplay("Rect ({x},{y}) {width}x{height}")]
     public class TiledSourceRect
     {
         /// <summary>
@@ -299,6 +311,7 @@ namespace TiledCS
     /// <summary>
     /// Represents a layer or object group
     /// </summary>
+    [System.Diagnostics.DebuggerDisplay("Group {name}")]
     public class TiledGroup
     {
         /// <summary>
