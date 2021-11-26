@@ -10,7 +10,7 @@ namespace TiledCS
 {
     public abstract class TiledSerializable
     {
-        public static T[] TryCreateFrom<T>(XmlNodeList nodeList)
+        protected static T[] TryCreateFrom<T>(XmlNodeList nodeList)
             where T : TiledSerializable, new()
         {
             if (nodeList == null) return null; // it could be replaced by Array.Empty<T>();
@@ -21,7 +21,7 @@ namespace TiledCS
                 .ToArray();
         }
 
-        public static T TryCreateFrom<T>(XmlNode node)
+        protected static T TryCreateFrom<T>(XmlNode node)
             where T:TiledSerializable, new()
         {
             if (node == null) return null;
@@ -238,9 +238,11 @@ namespace TiledCS
 
                 var nodeChunks = nodeData.SelectNodes("chunk");
 
-                if (nodeChunks == null)
+                if (nodeChunks == null || nodeChunks.Count == 0)
                 {
                     this.data = TiledIndex.TryCreateFrom(nodeData);
+
+                    if (this.data.Length < this.width * this.height) throw new TiledException("data size mismatch");
                 }
                 else
                 {
@@ -259,7 +261,9 @@ namespace TiledCS
             this.width = node.Attributes.GetIntegerOrDefault("width", 0);
             this.height = node.Attributes.GetIntegerOrDefault("height", 0);            
 
-            this.data = TiledIndex.TryCreateFrom(node);            
+            this.data = TiledIndex.TryCreateFrom(node);
+
+            if (this.data.Length < this.width * this.height) throw new TiledException("data size mismatch");
         }
     }
 
