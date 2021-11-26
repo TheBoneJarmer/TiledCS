@@ -80,7 +80,7 @@ namespace TiledCS
             // Check the file
             if (!File.Exists(path))
             {
-                throw new TiledException(path + " not found");
+                throw new TiledException($"{path} not found");
             }
             else
             {

@@ -95,7 +95,7 @@ namespace TiledCS
             // Check the file
             if (!File.Exists(path))
             {
-                throw new TiledException(path + " not found");
+                throw new TiledException($"{path} not found");
             }
             else
             {
@@ -351,7 +351,7 @@ namespace TiledCS
                     }
                     else
                     {
-                        throw new TiledException(compression + " compression is currently not supported");
+                        throw new TiledException($"{compression} compression is currently not supported");
                     }
 
                 }

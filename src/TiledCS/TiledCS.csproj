@@ -15,11 +15,6 @@
 
     <PropertyGroup>
       <TargetFramework>netstandard2.0</TargetFramework>
-      
-      <!-- limit language version to stay compatible with MonoGame and possibly Unity -->
-      <!-- https://github.com/MonoGame/MonoGame/blob/71b25eece3d1b92d6c9f3f32cb51dc054e099133/MonoGame.Framework/Directory.Build.props#L14 -->
-      <LangVersion>5</LangVersion>
-      
     </PropertyGroup>
 
 </Project>
