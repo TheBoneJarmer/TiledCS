@@ -8,7 +8,8 @@ using System.Text;
 using System.Xml;
 
 namespace TiledCS
-{    partial class TiledMap
+{    
+    partial class TiledMap
     {
         /// <summary>
         /// Loads a Tiled map in TMX format and parses it
@@ -17,13 +18,11 @@ namespace TiledCS
         /// <exception cref="TiledException">Thrown when the map could not be loaded or is not in a correct format</exception>
         public TiledMap(string path)
         {
-            string content;            
-
             // Check the file
             if (!File.Exists(path)) throw new TiledException($"{path} not found");
-            if (!path.EndsWith(".tmx")) throw new TiledException("Unsupported file format");
+            if (!path.ToLowerInvariant().EndsWith(".tmx")) throw new TiledException("Unsupported file format");
 
-            content = File.ReadAllText(path);
+            var content = File.ReadAllText(path);
             
             ParseXml(content);
         }

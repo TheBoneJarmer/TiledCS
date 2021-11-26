@@ -18,7 +18,7 @@ namespace TiledCS
         {
             // Check the file
             if (!File.Exists(path)) throw new TiledException($"{path} not found");
-            if (!path.EndsWith(".tsx")) throw new TiledException("Unsupported file format");
+            if (!path.ToLowerInvariant().EndsWith(".tsx")) throw new TiledException("Unsupported file format");
             
             var content = File.ReadAllText(path);
             
