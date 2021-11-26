@@ -90,15 +90,10 @@ namespace TiledCS
                     for(int mapX=0; mapX < Layer.width; ++mapX)
                     {
                         var mapIdx = mapY * Layer.width + mapX;
-                        var tileId = Layer.data[mapIdx];
-                        var tileRt = Layer.dataRotationFlags[mapIdx];
-
-                        
+                        var tileId = Layer.data[mapIdx];                        
                     }
                 }
             }
-
-
         }
     }
     

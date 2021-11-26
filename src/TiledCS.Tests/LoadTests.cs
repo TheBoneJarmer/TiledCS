@@ -27,7 +27,7 @@ namespace TiledCS
             Assert.AreEqual(4, map.Layers[0].chunks.Length);
         }
 
-        [TestCase("Resources\\exotic\\Tiles32x32.tsx")]
+        [TestCase("Resources\\exotic\\Tiles32x32.A.tsx")]
         [TestCase("Resources\\wangtiles\\grassAndWater.tsx")]
         [TestCase("Resources\\wangtiles\\PathAndObjects.tsx")]
         [TestCase("Resources\\wangtiles\\walkways.tsx")]

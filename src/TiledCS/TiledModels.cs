@@ -1,5 +1,7 @@
-namespace TiledCS
+﻿namespace TiledCS
 {
+    
+
     /// <summary>
     /// Represents an element within the Tilesets array of a TiledMap object
     /// </summary>
@@ -101,15 +103,7 @@ namespace TiledCS
         /// <summary>
         /// An int array of gid numbers which define which tile is being used where. The length of the array equals the layer width * the layer height. Is null when the layer is not a tilelayer.
         /// </summary>
-        public int[] data;
-        /// <summary>
-        /// A parallel array to data which stores the rotation flags of the tile.
-        /// Bit 3 is horizontal flip,
-        /// bit 2 is vertical flip, and
-        /// bit 1 is (anti) diagonal flip.
-        /// Is null when the layer is not a tilelayer.
-        /// </summary>
-        public byte[] dataRotationFlags;
+        public TiledIndex[] data;
 
         /// <summary>
         /// chunks for infinite TiledMap
@@ -146,15 +140,7 @@ namespace TiledCS
         /// <summary>
         /// An int array of gid numbers which define which tile is being used where. The length of the array equals the layer width * the layer height. Is null when the layer is not a tilelayer.
         /// </summary>
-        public int[] data;
-        /// <summary>
-        /// A parallel array to data which stores the rotation flags of the tile.
-        /// Bit 3 is horizontal flip,
-        /// bit 2 is vertical flip, and
-        /// bit 1 is (anti) diagonal flip.
-        /// Is null when the layer is not a tilelayer.
-        /// </summary>
-        public byte[] dataRotationFlags;
+        public TiledIndex[] data;
     }
 
     /// <summary>

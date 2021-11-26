@@ -187,16 +187,6 @@ namespace TiledCS
 
     partial class TiledLayer
     {
-        const uint FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
-        const uint FLIPPED_VERTICALLY_FLAG = 0x40000000;
-        const uint FLIPPED_DIAGONALLY_FLAG = 0x20000000;
-
-        /// <summary>
-        /// How many times we shift the FLIPPED flags to the right in order to store it in a byte.
-        /// For example: 0b10100000000000000000000000000000 >> SHIFT_FLIP_FLAG_TO_BYTE = 0b00000101
-        /// </summary>
-        const int SHIFT_FLIP_FLAG_TO_BYTE = 29;
-
         public static IEnumerable<TiledLayer> TryCreateFrom(XmlNodeList nodesLayer, XmlNodeList nodesObjectGroup, XmlNodeList nodesImageLayer)
         {
             foreach (XmlNode node in nodesLayer)
@@ -250,9 +240,7 @@ namespace TiledCS
 
                 if (nodeChunks == null)
                 {
-                    var (data, flags) = TiledXmlTileDecoder.ParseTiles(nodeData);
-                    this.data = data;
-                    this.dataRotationFlags = flags;
+                    this.data = TiledIndex.TryCreateFrom(nodeData);
                 }
                 else
                 {
@@ -269,12 +257,9 @@ namespace TiledCS
             this.offsetX = node.Attributes.GetIntegerOrDefault("x", 0);
             this.offsetY = node.Attributes.GetIntegerOrDefault("y", 0);
             this.width = node.Attributes.GetIntegerOrDefault("width", 0);
-            this.height = node.Attributes.GetIntegerOrDefault("height", 0);
+            this.height = node.Attributes.GetIntegerOrDefault("height", 0);            
 
-            var (data, flags) = TiledXmlTileDecoder.ParseTiles(node);
-
-            this.data = data;
-            this.dataRotationFlags = flags;
+            this.data = TiledIndex.TryCreateFrom(node);            
         }
     }
 

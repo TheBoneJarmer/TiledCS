@@ -243,7 +243,7 @@ namespace TiledCS
         /// <returns>True if the tile was flipped horizontally or False if not</returns>
         public bool IsTileFlippedHorizontal(int dataIndex)
         {
-            return (this.dataRotationFlags[dataIndex] & (FLIPPED_HORIZONTALLY_FLAG >> SHIFT_FLIP_FLAG_TO_BYTE)) > 0;
+            return this.data[dataIndex].HasHorizontalFlip;
         }
         /// <summary>
         /// Checks is a tile is flipped vertically
@@ -262,7 +262,7 @@ namespace TiledCS
         /// <returns>True if the tile was flipped vertically or False if not</returns>
         public bool IsTileFlippedVertical(int dataIndex)
         {
-            return (dataRotationFlags[dataIndex] & (FLIPPED_VERTICALLY_FLAG >> SHIFT_FLIP_FLAG_TO_BYTE)) > 0;
+            return data[dataIndex].HasVerticalFlip;
         }
         /// <summary>
         /// Checks is a tile is flipped diagonally
@@ -281,7 +281,7 @@ namespace TiledCS
         /// <returns>True if the tile was flipped diagonally or False if not</returns>
         public bool IsTileFlippedDiagonal(int dataIndex)
         {
-            return (dataRotationFlags[dataIndex] & (FLIPPED_DIAGONALLY_FLAG >> SHIFT_FLIP_FLAG_TO_BYTE)) > 0;
+            return data[dataIndex].HasDiagonalFlip;
         }
     }
 }

@@ -28,9 +28,7 @@ namespace TiledCS
         public static int[] AsIntArray(this string[] src)
         {
             return src.Select(x => int.Parse(x.Length == 0 ? "-1" : x)).ToArray();
-        }
-
-        
+        }        
 
         public static string GetStringOrDefault(this System.Xml.XmlAttributeCollection attributes, string name, string defval)
         {
