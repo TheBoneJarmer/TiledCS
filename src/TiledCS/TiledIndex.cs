@@ -11,9 +11,22 @@ namespace TiledCS
     /// <summary>
     /// Represents the index of a tile in a <see cref="TiledMapTileset"/>.
     /// </summary>    
-    [System.Diagnostics.DebuggerDisplay("{Index} {HasHorizontalFlip?'🡄':'🡆'} {HasVerticalFlip?'🡇':'🡅'} {HasDiagonalFlip?'⤵':' '}")]
+    [System.Diagnostics.DebuggerDisplay("{ToDebuggerString(),nq}")]
     public readonly struct TiledIndex
     {
+        internal string ToDebuggerString()
+        {
+            var text = Index.ToString();
+            var x = HasHorizontalFlip | HasVerticalFlip | HasDiagonalFlip;
+            if (x) text += " ";
+
+            if (HasDiagonalFlip) text += "🡘";
+            if (HasVerticalFlip) text += "🡙";
+            if (HasDiagonalFlip) text += "⭯";
+
+            return text;
+        }
+
         const uint FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
         const uint FLIPPED_VERTICALLY_FLAG = 0x40000000;
         const uint FLIPPED_DIAGONALLY_FLAG = 0x20000000;

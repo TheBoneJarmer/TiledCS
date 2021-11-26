@@ -8,13 +8,13 @@
  <layer id="1" name="Tile Layer 1" width="100" height="100">
   <data encoding="base64" compression="zlib">
    <chunk x="-16" y="-16" width="16" height="16">
-   eJxjYBgFo2AUDCfASAIGAAUIAAw=
+   eJxjYBgFo2AUDCfAwcDQwAikicEAGrwAkw==
   </chunk>
    <chunk x="0" y="-16" width="16" height="16">
    eJxjYBgFo2AUDFXAiITJAQAEtAAE
   </chunk>
    <chunk x="-16" y="0" width="16" height="16">
-   eJxjYMAEjCRgbIBYvUwU6qfU/lH9g1P/KKAfAAAyowBw
+   eJxjYMAEjCRgbIBYvUwU6ifVfg4kGogbyNDvAKOB+ACl/h/VPwoGGgAAqp4CWg==
   </chunk>
    <chunk x="0" y="0" width="16" height="16">
    eJxjZGBgYIRicgAzEItSoF8XiDUp0M/IQJn7R/UPrP5RMLAAANFnAIk=
