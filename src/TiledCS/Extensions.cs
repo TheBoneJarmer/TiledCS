@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 
 namespace TiledCS
@@ -7,7 +9,7 @@ namespace TiledCS
     /// <summary>
     /// Defines all extension methods used within TiledCS
     /// </summary>
-    public static class Extensions
+    internal static class Extensions
     {
         /// <summary>
         /// Converts a comma separated string to an int array
@@ -28,12 +30,9 @@ namespace TiledCS
             return src.Select(x => int.Parse(x.Length == 0 ? "-1" : x)).ToArray();
         }
 
-        internal static MemoryStream OpenReadBase64(this string base64text)
-        {
-            return new MemoryStream(Convert.FromBase64String(base64text));
-        }
+        
 
-        internal static string GetStringOrDefault(this System.Xml.XmlAttributeCollection attributes, string name, string defval)
+        public static string GetStringOrDefault(this System.Xml.XmlAttributeCollection attributes, string name, string defval)
         {
             var att = attributes[name];
             return att != null
@@ -41,7 +40,7 @@ namespace TiledCS
                 : defval;
         }
 
-        internal static int GetIntegerOrDefault(this System.Xml.XmlAttributeCollection attributes, string name, int defval)
+        public static int GetIntegerOrDefault(this System.Xml.XmlAttributeCollection attributes, string name, int defval)
         {
             var att = attributes[name];
             return att != null
@@ -49,11 +48,19 @@ namespace TiledCS
                 : defval;
         }
 
-        internal static float GetSingleOrDefault(this System.Xml.XmlAttributeCollection attributes, string name, float defval)
+        public static float GetSingleOrDefault(this System.Xml.XmlAttributeCollection attributes, string name, float defval)
         {
             var att = attributes[name];
             return att != null
                 ? float.Parse(att.Value, System.Globalization.CultureInfo.InvariantCulture)
+                : defval;
+        }
+
+        public static double GetDoubleOrDefault(this System.Xml.XmlAttributeCollection attributes, string name, double defval)
+        {
+            var att = attributes[name];
+            return att != null
+                ? double.Parse(att.Value, System.Globalization.CultureInfo.InvariantCulture)
                 : defval;
         }
     }

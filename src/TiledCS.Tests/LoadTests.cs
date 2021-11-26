@@ -9,7 +9,8 @@ namespace TiledCS
         [TestCase("Resources\\automapping\\2\\2.tmx")]
         [TestCase("Resources\\automapping\\3\\3.tmx")]
         [TestCase("Resources\\automapping\\4\\4.tmx")]
-        [TestCase("Resources\\data\\mapobject.tmx")]        
+        [TestCase("Resources\\data\\mapobject.tmx")]
+        [TestCase("Resources\\exotic\\Properties.tmx")]
         public void LoadTMX(string tmxPath)
         {
             var map = new TiledMap(tmxPath);
@@ -23,8 +24,10 @@ namespace TiledCS
         {
             var map = new TiledMap(tmxPath);
             Assert.NotNull(map);
+            Assert.AreEqual(4, map.Layers[0].chunks.Length);
         }
 
+        [TestCase("Resources\\exotic\\Tiles32x32.tsx")]
         [TestCase("Resources\\wangtiles\\grassAndWater.tsx")]
         [TestCase("Resources\\wangtiles\\PathAndObjects.tsx")]
         [TestCase("Resources\\wangtiles\\walkways.tsx")]
@@ -33,9 +36,6 @@ namespace TiledCS
         {
             var tiles = new TiledTileset(tsxPath);
             Assert.NotNull(tiles);
-        }
-
-
-        
+        }        
     }
 }

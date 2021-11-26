@@ -4,7 +4,7 @@ namespace TiledCS
     /// Represents an element within the Tilesets array of a TiledMap object
     /// </summary>
     [System.Diagnostics.DebuggerDisplay("TiledMap {source} {firstgid}")]
-    public class TiledMapTileset
+    public partial class TiledMapTileset
     {
         /// <summary>
         /// The first gid defines which gid matches the tile with source vector 0,0. Is used to determine which tileset belongs to which gid
@@ -20,7 +20,7 @@ namespace TiledCS
     /// Represents a property object in both tilesets, maps, layers and objects. Values are all in string but you can use the 'type' property for conversions
     /// </summary>
     [System.Diagnostics.DebuggerDisplay("Property {type,nq} {name} {value}")]
-    public class TiledProperty
+    public partial class TiledProperty
     {
         /// <summary>
         /// The property name or key in string format
@@ -36,21 +36,44 @@ namespace TiledCS
         public string value;
     }
 
+    public abstract partial class TiledProperties
+    {
+        /// <summary>
+        /// The layer properties if set
+        /// </summary>
+        public TiledProperty[] properties;
+    }
+
+    public abstract partial class TiledIdName : TiledProperties
+    {
+        /// <summary>
+        /// The id
+        /// </summary>
+        public int id;
+        /// <summary>
+        /// The name
+        /// </summary>
+        public string name;        
+    }
+
+    public abstract partial class TiledVisibleLocked : TiledIdName
+    {
+        /// <summary>
+        /// Defines if the layer is visible in the editor
+        /// </summary>
+        public bool visible;
+        /// <summary>
+        /// Is true when the layer is locked
+        /// </summary>
+        public bool locked;
+    }
 
     /// <summary>
     /// Represents a tile layer as well as an object layer within a tile map
     /// </summary>
     [System.Diagnostics.DebuggerDisplay("{type,nq} {name} {width}x{height}")]
-    public class TiledLayer
-    {
-        /// <summary>
-        /// The layer id
-        /// </summary>
-        public int id;
-        /// <summary>
-        /// The layer name
-        /// </summary>
-        public string name;
+    public partial class TiledLayer : TiledVisibleLocked
+    {        
         /// <summary>
         /// Total horizontal tiles
         /// </summary>
@@ -66,15 +89,7 @@ namespace TiledCS
         /// <summary>
         /// The tint color set by the user in hex code
         /// </summary>
-        public string tintcolor;
-        /// <summary>
-        /// Defines if the layer is visible in the editor
-        /// </summary>
-        public bool visible;
-        /// <summary>
-        /// Is true when the layer is locked
-        /// </summary>
-        public bool locked;
+        public string tintcolor;        
         /// <summary>
         /// The horizontal offset
         /// </summary>
@@ -95,32 +110,79 @@ namespace TiledCS
         /// Is null when the layer is not a tilelayer.
         /// </summary>
         public byte[] dataRotationFlags;
+
+        /// <summary>
+        /// chunks for infinite TiledMap
+        /// </summary>
+        public TiledLayerChunk[] chunks;
         /// <summary>
         /// The list of objects in case of an objectgroup layer. Is null when the layer has no objects.
         /// </summary>
         public TiledObject[] objects;
-        /// <summary>
-        /// The layer properties if set
-        /// </summary>
-        public TiledProperty[] properties;
+        
 
         public TiledImage image;
+    }
+
+    [System.Diagnostics.DebuggerDisplay("Chunk ({offsetX},{offsetY}) {width}x{height}")]
+    public partial class TiledLayerChunk
+    {
+        /// <summary>
+        /// The horizontal offset
+        /// </summary>
+        public int offsetX;
+        /// <summary>
+        /// The vertical offset
+        /// </summary>
+        public int offsetY;
+        /// <summary>
+        /// Total horizontal tiles
+        /// </summary>
+        public int width;
+        /// <summary>
+        /// Total vertical tiles
+        /// </summary>
+        public int height;
+        /// <summary>
+        /// An int array of gid numbers which define which tile is being used where. The length of the array equals the layer width * the layer height. Is null when the layer is not a tilelayer.
+        /// </summary>
+        public int[] data;
+        /// <summary>
+        /// A parallel array to data which stores the rotation flags of the tile.
+        /// Bit 3 is horizontal flip,
+        /// bit 2 is vertical flip, and
+        /// bit 1 is (anti) diagonal flip.
+        /// Is null when the layer is not a tilelayer.
+        /// </summary>
+        public byte[] dataRotationFlags;
+    }
+
+    /// <summary>
+    /// Represents a layer or object group
+    /// </summary>
+    [System.Diagnostics.DebuggerDisplay("Group {name}")]
+    public partial class TiledGroup : TiledVisibleLocked
+    {        
+        /// <summary>
+        /// The group's layers
+        /// </summary>
+        public TiledLayer[] layers;
+        /// <summary>
+        /// The group's objects
+        /// </summary>
+        public TiledObject[] objects;
+        /// <summary>
+        /// The group's subgroups
+        /// </summary>
+        public TiledGroup[] groups;
     }
 
     /// <summary>
     /// Represents an tiled object defined in object layers
     /// </summary>
     [System.Diagnostics.DebuggerDisplay("Object {type,nq} {name} ({x},{y})")]
-    public class TiledObject
-    {
-        /// <summary>
-        /// The object id
-        /// </summary>
-        public int id;
-        /// <summary>
-        /// The object's name
-        /// </summary>
-        public string name;
+    public partial class TiledObject : TiledIdName
+    {        
         /// <summary>
         /// The object type if defined. Null if none was set.
         /// </summary>
@@ -148,11 +210,7 @@ namespace TiledCS
         /// <summary>
         /// The tileset gid when the object is linked to a tile
         /// </summary>
-        public int gid;
-        /// <summary>
-        /// An array of properties. Is null if none were defined.
-        /// </summary>
-        public TiledProperty[] properties;
+        public int gid;        
         /// <summary>
         /// If an object was set to a polygon shape, this property will be set and can be used to access the polygon's data
         /// </summary>
@@ -202,7 +260,7 @@ namespace TiledCS
     /// </summary>
     /// <remarks>These are not defined for all tiles within a tileset, only the ones with properties, terrains and animations.</remarks>
     [System.Diagnostics.DebuggerDisplay("Tile {id} {type,nq}")]
-    public class TiledTile
+    public partial class TiledTile : TiledProperties
     {
         /// <summary>
         /// The tile id
@@ -216,11 +274,7 @@ namespace TiledCS
         /// The terrain definitions as int array. These are indices indicating what part of a terrain and which terrain this tile represents.
         /// </summary>
         /// <remarks>In the map file empty space is used to indicate null or no value. However, since it is an int array I needed something so I decided to replace empty values with -1.</remarks>
-        public int[] terrain;
-        /// <summary>
-        /// An array of properties. Is null if none were defined.
-        /// </summary>
-        public TiledProperty[] properties;
+        public int[] terrain;        
         /// <summary>
         /// An array of tile animations. Is null if none were defined. 
         /// </summary>
@@ -235,7 +289,7 @@ namespace TiledCS
     /// Represents an image
     /// </summary>
     [System.Diagnostics.DebuggerDisplay("Image {source} {width}x{height}")]
-    public class TiledImage
+    public partial class TiledImage
     {
         /// <summary>
         /// The image width
@@ -257,7 +311,7 @@ namespace TiledCS
     /// Represents a tile animation. Tile animations are a group of tiles which act as frames for an animation.
     /// </summary>
     [System.Diagnostics.DebuggerDisplay("Animation {tileid} {duration}")]
-    public class TiledTileAnimation
+    public partial class TiledTileAnimation
     {
         /// <summary>
         /// The tile id within a tileset
@@ -273,7 +327,7 @@ namespace TiledCS
     /// Represents a terrain definition.
     /// </summary>
     [System.Diagnostics.DebuggerDisplay("Terrain {name} {tile}")]
-    public class TiledTerrain
+    public partial class TiledTerrain
     {
         /// <summary>
         /// The terrain name
@@ -307,45 +361,5 @@ namespace TiledCS
         /// The height in pixels from the tile in the source image
         /// </summary>
         public int height;
-    }
-
-    /// <summary>
-    /// Represents a layer or object group
-    /// </summary>
-    [System.Diagnostics.DebuggerDisplay("Group {name}")]
-    public class TiledGroup
-    {
-        /// <summary>
-        /// The group's id
-        /// </summary>
-        public int id;
-        /// <summary>
-        /// The group's name
-        /// </summary>
-        public string name;
-        /// <summary>
-        /// The group's visibility
-        /// </summary>
-        public bool visible;
-        /// <summary>
-        /// The group's locked state
-        /// </summary>
-        public bool locked;
-        /// <summary>
-        /// The group's user properties
-        /// </summary>
-        public TiledProperty[] properties;
-        /// <summary>
-        /// The group's layers
-        /// </summary>
-        public TiledLayer[] layers;
-        /// <summary>
-        /// The group's objects
-        /// </summary>
-        public TiledObject[] objects;
-        /// <summary>
-        /// The group's subgroups
-        /// </summary>
-        public TiledGroup[] groups;
-    }
+    }    
 }
