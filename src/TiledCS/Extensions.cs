@@ -30,6 +30,12 @@ namespace TiledCS
             return src.Select(x => int.Parse(x.Length == 0 ? "-1" : x)).ToArray();
         }        
 
+
+        public static int UncheckedSigned(this uint unsigned)
+        {
+            return unchecked((int)unsigned);
+        }
+
         public static string GetStringOrDefault(this System.Xml.XmlAttributeCollection attributes, string name, string defval)
         {
             var att = attributes[name];
@@ -38,11 +44,19 @@ namespace TiledCS
                 : defval;
         }
 
-        public static int GetIntegerOrDefault(this System.Xml.XmlAttributeCollection attributes, string name, int defval)
+        public static int GetSignedOrDefault(this System.Xml.XmlAttributeCollection attributes, string name, int defval)
         {
             var att = attributes[name];
             return att != null
                 ? int.Parse(att.Value)
+                : defval;
+        }
+
+        public static uint GetUnsignedOrDefault(this System.Xml.XmlAttributeCollection attributes, string name, uint defval)
+        {
+            var att = attributes[name];
+            return att != null
+                ? uint.Parse(att.Value)
                 : defval;
         }
 

@@ -12,6 +12,10 @@ namespace TiledCS
     partial class TiledMap
     {
         /// <summary>
+        /// Returns an empty instance of <see cref="TiledMap"/>
+        /// </summary>
+        public TiledMap() { }
+        /// <summary>
         /// Loads a Tiled map in TMX format and parses it
         /// </summary>
         /// <param name="path">The path to the tmx file</param>
@@ -25,6 +29,8 @@ namespace TiledCS
             var content = File.ReadAllText(path);
             
             ParseXml(content);
+
+            this.Tilesets = TiledTilesetSource.ReplaceTileSetFiles(this.Tilesets, new System.IO.FileInfo(path));
         }
 
         /// <summary>
@@ -50,32 +56,62 @@ namespace TiledCS
                 throw new TiledException("Unable to parse xml data, make sure the xml data represents a valid Tiled map", ex);
             }
 #endif
+        }        
+    }
+
+    [System.Diagnostics.DebuggerDisplay("TileSet {GetDebuggerString(),nq}")]
+    public class TiledTilesetSource : TiledTileset
+    {
+        /// <summary>
+        /// The tsx file path as defined in the map file itself
+        /// </summary>
+        public string Source { get; set; }
+
+        /// <inheritdoc />
+        protected override void ParseXml(XmlNode node)
+        {
+            this.FirstGlobalId = node.Attributes.GetSignedOrDefault("firstgid", 0);
+            this.Source = node.Attributes.GetStringOrDefault("source", null);
+
+            // if source is not null, all other properties and fields should not be loaded now.
+            if (!string.IsNullOrEmpty(this.Source)) return;
+
+            base.ParseXml(node);
         }
 
-        protected override void ParseXml(XmlNode nodeMap)
+        /// <summary>
+        /// Checks if there's external TSX files remaining to be loaded.
+        /// </summary>
+        /// <param name="srcSets">The <see cref="TiledTileset"/> to check.</param>
+        /// <param name="sourceFile">The path for the source TMX file.</param>
+        /// <returns>A new <see cref="TiledTileset"/> array where all TSX have been loaded.</returns>
+        public static TiledTileset[] ReplaceTileSetFiles(TiledTileset[] srcSets, System.IO.FileInfo sourceFile)
         {
-            base.ParseXml(nodeMap);
+            var directory = sourceFile.Directory;
+            return srcSets.Select(item => ReplaceTileSetFile(item, directory)).ToArray();
+        }
 
-            var version = nodeMap.Attributes.GetStringOrDefault("version", "Unknown");
-            this.TiledVersion = nodeMap.Attributes.GetStringOrDefault("tiledversion", version);
+        private static TiledTileset ReplaceTileSetFile(TiledTileset src, System.IO.DirectoryInfo directory)
+        {
+            if (src is TiledTilesetSource tss && !string.IsNullOrEmpty(tss.Source))
+            {
+                var fpath = System.IO.Path.Combine(directory.FullName, tss.Source);
 
-            this.Orientation = nodeMap.Attributes["orientation"].Value;
-            this.RenderOrder = nodeMap.Attributes.GetStringOrDefault("renderorder", string.Empty);
-            this.BackgroundColor = nodeMap.Attributes.GetStringOrDefault("backgroundcolor", null);
-            this.Infinite = nodeMap.Attributes.GetStringOrDefault("infinite", "0") == "1";
+                var extSet = new TiledTileset(fpath);
+                extSet.FirstGlobalId = tss.FirstGlobalId;
 
-            this.Width = int.Parse(nodeMap.Attributes["width"].Value);
-            this.Height = int.Parse(nodeMap.Attributes["height"].Value);
-            this.TileWidth = int.Parse(nodeMap.Attributes["tilewidth"].Value);
-            this.TileHeight = int.Parse(nodeMap.Attributes["tileheight"].Value);
+                return extSet;
+            }
 
-            Tilesets = TryCreateFrom<TiledMapTileset>(nodeMap.SelectNodes("tileset"));
-            Groups = TryCreateFrom<TiledGroup>(nodeMap.SelectNodes("group"));
+            return src;
+        }
 
-            var nodesLayer = nodeMap.SelectNodes("layer");
-            var nodesImageLayer = nodeMap.SelectNodes("imagelayer");
-            var nodesObjectGroup = nodeMap.SelectNodes("objectgroup");
-            Layers = TiledLayer.TryCreateFrom(nodesLayer, nodesObjectGroup, nodesImageLayer).ToArray();            
+        /// <inheritdoc />
+        protected override string GetDebuggerString()
+        {
+            return string.IsNullOrEmpty(Source)
+                ? base.GetDebuggerString()
+                : Source;
         }
     }
 }

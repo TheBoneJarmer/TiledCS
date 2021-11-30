@@ -9,42 +9,52 @@ using System.Xml;
 namespace TiledCS
 {
     /// <summary>
-    /// Represents the index of a tile in a <see cref="TiledMapTileset"/>.
+    /// Represents the index of a tile in <see cref="TiledTilesLayer.Data"/>.
     /// </summary>    
     [System.Diagnostics.DebuggerDisplay("{ToDebuggerString(),nq}")]
     public readonly struct TiledIndex
     {
-        internal string ToDebuggerString()
-        {
-            var text = Index.ToString();
-            var x = HasHorizontalFlip | HasVerticalFlip | HasDiagonalFlip;
-            if (x) text += " ";
-
-            if (HasDiagonalFlip) text += "🡘";
-            if (HasVerticalFlip) text += "🡙";
-            if (HasDiagonalFlip) text += "⭯";
-
-            return text;
-        }
-
         const uint FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
         const uint FLIPPED_VERTICALLY_FLAG = 0x40000000;
         const uint FLIPPED_DIAGONALLY_FLAG = 0x20000000;
 
         const uint INDEX_MASK = ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
 
+        /// <summary>
+        /// Initializes a new <see cref="TiledIndex"/>.
+        /// </summary>
+        /// <param name="rawValue"></param>
         public TiledIndex(uint rawValue) { RawValue = rawValue; }
 
         private readonly uint RawValue;
 
+        /// <summary>
+        /// The global tile index.
+        /// </summary>
         public int Index => (int)(RawValue & INDEX_MASK);
 
+        /// <summary>
+        /// Indicates whether the tile pointed by <see cref="Index"/> has to be rendered with horizontal flip.
+        /// </summary>
         public bool HasHorizontalFlip => (RawValue & FLIPPED_HORIZONTALLY_FLAG) != 0;
-        public bool HasVerticalFlip => (RawValue & FLIPPED_VERTICALLY_FLAG) != 0;
-        public bool HasDiagonalFlip => (RawValue & FLIPPED_DIAGONALLY_FLAG) != 0;
-    
 
-        public static TiledIndex[] TryCreateFrom(XmlNode nodeData)
+        /// <summary>
+        /// Indicates whether the tile pointed by <see cref="Index"/> has to be rendered with vertical flip.
+        /// </summary>
+        public bool HasVerticalFlip => (RawValue & FLIPPED_VERTICALLY_FLAG) != 0;
+
+        /// <summary>
+        /// Indicates whether the tile pointed by <see cref="Index"/> has to be rendered with diagonal flip.
+        /// </summary>
+        public bool HasDiagonalFlip => (RawValue & FLIPPED_DIAGONALLY_FLAG) != 0;
+
+
+        /// <summary>
+        /// Initializes an array of type <see cref="TiledIndex"/> from XML.
+        /// </summary>        
+        /// <param name="nodeData">The xml source.</param>
+        /// <returns>The initialized array.</returns>
+        internal static TiledIndex[] TryCreateFrom(XmlNode nodeData)
         {
             return DecodeRawData(nodeData).Select(raw => new TiledIndex(raw)).ToArray();
         }
@@ -93,60 +103,53 @@ namespace TiledCS
 
         private static IEnumerable<uint> DecodeStream(byte[] rawdata, string compression)
         {
-            using (var rawStream = new MemoryStream(rawdata, false))
+            using (var stream = OpenStreamFrom(rawdata, compression))
             {
-                if (compression == null)
-                {
-                    // Parse the decoded bytes
-                    var rawBytes = new byte[4];
+                // Parse the raw decompressed bytes
+                var decompressedDataBuffer = new byte[4]; // size of each tile                
 
-                    for (var i = 0; i < rawStream.Length; i++)
-                    {
-                        rawStream.Read(rawBytes, 0, rawBytes.Length);
-                        yield return BitConverter.ToUInt32(rawBytes, 0);
-                    }
-                }
-                else if (compression == "zlib")
+                while (stream.Read(decompressedDataBuffer, 0, decompressedDataBuffer.Length) == decompressedDataBuffer.Length)
                 {
-                    // .NET doesn't play well with the headered zlib data that Tiled produces,
-                    // so we have to manually skip the 2-byte header to get what DeflateStream's looking for
-                    // Should an external library be used instead of this hack?
-                    rawStream.ReadByte();
-                    rawStream.ReadByte();
-
-                    using (var decompressionStream = new DeflateStream(rawStream, CompressionMode.Decompress))
-                    {
-                        // Parse the raw decompressed bytes
-                        var decompressedDataBuffer = new byte[4]; // size of each tile
-                        var dataRotationFlagsList = new List<byte>();
-                        var layerDataList = new List<int>();
-
-                        while (decompressionStream.Read(decompressedDataBuffer, 0, decompressedDataBuffer.Length) == decompressedDataBuffer.Length)
-                        {
-                            yield return BitConverter.ToUInt32(decompressedDataBuffer, 0);
-                        }
-                    }
-                }
-                else if (compression == "gzip")
-                {
-                    using (var decompressionStream = new GZipStream(rawStream, CompressionMode.Decompress))
-                    {
-                        // Parse the raw decompressed bytes and update the inner data as well as the data rotation flags
-                        var decompressedDataBuffer = new byte[4]; // size of each tile
-                        var dataRotationFlagsList = new List<byte>();
-                        var layerDataList = new List<int>();
-
-                        while (decompressionStream.Read(decompressedDataBuffer, 0, decompressedDataBuffer.Length) == decompressedDataBuffer.Length)
-                        {
-                            yield return BitConverter.ToUInt32(decompressedDataBuffer, 0);
-                        }
-                    }
-                }
-                else
-                {
-                    throw new TiledException($"{compression} compression is currently not supported");
+                    yield return BitConverter.ToUInt32(decompressedDataBuffer, 0);
                 }
             }
+        }
+
+        private static System.IO.Stream OpenStreamFrom(byte[] rawdata, string compression)
+        {
+            var rawStream = new MemoryStream(rawdata, false);
+
+            if (string.IsNullOrWhiteSpace(compression)) return rawStream;
+
+            if (compression == "zlib")
+            {
+                // .NET doesn't play well with the headered zlib data that Tiled produces,
+                // so we have to manually skip the 2-byte header to get what DeflateStream's looking for
+                // Should an external library be used instead of this hack?
+                rawStream.ReadByte();
+                rawStream.ReadByte();
+                return new DeflateStream(rawStream, CompressionMode.Decompress, false);
+            }
+
+            if (compression == "gzip")
+            {
+                return new GZipStream(rawStream, CompressionMode.Decompress);
+            }
+
+            throw new TiledException($"{compression} compression is currently not supported");
+        }
+
+        internal string ToDebuggerString()
+        {
+            var text = Index.ToString();
+            var x = HasHorizontalFlip | HasVerticalFlip | HasDiagonalFlip;
+            if (!x) return text;
+
+            text += " ";
+            if (HasDiagonalFlip) text += "🡘";
+            if (HasVerticalFlip) text += "🡙";
+            if (HasDiagonalFlip) text += "⤯";
+            return text;
         }
     }
 }

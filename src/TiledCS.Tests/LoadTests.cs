@@ -1,3 +1,5 @@
+using System.Linq;
+
 using NUnit.Framework;
 
 namespace TiledCS
@@ -16,26 +18,50 @@ namespace TiledCS
             var map = new TiledMap(tmxPath);
             Assert.NotNull(map);
 
-            TestContext.WriteLine($"Version:{map.TiledVersion} Size:{map.Width}x{map.Height} Orientation:{map.Orientation} RenderOrder:{map.RenderOrder} Infinite:{map.Infinite}");
+            TestContext.WriteLine($"Version:{map.Version} Size:{map.Width}x{map.Height} Orientation:{map.Orientation} RenderOrder:{map.RenderOrder} Infinite:{map.Infinite}");                        
         }
 
+        
         [TestCase("Resources\\exotic\\infinite.tmx")]
         public void TestLoadingInfiniteTMX(string tmxPath)
         {
-            var map = new TiledMap(tmxPath);
-            Assert.NotNull(map);
-            Assert.AreEqual(4, map.Layers[0].chunks.Length);
+            var map = new TiledMap(tmxPath);            
+            Assert.NotNull(map);            
         }
 
+        [TestCase("Resources\\examples\\rpg\\beach_tileset.tsx")]
         [TestCase("Resources\\exotic\\Tiles32x32.A.tsx")]
-        [TestCase("Resources\\wangtiles\\grassAndWater.tsx")]
-        [TestCase("Resources\\wangtiles\\PathAndObjects.tsx")]
-        [TestCase("Resources\\wangtiles\\walkways.tsx")]
-        [TestCase("Resources\\wangtiles\\wangblob.tsx")]
+        [TestCase("Resources\\examples\\perspective_walls.tsx")]        
         public void LoadTSX(string tsxPath)
         {
             var tiles = new TiledTileset(tsxPath);
             Assert.NotNull(tiles);
-        }        
+
+            var view = TileView.CreateFrom(tiles).ToArray();
+        }
+
+        [Test]
+        public void TestLoadComplexTMX()
+        {
+            var map = new TiledMap("Resources\\examples\\orthogonal-outside.tmx");
+            Assert.NotNull(map);
+            Assert.AreEqual(3, map.Layers.Length);
+
+            var groundLayer = map.Layers[0] as TiledTilesLayer;
+            var fringeLayer = map.Layers[1] as TiledTilesLayer;
+            var objectsLayer = map.Layers[2] as TiledObjectsLayer;
+
+            Assert.AreEqual(29, objectsLayer.Objects.Length);            
+        }
+
+        [TestCase("Resources\\examples\\orthogonal-outside.tmx")]        
+        public void TestEvaluation(string tmxPath)
+        {
+            var mapView = TiledMapView.Load(tmxPath);
+
+            var drawables = mapView
+                .GetDrawables(30, 50, 800, 600)
+                .ToArray();
+        }
     }
 }

@@ -10,6 +10,11 @@ namespace TiledCS
     partial class TiledTileset
     {
         /// <summary>
+        /// Returns an empty instance of <see cref="TiledTileset"/>
+        /// </summary>
+        public TiledTileset() { }
+
+        /// <summary>
         /// Loads a tileset in TSX format and parses it
         /// </summary>
         /// <param name="path">The file path of the TSX file</param>
@@ -49,23 +54,6 @@ namespace TiledCS
                 throw new TiledException("Unable to parse xml data, make sure the xml data represents a valid Tiled tileset", ex);
             }
 #endif
-        }
-
-        protected override void ParseXml(XmlNode node)
-        {
-            base.ParseXml(node);            
-
-            TiledVersion = node.Attributes["tiledversion"].Value;
-            Name = node.Attributes.GetStringOrDefault("name", null);
-            TileWidth = int.Parse(node.Attributes["tilewidth"].Value);
-            TileHeight = int.Parse(node.Attributes["tileheight"].Value);
-            TileCount = int.Parse(node.Attributes["tilecount"].Value);
-            Columns = int.Parse(node.Attributes["columns"].Value);
-            Margin = node.Attributes.GetIntegerOrDefault("margin", 0);
-            Spacing = node.Attributes.GetIntegerOrDefault("spacing", 0);
-            Image = TryCreateFrom<TiledImage>(node.SelectSingleNode("image"));
-            Tiles = TryCreateFrom<TiledTile>(node.SelectNodes("tile"));            
-            Terrains = TryCreateFrom<TiledTerrain>(node.SelectNodes("terraintypes/terrain"));
         }        
     }
 }
