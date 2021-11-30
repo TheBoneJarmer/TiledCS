@@ -19,7 +19,7 @@ namespace TiledCS
         /// <summary>
         /// A reference to a tile. (optional)
         /// </summary>
-        public int GlobalId { get; set; }
+        public TiledIndex TileId { get; set; }
         /// <summary>
         /// The object's x position in pixels
         /// </summary>
@@ -63,8 +63,8 @@ namespace TiledCS
         {
             base.ParseXml(node);
 
-            this.Type = node.Attributes.GetStringOrDefault("type", null);
-            this.GlobalId = (int)node.Attributes.GetUnsignedOrDefault("gid", 0);
+            this.Type = node.Attributes.GetStringOrDefault("type", null);            
+            this.TileId = new TiledIndex(node.Attributes.GetUnsignedOrDefault("gid", 0));
             this.X = node.Attributes.GetSingleOrDefault("x", 0);
             this.Y = node.Attributes.GetSingleOrDefault("y", 0);
             this.Width = node.Attributes.GetSingleOrDefault("width", 0);
@@ -97,7 +97,7 @@ namespace TiledCS
         {
             var txt = base.GetDebuggerString();
             if (!string.IsNullOrWhiteSpace(Type)) txt += $" Type={Type}";
-            if (GlobalId != 0) txt += $" TileId={GlobalId}";
+            if (TileId.Index != 0) txt += $" TileId={TileId.Index}";
             if (X != 0 || Y!=0) txt += $" ({X} {Y})";
             if (Width != 0 || Height != 0) txt += $" ({Width}x{Height})";
             if (Rotation != 0) txt += $" {Rotation}°";
