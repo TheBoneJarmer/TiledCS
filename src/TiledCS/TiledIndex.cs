@@ -18,7 +18,12 @@ namespace TiledCS
         const uint FLIPPED_VERTICALLY_FLAG = 0x40000000;
         const uint FLIPPED_DIAGONALLY_FLAG = 0x20000000;
 
-        const uint INDEX_MASK = ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
+        // for hexagonal maps
+        const uint ROTATE_60_FLAG = 0x20000000;
+        // for hexagonal maps
+        const uint ROTATE_120_FLAG = 0x10000000;
+
+        const uint INDEX_MASK = ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG | ROTATE_120_FLAG);
 
         /// <summary>
         /// Initializes a new <see cref="TiledIndex"/>.
