@@ -26,45 +26,40 @@ namespace TestApp
         private static void Main(string[] args)
         {
             // For loading maps in XML format
-            var map = new TiledMap("path-to-map.tmx");        
+            var map = new TiledMap("path-to-map.tmx");
             var tileset = new TiledTileset("path-to-tileset.tsx");
-            
+
             // For loading maps in JSON format
             var json1 = File.ReadAllText("path-to-map.json");
             var json2 = File.ReadAllText("path-to-tileset.json");
             var mapJson = JsonConvert.DeserializeObject<TiledMap>(json1);
             var tilesetJson = JsonConvert.DeserializeObject<TiledTileset>(json2);
-            
+
             // Retrieving objects or layers can be done using Linq or a for loop
             var myLayer = map.layers.First(l => l.name == "monsters");
             var myObj = myLayer.objects.First(o => o.name == "monster");
-            
+
             // Since they are classes and not structs, you can do null checks to figure out if an object exists or not
             if (myObj != null)
             {
                 var xx = myObj.x * 16;
                 var yy = myObj.y * 16;
             }
-            
+
             // You can use the helper methods to get useful information to generate maps
             if (map.IsTileFlippedHorizontal(myLayer, 3, 5))
             {
                 // Do something
             }
-            
+
             var mapTileset = map.Tilesets.First();
-            
+
             // Used for retrieving the tile horizontal and vertical position of the source rect of the tileset image which you can use to draw tiles with. This way you won't have to manually figure that one out yourself.
             var srcVector = map.GetSourceVector(mapTileset, tileset, 478);
         }
     }
 }
 ```
-
-### MonoGame
-> **Note! The MonoGame content pipeline only supports loading maps in TMX and TSX format**
-
-If you are using MonoGame and you would like to import Tiled maps and tilesets I recommend taking a look at [DelightedCat's extension project](https://github.com/DelightedCat/TiledCS.Extensions.MonoGame). He created a custom pipeline which allows the import of Tiled maps and tilesets.
 
 ## Building
 You need the latest stable dotnet sdk to compile TiledCS as it makes use of modern C# features that may or may not be included in earlier versions.
