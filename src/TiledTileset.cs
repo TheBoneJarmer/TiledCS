@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Xml;
 
@@ -196,6 +197,7 @@ namespace TiledCS
                 var nodesProperty = node.SelectNodes("properties/property");
                 var nodesAnimation = node.SelectNodes("animation/frame");
                 var nodeImage = node.SelectSingleNode("image");
+                var nodesObjectGroup = node.SelectNodes("objectgroup");
 
                 var tile = new TiledTile();
                 tile.id = int.Parse(node.Attributes["id"].Value);
@@ -203,6 +205,7 @@ namespace TiledCS
                 tile.terrain = node.Attributes["terrain"]?.Value.Split(',').AsIntArray();
                 tile.properties = ParseProperties(nodesProperty);
                 tile.animation = ParseAnimations(nodesAnimation);
+                tile.objects = ParseObjects(nodesObjectGroup);
 
                 if (nodeImage != null)
                 {
@@ -215,6 +218,49 @@ namespace TiledCS
                 }
 
                 result.Add(tile);
+            }
+
+            return result.ToArray();
+        }
+
+        private TiledObject[] ParseObjects(XmlNodeList nodeList)
+        {
+            var result = new List<TiledObject>();
+
+            foreach (XmlNode node in nodeList)
+            {
+                var nodesObject = node.SelectNodes("object");
+                foreach (XmlNode objectNode in nodesObject)
+                {
+                    var nodePolygon = objectNode.SelectSingleNode("polygon");
+
+                    var obj = new TiledObject();
+                    obj.id = int.Parse(objectNode.Attributes["id"].Value);
+                    obj.name = objectNode.Attributes["name"]?.Value;
+                    obj.type = objectNode.Attributes["type"]?.Value;
+                    obj.gid = int.Parse(objectNode.Attributes["gid"]?.Value ?? "0");
+                    obj.x = float.Parse(objectNode.Attributes["x"].Value, CultureInfo.InvariantCulture);
+                    obj.y = float.Parse(objectNode.Attributes["y"].Value, CultureInfo.InvariantCulture);
+
+                    if (nodePolygon != null)
+                    {
+                        var points = nodePolygon.Attributes["points"].Value;
+                        var vertices = points.Split(' ');
+
+                        var polygon = new TiledPolygon();
+                        polygon.points = new float[vertices.Length * 2];
+
+                        for (var i = 0; i < vertices.Length; i++)
+                        {
+                            polygon.points[(i * 2) + 0] = float.Parse(vertices[i].Split(',')[0], CultureInfo.InvariantCulture);
+                            polygon.points[(i * 2) + 1] = float.Parse(vertices[i].Split(',')[1], CultureInfo.InvariantCulture);
+                        }
+
+                        obj.polygon = polygon;
+                    }
+
+                    result.Add(obj);
+                }
             }
 
             return result.ToArray();

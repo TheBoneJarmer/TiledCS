@@ -443,6 +443,7 @@ namespace TiledCS
             {
                 var nodesProperty = node.SelectNodes("properties/property");
                 var nodePolygon = node.SelectSingleNode("polygon");
+                var nodePolyline = node.SelectSingleNode("polyline");
                 var nodePoint = node.SelectSingleNode("point");
                 var nodeEllipse = node.SelectSingleNode("ellipse");
 
@@ -474,6 +475,23 @@ namespace TiledCS
                     }
 
                     obj.polygon = polygon;
+                }
+
+                if (nodePolyline != null)
+                {
+                    var points = nodePolyline.Attributes["points"].Value;
+                    var vertices = points.Split(' ');
+
+                    var polyline = new TiledPolyline();
+                    polyline.points = new float[vertices.Length * 2];
+
+                    for (var i = 0; i < vertices.Length; i++)
+                    {
+                        polyline.points[(i * 2) + 0] = float.Parse(vertices[i].Split(',')[0], CultureInfo.InvariantCulture);
+                        polyline.points[(i * 2) + 1] = float.Parse(vertices[i].Split(',')[1], CultureInfo.InvariantCulture);
+                    }
+
+                    obj.polyline = polyline;
                 }
 
                 if (nodeEllipse != null)
