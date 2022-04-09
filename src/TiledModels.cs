@@ -9,6 +9,7 @@ namespace TiledCS
         /// The first gid defines which gid matches the tile with source vector 0,0. Is used to determine which tileset belongs to which gid
         /// </summary>
         public int firstgid;
+
         /// <summary>
         /// The tsx file path as defined in the map file itself
         /// </summary>
@@ -24,10 +25,12 @@ namespace TiledCS
         /// The property name or key in string format
         /// </summary>
         public string name;
+
         /// <summary>
         /// The property type as used in Tiled. Can be bool, number, string, ...
         /// </summary>
         public string type;
+
         /// <summary>
         /// The value in string format
         /// </summary>
@@ -43,46 +46,67 @@ namespace TiledCS
         /// The layer id
         /// </summary>
         public int id;
+
         /// <summary>
         /// The layer name
         /// </summary>
         public string name;
+
         /// <summary>
         /// Total horizontal tiles
         /// </summary>
         public int width;
+
         /// <summary>
         /// Total vertical tiles
         /// </summary>
         public int height;
+
         /// <summary>
         /// The layer type. Usually this is "objectgroup" or "tilelayer".
         /// </summary>
         public string type;
+
         /// <summary>
         /// The tint color set by the user in hex code
         /// </summary>
         public string tintcolor;
+
         /// <summary>
         /// Defines if the layer is visible in the editor
         /// </summary>
         public bool visible;
+
         /// <summary>
         /// Is true when the layer is locked
         /// </summary>
         public bool locked;
+
         /// <summary>
         /// The horizontal offset
         /// </summary>
-        public int offsetX;
+        public float offsetX;
+
         /// <summary>
         /// The vertical offset
         /// </summary>
-        public int offsetY;
+        public float offsetY;
+
+        /// <summary>
+        /// The parallax x position
+        /// </summary>
+        public float parallaxX;
+
+        /// <summary>
+        /// The parallax y position
+        /// </summary>
+        public float parallaxY;
+
         /// <summary>
         /// An int array of gid numbers which define which tile is being used where. The length of the array equals the layer width * the layer height. Is null when the layer is not a tilelayer.
         /// </summary>
         public int[] data;
+
         /// <summary>
         /// A parallel array to data which stores the rotation flags of the tile.
         /// Bit 3 is horizontal flip,
@@ -91,10 +115,12 @@ namespace TiledCS
         /// Is null when the layer is not a tilelayer.
         /// </summary>
         public byte[] dataRotationFlags;
+
         /// <summary>
         /// The list of objects in case of an objectgroup layer. Is null when the layer has no objects.
         /// </summary>
         public TiledObject[] objects;
+
         /// <summary>
         /// The layer properties if set
         /// </summary>
@@ -112,50 +138,62 @@ namespace TiledCS
         /// The object id
         /// </summary>
         public int id;
+
         /// <summary>
         /// The object's name
         /// </summary>
         public string name;
+
         /// <summary>
         /// The object type if defined. Null if none was set.
         /// </summary>
         public string type;
+
         /// <summary>
         /// The object's x position in pixels
         /// </summary>
         public float x;
+
         /// <summary>
         /// The object's y position in pixels
         /// </summary>
         public float y;
+
         /// <summary>
         /// The object's rotation
         /// </summary>
         public int rotation;
+
         /// <summary>
         /// The object's width in pixels
         /// </summary>
         public float width;
+
         /// <summary>
         /// The object's height in pixels
         /// </summary>
         public float height;
+
         /// <summary>
         /// The tileset gid when the object is linked to a tile
         /// </summary>
         public int gid;
+
         /// <summary>
         /// An array of properties. Is null if none were defined.
         /// </summary>
         public TiledProperty[] properties;
+
         /// <summary>
         /// If an object was set to a polygon shape, this property will be set and can be used to access the polygon's data
         /// </summary>
         public TiledPolygon polygon;
+
         /// <summary>
         /// If an object was set to a point shape, this property will be set
         /// </summary>
         public TiledPoint point;
+
         /// <summary>
         /// If an object was set to an ellipse shape, this property will be set
         /// </summary>
@@ -201,7 +239,6 @@ namespace TiledCS
     /// </summary>
     public class TiledPoint
     {
-        
     }
 
     /// <summary>
@@ -209,7 +246,6 @@ namespace TiledCS
     /// </summary>
     public class TiledEllipse
     {
-        
     }
 
     /// <summary>
@@ -222,27 +258,33 @@ namespace TiledCS
         /// The tile id
         /// </summary>
         public int id;
+
         /// <summary>
         /// The custom tile type, set by the user
         /// </summary>
         public string type;
+
         /// <summary>
         /// The terrain definitions as int array. These are indices indicating what part of a terrain and which terrain this tile represents.
         /// </summary>
         /// <remarks>In the map file empty space is used to indicate null or no value. However, since it is an int array I needed something so I decided to replace empty values with -1.</remarks>
         public int[] terrain;
+
         /// <summary>
         /// An array of properties. Is null if none were defined.
         /// </summary>
         public TiledProperty[] properties;
+
         /// <summary>
         /// An array of tile animations. Is null if none were defined. 
         /// </summary>
         public TiledTileAnimation[] animation;
+
         /// <summary>
         /// An array of tile objects created using the tile collision editor
         /// </summary>
         public TiledTileObject[] objects;
+
         /// <summary>
         /// The individual tile image
         /// </summary>
@@ -258,12 +300,12 @@ namespace TiledCS
         /// The image width
         /// </summary>
         public int width;
-        
+
         /// <summary>
         /// The image height
         /// </summary>
         public int height;
-        
+
         /// <summary>
         /// The image source path
         /// </summary>
@@ -279,6 +321,7 @@ namespace TiledCS
         /// The tile id within a tileset
         /// </summary>
         public int tileid;
+
         /// <summary>
         /// The duration in miliseconds
         /// </summary>
@@ -294,6 +337,7 @@ namespace TiledCS
         /// The terrain name
         /// </summary>
         public string name;
+
         /// <summary>
         /// The tile used as icon for the terrain editor
         /// </summary>
@@ -309,14 +353,17 @@ namespace TiledCS
         /// The x position in pixels from the tile location in the source image
         /// </summary>
         public int x;
+
         /// <summary>
         /// The y position in pixels from the tile location in the source image
         /// </summary>
         public int y;
+
         /// <summary>
         /// The width in pixels from the tile in the source image
         /// </summary>
         public int width;
+
         /// <summary>
         /// The height in pixels from the tile in the source image
         /// </summary>
@@ -332,30 +379,37 @@ namespace TiledCS
         /// The group's id
         /// </summary>
         public int id;
+
         /// <summary>
         /// The group's name
         /// </summary>
         public string name;
+
         /// <summary>
         /// The group's visibility
         /// </summary>
         public bool visible;
+
         /// <summary>
         /// The group's locked state
         /// </summary>
         public bool locked;
+
         /// <summary>
         /// The group's user properties
         /// </summary>
         public TiledProperty[] properties;
+
         /// <summary>
         /// The group's layers
         /// </summary>
         public TiledLayer[] layers;
+
         /// <summary>
         /// The group's objects
         /// </summary>
         public TiledObject[] objects;
+
         /// <summary>
         /// The group's subgroups
         /// </summary>

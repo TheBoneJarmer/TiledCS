@@ -26,60 +26,82 @@ namespace TiledCS
         /// Returns the Tiled version used to create this map
         /// </summary>
         public string TiledVersion { get; set; }
+
         /// <summary>
         /// Returns an array of properties defined in the map
         /// </summary>
         public TiledProperty[] Properties { get; set; }
+
         /// <summary>
         /// Returns an array of tileset definitions in the map
         /// </summary>
         public TiledMapTileset[] Tilesets { get; set; }
+
         /// <summary>
         /// Returns an array of layers or null if none were defined
         /// </summary>
         public TiledLayer[] Layers { get; set; }
+
         /// <summary>
         /// Returns an array of groups or null if none were defined
         /// </summary>
         public TiledGroup[] Groups { get; set; }
+
         /// <summary>
         /// Returns the defined map orientation as a string
         /// </summary>
         public string Orientation { get; set; }
+
         /// <summary>
         /// Returns the render order as a string
         /// </summary>
         public string RenderOrder { get; set; }
+
         /// <summary>
         /// The amount of horizontal tiles
         /// </summary>
         public int Width { get; set; }
+
         /// <summary>
         /// The amount of vertical tiles
         /// </summary>
         public int Height { get; set; }
+
         /// <summary>
         /// The tile width in pixels
         /// </summary>
         public int TileWidth { get; set; }
+
         /// <summary>
         /// The tile height in pixels
         /// </summary>
         public int TileHeight { get; set; }
+
+        /// <summary>
+        /// The parallax origin x
+        /// </summary>
+        public float ParallaxOriginX { get; set; }
+
+        /// <summary>
+        /// The parallax origin y
+        /// </summary>
+        public float ParallaxOriginY { get; set; }
+
         /// <summary>
         /// Returns true if the map is configured as infinite
         /// </summary>
         public bool Infinite { get; set; }
+
         /// <summary>
         /// Returns the defined map background color as a hex string
         /// </summary>
         public string BackgroundColor { get; set; }
+
         /// <summary>
         /// Returns an empty instance of TiledMap
         /// </summary>
         public TiledMap()
         {
-
         }
 
         /// <summary>
@@ -94,7 +116,7 @@ namespace TiledCS
             {
                 throw new TiledException($"{path} not found");
             }
-            
+
             var content = File.ReadAllText(path);
 
             if (path.EndsWith(".tmx"))
@@ -127,6 +149,8 @@ namespace TiledCS
                 var nodesObjectGroup = nodeMap.SelectNodes("objectgroup");
                 var nodesTileset = nodeMap.SelectNodes("tileset");
                 var nodesGroup = nodeMap.SelectNodes("group");
+                var attrParallaxOriginX = nodeMap.Attributes["parallaxoriginx"];
+                var attrParallaxOriginY = nodeMap.Attributes["parallaxoriginy"];
 
                 this.TiledVersion = nodeMap.Attributes["tiledversion"].Value;
                 this.Orientation = nodeMap.Attributes["orientation"].Value;
@@ -143,6 +167,8 @@ namespace TiledCS
                 if (nodesTileset != null) Tilesets = ParseTilesets(nodesTileset);
                 if (nodesLayer != null) Layers = ParseLayers(nodesLayer, nodesObjectGroup, nodesImageLayer);
                 if (nodesGroup != null) Groups = ParseGroups(nodesGroup);
+                if (attrParallaxOriginX != null) ParallaxOriginX = float.Parse(attrParallaxOriginX.Value, CultureInfo.InvariantCulture);
+                if (attrParallaxOriginY != null) ParallaxOriginY = float.Parse(attrParallaxOriginY.Value, CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
@@ -205,18 +231,19 @@ namespace TiledCS
                 var tiledGroup = new TiledGroup();
                 tiledGroup.id = int.Parse(node.Attributes["id"].Value);
                 tiledGroup.name = node.Attributes["name"].Value;
-                
+
                 if (attrVisible != null) tiledGroup.visible = attrVisible.Value == "1";
                 if (attrLocked != null) tiledGroup.locked = attrLocked.Value == "1";
                 if (nodesProperty != null) tiledGroup.properties = ParseProperties(nodesProperty);
                 if (nodesGroup != null) tiledGroup.groups = ParseGroups(nodesGroup);
                 if (nodesLayer != null) tiledGroup.layers = ParseLayers(nodesLayer, nodesObjectGroup, nodesImageLayer);
-                
+
                 result.Add(tiledGroup);
             }
-            
+
             return result.ToArray();
         }
+
         private TiledLayer[] ParseLayers(XmlNodeList nodesLayer, XmlNodeList nodesObjectGroup, XmlNodeList nodesImageLayer)
         {
             var result = new List<TiledLayer>();
@@ -231,6 +258,8 @@ namespace TiledCS
                 var attrTint = node.Attributes["tintcolor"];
                 var attrOffsetX = node.Attributes["offsetx"];
                 var attrOffsetY = node.Attributes["offsety"];
+                var attrParallaxX = node.Attributes["parallaxx"];
+                var attrParallaxY = node.Attributes["parallaxy"];
 
                 var tiledLayer = new TiledLayer();
                 tiledLayer.id = int.Parse(node.Attributes["id"].Value);
@@ -243,8 +272,10 @@ namespace TiledCS
                 if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
                 if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
                 if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
-                if (attrOffsetX != null) tiledLayer.offsetX = int.Parse(attrOffsetX.Value);
-                if (attrOffsetY != null) tiledLayer.offsetY = int.Parse(attrOffsetY.Value);
+                if (attrOffsetX != null) tiledLayer.offsetX = float.Parse(attrOffsetX.Value);
+                if (attrOffsetY != null) tiledLayer.offsetY = float.Parse(attrOffsetY.Value);
+                if (attrParallaxX != null) tiledLayer.offsetX = float.Parse(attrParallaxX.Value);
+                if (attrParallaxY != null) tiledLayer.offsetY = float.Parse(attrParallaxY.Value);
                 if (nodesProperty != null) tiledLayer.properties = ParseProperties(nodesProperty);
 
                 if (encoding == "csv")
@@ -261,10 +292,11 @@ namespace TiledCS
                         var hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
                         var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
                         var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
-                        tiledLayer.dataRotationFlags[i] = (byte)((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE);
+                        tiledLayer.dataRotationFlags[i] = (byte) ((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE);
 
                         // assign data to rawID with the rotation flags cleared
-                        tiledLayer.data[i] = (int)(rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG));
+                        tiledLayer.data[i] = (int) (rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG |
+                                                              FLIPPED_DIAGONALLY_FLAG));
                     }
                 }
                 else if (encoding == "base64")
@@ -287,10 +319,12 @@ namespace TiledCS
                                 var hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
                                 var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
                                 var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
-                                tiledLayer.dataRotationFlags[i] = (byte)((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE);
+                                tiledLayer.dataRotationFlags[i] = (byte) ((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE);
 
                                 // assign data to rawID with the rotation flags cleared
-                                tiledLayer.data[i] = (int)(rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG));
+                                tiledLayer.data[i] = (int) (rawID & ~(FLIPPED_HORIZONTALLY_FLAG |
+                                                                      FLIPPED_VERTICALLY_FLAG |
+                                                                      FLIPPED_DIAGONALLY_FLAG));
                             }
                         }
                         else if (compression == "zlib")
@@ -300,24 +334,28 @@ namespace TiledCS
                             // Should an external library be used instead of this hack?
                             base64DataStream.ReadByte();
                             base64DataStream.ReadByte();
-                            
-                            using (var decompressionStream = new DeflateStream(base64DataStream, CompressionMode.Decompress))
+
+                            using (var decompressionStream =
+                                   new DeflateStream(base64DataStream, CompressionMode.Decompress))
                             {
                                 // Parse the raw decompressed bytes and update the inner data as well as the data rotation flags
                                 var decompressedDataBuffer = new byte[4]; // size of each tile
                                 var dataRotationFlagsList = new List<byte>();
                                 var layerDataList = new List<int>();
-                                
-                                while (decompressionStream.Read(decompressedDataBuffer, 0, decompressedDataBuffer.Length) == decompressedDataBuffer.Length)
+
+                                while (decompressionStream.Read(decompressedDataBuffer, 0,
+                                           decompressedDataBuffer.Length) == decompressedDataBuffer.Length)
                                 {
                                     var rawID = BitConverter.ToUInt32(decompressedDataBuffer, 0);
                                     var hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
                                     var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
                                     var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
-                                    dataRotationFlagsList.Add((byte)((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE));
+                                    dataRotationFlagsList.Add((byte) ((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE));
 
                                     // assign data to rawID with the rotation flags cleared
-                                    layerDataList.Add((int)(rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG)));
+                                    layerDataList.Add((int) (rawID & ~(FLIPPED_HORIZONTALLY_FLAG |
+                                                                       FLIPPED_VERTICALLY_FLAG |
+                                                                       FLIPPED_DIAGONALLY_FLAG)));
                                 }
 
                                 tiledLayer.data = layerDataList.ToArray();
@@ -326,24 +364,28 @@ namespace TiledCS
                         }
                         else if (compression == "gzip")
                         {
-                            using (var decompressionStream = new GZipStream(base64DataStream, CompressionMode.Decompress))
+                            using (var decompressionStream =
+                                   new GZipStream(base64DataStream, CompressionMode.Decompress))
                             {
                                 // Parse the raw decompressed bytes and update the inner data as well as the data rotation flags
                                 var decompressedDataBuffer = new byte[4]; // size of each tile
                                 var dataRotationFlagsList = new List<byte>();
                                 var layerDataList = new List<int>();
-                                
-                                while (decompressionStream.Read(decompressedDataBuffer, 0, decompressedDataBuffer.Length) == decompressedDataBuffer.Length)
+
+                                while (decompressionStream.Read(decompressedDataBuffer, 0,
+                                           decompressedDataBuffer.Length) == decompressedDataBuffer.Length)
                                 {
                                     var rawID = BitConverter.ToUInt32(decompressedDataBuffer, 0);
                                     var hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
                                     var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
                                     var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
-                                    
-                                    dataRotationFlagsList.Add((byte)((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE));
+
+                                    dataRotationFlagsList.Add((byte) ((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE));
 
                                     // assign data to rawID with the rotation flags cleared
-                                    layerDataList.Add((int)(rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG)));
+                                    layerDataList.Add((int) (rawID & ~(FLIPPED_HORIZONTALLY_FLAG |
+                                                                       FLIPPED_VERTICALLY_FLAG |
+                                                                       FLIPPED_DIAGONALLY_FLAG)));
                                 }
 
                                 tiledLayer.data = layerDataList.ToArray();
@@ -400,13 +442,13 @@ namespace TiledCS
                 var attrTint = node.Attributes["tintcolor"];
                 var attrOffsetX = node.Attributes["offsetx"];
                 var attrOffsetY = node.Attributes["offsety"];
-                
+
                 var tiledLayer = new TiledLayer();
                 tiledLayer.id = int.Parse(node.Attributes["id"].Value);
                 tiledLayer.name = node.Attributes["name"].Value;
                 tiledLayer.type = "imagelayer";
                 tiledLayer.visible = true;
-                
+
                 if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
                 if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
                 if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
@@ -414,13 +456,13 @@ namespace TiledCS
                 if (attrOffsetY != null) tiledLayer.offsetY = int.Parse(attrOffsetY.Value);
                 if (nodesProperty != null) tiledLayer.properties = ParseProperties(nodesProperty);
                 if (nodeImage != null) tiledLayer.image = ParseImage(nodeImage);
-                
+
                 result.Add(tiledLayer);
             }
 
             return result.ToArray();
         }
-        
+
         private TiledImage ParseImage(XmlNode node)
         {
             var tiledImage = new TiledImage();
@@ -465,8 +507,10 @@ namespace TiledCS
 
                     for (var i = 0; i < vertices.Length; i++)
                     {
-                        polygon.points[(i * 2) + 0] = float.Parse(vertices[i].Split(',')[0], CultureInfo.InvariantCulture);
-                        polygon.points[(i * 2) + 1] = float.Parse(vertices[i].Split(',')[1], CultureInfo.InvariantCulture);
+                        polygon.points[(i * 2) + 0] =
+                            float.Parse(vertices[i].Split(',')[0], CultureInfo.InvariantCulture);
+                        polygon.points[(i * 2) + 1] =
+                            float.Parse(vertices[i].Split(',')[1], CultureInfo.InvariantCulture);
                     }
 
                     obj.polygon = polygon;
@@ -536,6 +580,7 @@ namespace TiledCS
 
             return new TiledMapTileset();
         }
+
         /// <summary>
         /// Loads external tilesets and matches them to firstGids from elements within the Tilesets array
         /// </summary>
@@ -564,6 +609,7 @@ namespace TiledCS
 
             return tilesets;
         }
+
         /// <summary>
         /// Locates a specific TiledTile object
         /// </summary>
@@ -584,6 +630,7 @@ namespace TiledCS
 
             return null;
         }
+
         /// <summary>
         /// This method can be used to figure out the x and y position on a Tileset image for rendering tiles. 
         /// </summary>
@@ -592,7 +639,8 @@ namespace TiledCS
         /// <param name="gid">An element within a TiledLayer.data array</param>
         /// <returns>An int array of length 2 containing the x and y position of the source rect of the tileset image. Multiply the values by the tile width and height in pixels to get the actual x and y position. Returns null if the gid was not found</returns>
         /// <remarks>This method currently doesn't take margin into account</remarks>
-        [Obsolete("Please use GetSourceRect instead because with future versions of Tiled this method may no longer be sufficient")]
+        [Obsolete(
+            "Please use GetSourceRect instead because with future versions of Tiled this method may no longer be sufficient")]
         public int[] GetSourceVector(TiledMapTileset mapTileset, TiledTileset tileset, int gid)
         {
             var tileHor = 0;
@@ -602,7 +650,7 @@ namespace TiledCS
             {
                 if (i == gid - mapTileset.firstgid)
                 {
-                    return new[] { tileHor, tileVert };
+                    return new[] {tileHor, tileVert};
                 }
 
                 // Update x and y position
@@ -667,6 +715,7 @@ namespace TiledCS
         {
             return IsTileFlippedHorizontal(layer, tileHor + (tileVert * layer.width));
         }
+
         /// <summary>
         /// Checks is a tile is flipped horizontally
         /// </summary>
@@ -677,6 +726,7 @@ namespace TiledCS
         {
             return (layer.dataRotationFlags[dataIndex] & (FLIPPED_HORIZONTALLY_FLAG >> SHIFT_FLIP_FLAG_TO_BYTE)) > 0;
         }
+
         /// <summary>
         /// Checks is a tile is flipped vertically
         /// </summary>
@@ -688,6 +738,7 @@ namespace TiledCS
         {
             return IsTileFlippedVertical(layer, tileHor + (tileVert * layer.width));
         }
+
         /// <summary>
         /// Checks is a tile is flipped vertically
         /// </summary>
@@ -698,6 +749,7 @@ namespace TiledCS
         {
             return (layer.dataRotationFlags[dataIndex] & (FLIPPED_VERTICALLY_FLAG >> SHIFT_FLIP_FLAG_TO_BYTE)) > 0;
         }
+
         /// <summary>
         /// Checks is a tile is flipped diagonally
         /// </summary>
@@ -709,6 +761,7 @@ namespace TiledCS
         {
             return IsTileFlippedDiagonal(layer, tileHor + (tileVert * layer.width));
         }
+
         /// <summary>
         /// Checks is a tile is flipped diagonally
         /// </summary>
