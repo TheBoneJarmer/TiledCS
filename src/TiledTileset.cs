@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Xml;
 
@@ -75,17 +76,13 @@ namespace TiledCS
         /// <exception cref="TiledException">Thrown when the file could not be found or parsed</exception>
         public TiledTileset(string path)
         {
-            var content = "";
-
             // Check the file
             if (!File.Exists(path))
             {
                 throw new TiledException($"{path} not found");
             }
-            else
-            {
-                content = File.ReadAllText(path);
-            }
+            
+            var content = File.ReadAllText(path);
 
             if (path.EndsWith(".tsx"))
             {
@@ -135,7 +132,7 @@ namespace TiledCS
             }
             catch (Exception ex)
             {
-                throw new TiledException("Unable to parse xml data, make sure the xml data represents a valid Tiled tileset", ex);
+                throw new TiledException("An error occurred while trying to parse the Tiled tileset file", ex);
             }
         }
 
@@ -194,6 +191,7 @@ namespace TiledCS
             foreach (XmlNode node in nodeList)
             {
                 var nodesProperty = node.SelectNodes("properties/property");
+                var nodesObject = node.SelectNodes("objectgroup/object");
                 var nodesAnimation = node.SelectNodes("animation/frame");
                 var nodeImage = node.SelectSingleNode("image");
 
@@ -203,6 +201,7 @@ namespace TiledCS
                 tile.terrain = node.Attributes["terrain"]?.Value.Split(',').AsIntArray();
                 tile.properties = ParseProperties(nodesProperty);
                 tile.animation = ParseAnimations(nodesAnimation);
+                tile.objects = ParseTileObjects(nodesObject);
 
                 if (nodeImage != null)
                 {
@@ -215,6 +214,64 @@ namespace TiledCS
                 }
 
                 result.Add(tile);
+            }
+
+            return result.ToArray();
+        }
+        
+        private TiledTileObject[] ParseTileObjects(XmlNodeList nodeList)
+        {
+            var result = new List<TiledTileObject>();
+
+            foreach (XmlNode node in nodeList)
+            {
+                var nodePolyline = node.SelectSingleNode("polyline");
+                var nodePoint = node.SelectSingleNode("point");
+                var nodeEllipse = node.SelectSingleNode("ellipse");
+
+                var obj = new TiledTileObject();
+                obj.id = int.Parse(node.Attributes["id"].Value);
+                obj.x = float.Parse(node.Attributes["x"].Value, CultureInfo.InvariantCulture);
+                obj.y = float.Parse(node.Attributes["y"].Value, CultureInfo.InvariantCulture);
+
+                if (node.Attributes["width"] != null)
+                {
+                    obj.width = float.Parse(node.Attributes["width"].Value, CultureInfo.InvariantCulture);
+                }
+                
+                if (node.Attributes["height"] != null)
+                {
+                    obj.height = float.Parse(node.Attributes["height"].Value, CultureInfo.InvariantCulture);
+                }
+                
+                if (nodePolyline != null)
+                {
+                    var points = nodePolyline.Attributes["points"].Value;
+                    var vertices = points.Split(' ');
+
+                    var polyline = new TiledPolyline();
+                    polyline.points = new float[vertices.Length * 2];
+
+                    for (var i = 0; i < vertices.Length; i++)
+                    {
+                        polyline.points[(i * 2) + 0] = float.Parse(vertices[i].Split(',')[0], CultureInfo.InvariantCulture);
+                        polyline.points[(i * 2) + 1] = float.Parse(vertices[i].Split(',')[1], CultureInfo.InvariantCulture);
+                    }
+
+                    obj.polyline = polyline;
+                }
+
+                if (nodeEllipse != null)
+                {
+                    obj.ellipse = new TiledEllipse();
+                }
+
+                if (nodePoint != null)
+                {
+                    obj.point = new TiledPoint();
+                }
+
+                result.Add(obj);
             }
 
             return result.ToArray();

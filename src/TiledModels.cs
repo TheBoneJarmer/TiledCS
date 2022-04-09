@@ -163,6 +163,21 @@ namespace TiledCS
     }
 
     /// <summary>
+    /// Represents an element of the tile objects created by the tile collision editor
+    /// </summary>
+    public class TiledTileObject
+    {
+        public int id;
+        public float x;
+        public float y;
+        public float width;
+        public float height;
+        public TiledPolyline polyline;
+        public TiledPoint point;
+        public TiledEllipse ellipse;
+    }
+
+    /// <summary>
     /// Represents a polygon shape
     /// </summary>
     public class TiledPolygon
@@ -170,6 +185,14 @@ namespace TiledCS
         /// <summary>
         /// The array of vertices where each two elements represent an x and y position. Like 'x,y,x,y,x,y,x,y'.
         /// </summary>
+        public float[] points;
+    }
+
+    /// <summary>
+    /// Represents a polyline shape
+    /// </summary>
+    public class TiledPolyline
+    {
         public float[] points;
     }
 
@@ -216,6 +239,10 @@ namespace TiledCS
         /// An array of tile animations. Is null if none were defined. 
         /// </summary>
         public TiledTileAnimation[] animation;
+        /// <summary>
+        /// An array of tile objects created using the tile collision editor
+        /// </summary>
+        public TiledTileObject[] objects;
         /// <summary>
         /// The individual tile image
         /// </summary>

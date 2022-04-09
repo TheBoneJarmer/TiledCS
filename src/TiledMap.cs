@@ -89,17 +89,13 @@ namespace TiledCS
         /// <exception cref="TiledException">Thrown when the map could not be loaded or is not in a correct format</exception>
         public TiledMap(string path)
         {
-            var content = "";
-
             // Check the file
             if (!File.Exists(path))
             {
                 throw new TiledException($"{path} not found");
             }
-            else
-            {
-                content = File.ReadAllText(path);
-            }
+            
+            var content = File.ReadAllText(path);
 
             if (path.EndsWith(".tmx"))
             {
@@ -150,7 +146,7 @@ namespace TiledCS
             }
             catch (Exception ex)
             {
-                throw new TiledException("Unable to parse xml data, make sure the xml data represents a valid Tiled map", ex);
+                throw new TiledException("An error occurred while trying to parse the Tiled map file", ex);
             }
         }
 
