@@ -1,7 +1,5 @@
-> **Heads up!** I am looking for a second maintainer or someone to take over the project entirely as you may have noticed I am not that active anymore. The reason for this being the lack of time to work on this project.
-
 # TiledCS
-TiledCS is a dotnet library for loading Tiled maps and tilesets. It supports both XML as JSON map formats. The library requires no 3rd-party dependencies except for Newtonsoft.Json or another JSON parsing library. This way the library can be used with popular game engines like Unity3D, MonoGame and Godot.
+TiledCS is a .NET library for loading Tiled maps and tilesets. It supports only the _TMX_ and _TSX_ file formats. The library requires no 3rd-party dependencies. This way the library can be used with popular game engines like Unity3D, MonoGame and Godot.
 
 ## Installation
 ```
@@ -9,10 +7,6 @@ dotnet add package tiledcs
 ```
 
 ## Usage
-> **JSON support may not be fully functioning for now due to the differences between how nodes differ between the TMX format and the JSON format. This will be fixed in a later version**
-
-TiledCS has been created with as mindset being as comfortable and easy to use as possible. The structure of the classes and properties are similar to the JSON map format and can therefore be deserialized like that.
-
 ```csharp
 using System;
 using System.IO;
@@ -28,12 +22,6 @@ namespace TestApp
             // For loading maps in XML format
             var map = new TiledMap("path-to-map.tmx");
             var tileset = new TiledTileset("path-to-tileset.tsx");
-
-            // For loading maps in JSON format
-            var json1 = File.ReadAllText("path-to-map.json");
-            var json2 = File.ReadAllText("path-to-tileset.json");
-            var mapJson = JsonConvert.DeserializeObject<TiledMap>(json1);
-            var tilesetJson = JsonConvert.DeserializeObject<TiledTileset>(json2);
 
             // Retrieving objects or layers can be done using Linq or a for loop
             var myLayer = map.layers.First(l => l.name == "monsters");
@@ -62,16 +50,15 @@ namespace TestApp
 ```
 
 ## Building
-You need the latest stable dotnet sdk to compile TiledCS as it makes use of modern C# features that may or may not be included in earlier versions.
+You need **.NET 6** to compile TiledCS as it makes use of modern C# features that may or may not be included in earlier versions.
 
 ## Version support
-If you want to know what package supports your version of Tiled, please read the package's description. The most recent package always supports the current Tiled version.
+If you want to know what package supports your version of Tiled, please read the package's description.
 
 ## Contribution
-Feel free to open up an issue with your question or request. If you do plan to make modifications to the code please open up an issue first with more details about what you'd like to change and why. If you open a pull request, please target the **develop** branch. I follow the [GitFlow branching model](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow).
+Feel free to open up an issue with your question or request. If you do plan to make modifications to the code please open up an issue first with more details about what you'd like to change and why. If you open a pull request, please use the **develop** branch as both **source** and **target** branch. I follow the [GitFlow branching model](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow).
 
 ## Credits
-* A huge thanks to DelightedCat who created a MonoGame pipeline. Although the pipeline isn't officially included in this library (as we both agreed to keep it standalone and not engine-based), you can ask help and questions here as DelightedCat is an official maintainer.
 * A very respectful thank you to Goodlyay who introduced support for tile rotations aka flipped tiles and taught me about bitwise operators in C#.
 
 ## License
