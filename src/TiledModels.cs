@@ -130,7 +130,7 @@ namespace TiledCS
     }
 
     /// <summary>
-    /// Represents an tiled object defined in object layers
+    /// Represents an tiled object defined in object layers and tiles
     /// </summary>
     public class TiledObject
     {
@@ -197,21 +197,6 @@ namespace TiledCS
         /// <summary>
         /// If an object was set to an ellipse shape, this property will be set
         /// </summary>
-        public TiledEllipse ellipse;
-    }
-
-    /// <summary>
-    /// Represents an element of the tile objects created by the tile collision editor
-    /// </summary>
-    public class TiledTileObject
-    {
-        public int id;
-        public float x;
-        public float y;
-        public float width;
-        public float height;
-        public TiledPolyline polyline;
-        public TiledPoint point;
         public TiledEllipse ellipse;
     }
 
@@ -283,7 +268,7 @@ namespace TiledCS
         /// <summary>
         /// An array of tile objects created using the tile collision editor
         /// </summary>
-        public TiledTileObject[] objects;
+        public TiledObject[] objects;
 
         /// <summary>
         /// The individual tile image

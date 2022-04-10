@@ -201,7 +201,7 @@ namespace TiledCS
                 tile.terrain = node.Attributes["terrain"]?.Value.Split(',').AsIntArray();
                 tile.properties = ParseProperties(nodesProperty);
                 tile.animation = ParseAnimations(nodesAnimation);
-                tile.objects = ParseTileObjects(nodesObject);
+                tile.objects = ParseObjects(nodesObject);
 
                 if (nodeImage != null)
                 {
@@ -219,46 +219,47 @@ namespace TiledCS
             return result.ToArray();
         }
         
-        private TiledTileObject[] ParseTileObjects(XmlNodeList nodeList)
+        private TiledObject[] ParseObjects(XmlNodeList nodeList)
         {
-            var result = new List<TiledTileObject>();
+            var result = new List<TiledObject>();
 
             foreach (XmlNode node in nodeList)
             {
-                var nodePolyline = node.SelectSingleNode("polyline");
+                var nodesProperty = node.SelectNodes("properties/property");
+                var nodePolygon = node.SelectSingleNode("polygon");
                 var nodePoint = node.SelectSingleNode("point");
                 var nodeEllipse = node.SelectSingleNode("ellipse");
 
-                var obj = new TiledTileObject();
+                var obj = new TiledObject();
                 obj.id = int.Parse(node.Attributes["id"].Value);
+                obj.name = node.Attributes["name"]?.Value;
+                obj.type = node.Attributes["type"]?.Value;
+                obj.gid = int.Parse(node.Attributes["gid"]?.Value ?? "0");
                 obj.x = float.Parse(node.Attributes["x"].Value, CultureInfo.InvariantCulture);
                 obj.y = float.Parse(node.Attributes["y"].Value, CultureInfo.InvariantCulture);
 
-                if (node.Attributes["width"] != null)
+                if (nodesProperty != null)
                 {
-                    obj.width = float.Parse(node.Attributes["width"].Value, CultureInfo.InvariantCulture);
+                    obj.properties = ParseProperties(nodesProperty);
                 }
-                
-                if (node.Attributes["height"] != null)
+
+                if (nodePolygon != null)
                 {
-                    obj.height = float.Parse(node.Attributes["height"].Value, CultureInfo.InvariantCulture);
-                }
-                
-                if (nodePolyline != null)
-                {
-                    var points = nodePolyline.Attributes["points"].Value;
+                    var points = nodePolygon.Attributes["points"].Value;
                     var vertices = points.Split(' ');
 
-                    var polyline = new TiledPolyline();
-                    polyline.points = new float[vertices.Length * 2];
+                    var polygon = new TiledPolygon();
+                    polygon.points = new float[vertices.Length * 2];
 
                     for (var i = 0; i < vertices.Length; i++)
                     {
-                        polyline.points[(i * 2) + 0] = float.Parse(vertices[i].Split(',')[0], CultureInfo.InvariantCulture);
-                        polyline.points[(i * 2) + 1] = float.Parse(vertices[i].Split(',')[1], CultureInfo.InvariantCulture);
+                        polygon.points[(i * 2) + 0] =
+                            float.Parse(vertices[i].Split(',')[0], CultureInfo.InvariantCulture);
+                        polygon.points[(i * 2) + 1] =
+                            float.Parse(vertices[i].Split(',')[1], CultureInfo.InvariantCulture);
                     }
 
-                    obj.polyline = polyline;
+                    obj.polygon = polygon;
                 }
 
                 if (nodeEllipse != null)
@@ -269,6 +270,21 @@ namespace TiledCS
                 if (nodePoint != null)
                 {
                     obj.point = new TiledPoint();
+                }
+
+                if (node.Attributes["width"] != null)
+                {
+                    obj.width = float.Parse(node.Attributes["width"].Value, CultureInfo.InvariantCulture);
+                }
+
+                if (node.Attributes["height"] != null)
+                {
+                    obj.height = float.Parse(node.Attributes["height"].Value, CultureInfo.InvariantCulture);
+                }
+
+                if (node.Attributes["rotation"] != null)
+                {
+                    obj.rotation = int.Parse(node.Attributes["rotation"].Value);
                 }
 
                 result.Add(obj);
