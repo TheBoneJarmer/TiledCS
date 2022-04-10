@@ -314,22 +314,6 @@ namespace TiledCS
     }
 
     /// <summary>
-    /// Represents a terrain definition.
-    /// </summary>
-    public class TiledTerrain
-    {
-        /// <summary>
-        /// The terrain name
-        /// </summary>
-        public string name;
-
-        /// <summary>
-        /// The tile used as icon for the terrain editor
-        /// </summary>
-        public int tile;
-    }
-
-    /// <summary>
     /// Used as data type for the GetSourceRect method. Represents basically a rectangle.
     /// </summary>
     public class TiledSourceRect

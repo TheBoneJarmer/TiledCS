@@ -53,10 +53,6 @@ namespace TiledCS
         /// <remarks>Not all tiles within a tileset have definitions. Only those with properties, animations, terrains, ...</remarks>
         public TiledTile[] Tiles { get; set; }
         /// <summary>
-        /// An array of terrain definitions
-        /// </summary>
-        public TiledTerrain[] Terrains { get; set; }
-        /// <summary>
         /// An array of tileset properties
         /// </summary>
         public TiledProperty[] Properties { get; set; }
@@ -128,7 +124,6 @@ namespace TiledCS
 
                 Tiles = ParseTiles(nodesTile);
                 Properties = ParseProperties(nodesProperty);
-                Terrains = ParseTerrains(nodesTerrain);
             }
             catch (Exception ex)
             {
@@ -288,22 +283,6 @@ namespace TiledCS
                 }
 
                 result.Add(obj);
-            }
-
-            return result.ToArray();
-        }
-
-        private TiledTerrain[] ParseTerrains(XmlNodeList nodeList)
-        {
-            var result = new List<TiledTerrain>();
-
-            foreach (XmlNode node in nodeList)
-            {
-                var terrain = new TiledTerrain();
-                terrain.name = node.Attributes["name"].Value;
-                terrain.tile = int.Parse(node.Attributes["tile"].Value);
-
-                result.Add(terrain);
             }
 
             return result.ToArray();
