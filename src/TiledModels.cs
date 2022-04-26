@@ -63,9 +63,9 @@ namespace TiledCS
         public int height;
 
         /// <summary>
-        /// The layer type. Usually this is "objectgroup" or "tilelayer".
+        /// The layer type.
         /// </summary>
-        public string type;
+        public TiledLayerType type;
 
         /// <summary>
         /// The tint color set by the user in hex code

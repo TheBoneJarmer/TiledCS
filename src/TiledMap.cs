@@ -266,7 +266,7 @@ namespace TiledCS
                 tiledLayer.name = node.Attributes["name"].Value;
                 tiledLayer.height = int.Parse(node.Attributes["height"].Value);
                 tiledLayer.width = int.Parse(node.Attributes["width"].Value);
-                tiledLayer.type = "tilelayer";
+                tiledLayer.type = TiledLayerType.TileLayer;
                 tiledLayer.visible = true;
 
                 if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
@@ -420,7 +420,7 @@ namespace TiledCS
                 tiledLayer.id = int.Parse(node.Attributes["id"].Value);
                 tiledLayer.name = node.Attributes["name"].Value;
                 tiledLayer.objects = ParseObjects(nodesObject);
-                tiledLayer.type = "objectgroup";
+                tiledLayer.type = TiledLayerType.ObjectGroup;
                 tiledLayer.visible = true;
 
                 if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
@@ -446,7 +446,7 @@ namespace TiledCS
                 var tiledLayer = new TiledLayer();
                 tiledLayer.id = int.Parse(node.Attributes["id"].Value);
                 tiledLayer.name = node.Attributes["name"].Value;
-                tiledLayer.type = "imagelayer";
+                tiledLayer.type = TiledLayerType.ImageLayer;
                 tiledLayer.visible = true;
 
                 if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
