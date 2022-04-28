@@ -106,7 +106,6 @@ namespace TiledCS
                 var nodeImage = nodeTileset.SelectSingleNode("image");
                 var nodesTile = nodeTileset.SelectNodes("tile");
                 var nodesProperty = nodeTileset.SelectNodes("properties/property");
-                var nodesTerrain = nodeTileset.SelectNodes("terraintypes/terrain");
 
                 var attrMargin = nodeTileset.Attributes["margin"];
                 var attrSpacing = nodeTileset.Attributes["spacing"];
@@ -248,10 +247,8 @@ namespace TiledCS
 
                     for (var i = 0; i < vertices.Length; i++)
                     {
-                        polygon.points[(i * 2) + 0] =
-                            float.Parse(vertices[i].Split(',')[0], CultureInfo.InvariantCulture);
-                        polygon.points[(i * 2) + 1] =
-                            float.Parse(vertices[i].Split(',')[1], CultureInfo.InvariantCulture);
+                        polygon.points[(i * 2) + 0] = float.Parse(vertices[i].Split(',')[0], CultureInfo.InvariantCulture);
+                        polygon.points[(i * 2) + 1] = float.Parse(vertices[i].Split(',')[1], CultureInfo.InvariantCulture);
                     }
 
                     obj.polygon = polygon;

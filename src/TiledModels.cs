@@ -126,7 +126,15 @@ namespace TiledCS
         /// </summary>
         public TiledProperty[] properties;
 
+        /// <summary>
+        /// The image the layer represents when the layer is an image layer
+        /// </summary>
         public TiledImage image;
+
+        /// <summary>
+        /// The chunks of data when the map is infinite
+        /// </summary>
+        public TiledChunk[] chunks;
     }
 
     /// <summary>
@@ -208,14 +216,6 @@ namespace TiledCS
         /// <summary>
         /// The array of vertices where each two elements represent an x and y position. Like 'x,y,x,y,x,y,x,y'.
         /// </summary>
-        public float[] points;
-    }
-
-    /// <summary>
-    /// Represents a polyline shape
-    /// </summary>
-    public class TiledPolyline
-    {
         public float[] points;
     }
 
@@ -383,5 +383,18 @@ namespace TiledCS
         /// The group's subgroups
         /// </summary>
         public TiledGroup[] groups;
+    }
+
+    /// <summary>
+    /// Represents a tile layer chunk when the map is infinite
+    /// </summary>
+    public class TiledChunk
+    {
+        public int x;
+        public int y;
+        public int width;
+        public int height;
+        public int[] data;
+        public byte[] dataRotationFlags;
     }
 }

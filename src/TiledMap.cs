@@ -250,217 +250,256 @@ namespace TiledCS
 
             foreach (XmlNode node in nodesLayer)
             {
-                var nodeData = node.SelectSingleNode("data");
-                var nodesProperty = node.SelectNodes("properties/property");
-                var encoding = nodeData.Attributes["encoding"].Value;
-                var attrVisible = node.Attributes["visible"];
-                var attrLocked = node.Attributes["locked"];
-                var attrTint = node.Attributes["tintcolor"];
-                var attrOffsetX = node.Attributes["offsetx"];
-                var attrOffsetY = node.Attributes["offsety"];
-                var attrParallaxX = node.Attributes["parallaxx"];
-                var attrParallaxY = node.Attributes["parallaxy"];
-
-                var tiledLayer = new TiledLayer();
-                tiledLayer.id = int.Parse(node.Attributes["id"].Value);
-                tiledLayer.name = node.Attributes["name"].Value;
-                tiledLayer.height = int.Parse(node.Attributes["height"].Value);
-                tiledLayer.width = int.Parse(node.Attributes["width"].Value);
-                tiledLayer.type = TiledLayerType.TileLayer;
-                tiledLayer.visible = true;
-
-                if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
-                if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
-                if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
-                if (attrOffsetX != null) tiledLayer.offsetX = float.Parse(attrOffsetX.Value);
-                if (attrOffsetY != null) tiledLayer.offsetY = float.Parse(attrOffsetY.Value);
-                if (attrParallaxX != null) tiledLayer.offsetX = float.Parse(attrParallaxX.Value);
-                if (attrParallaxY != null) tiledLayer.offsetY = float.Parse(attrParallaxY.Value);
-                if (nodesProperty != null) tiledLayer.properties = ParseProperties(nodesProperty);
-
-                if (encoding == "csv")
-                {
-                    var csvs = nodeData.InnerText.Split(',');
-
-                    tiledLayer.data = new int[csvs.Length];
-                    tiledLayer.dataRotationFlags = new byte[csvs.Length];
-
-                    // Parse the comma separated csv string and update the inner data as well as the data rotation flags
-                    for (var i = 0; i < csvs.Length; i++)
-                    {
-                        var rawID = uint.Parse(csvs[i]);
-                        var hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
-                        var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
-                        var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
-                        tiledLayer.dataRotationFlags[i] = (byte) ((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE);
-
-                        // assign data to rawID with the rotation flags cleared
-                        tiledLayer.data[i] = (int) (rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG |
-                                                              FLIPPED_DIAGONALLY_FLAG));
-                    }
-                }
-                else if (encoding == "base64")
-                {
-                    var compression = nodeData.Attributes["compression"]?.Value;
-
-                    using (var base64DataStream = new MemoryStream(Convert.FromBase64String(nodeData.InnerText)))
-                    {
-                        if (compression == null)
-                        {
-                            // Parse the decoded bytes and update the inner data as well as the data rotation flags
-                            var rawBytes = new byte[4];
-                            tiledLayer.data = new int[base64DataStream.Length];
-                            tiledLayer.dataRotationFlags = new byte[base64DataStream.Length];
-
-                            for (var i = 0; i < base64DataStream.Length; i++)
-                            {
-                                base64DataStream.Read(rawBytes, 0, rawBytes.Length);
-                                var rawID = BitConverter.ToUInt32(rawBytes, 0);
-                                var hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
-                                var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
-                                var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
-                                tiledLayer.dataRotationFlags[i] = (byte) ((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE);
-
-                                // assign data to rawID with the rotation flags cleared
-                                tiledLayer.data[i] = (int) (rawID & ~(FLIPPED_HORIZONTALLY_FLAG |
-                                                                      FLIPPED_VERTICALLY_FLAG |
-                                                                      FLIPPED_DIAGONALLY_FLAG));
-                            }
-                        }
-                        else if (compression == "zlib")
-                        {
-                            // .NET doesn't play well with the headered zlib data that Tiled produces,
-                            // so we have to manually skip the 2-byte header to get what DeflateStream's looking for
-                            // Should an external library be used instead of this hack?
-                            base64DataStream.ReadByte();
-                            base64DataStream.ReadByte();
-
-                            using (var decompressionStream =
-                                   new DeflateStream(base64DataStream, CompressionMode.Decompress))
-                            {
-                                // Parse the raw decompressed bytes and update the inner data as well as the data rotation flags
-                                var decompressedDataBuffer = new byte[4]; // size of each tile
-                                var dataRotationFlagsList = new List<byte>();
-                                var layerDataList = new List<int>();
-
-                                while (decompressionStream.Read(decompressedDataBuffer, 0,
-                                           decompressedDataBuffer.Length) == decompressedDataBuffer.Length)
-                                {
-                                    var rawID = BitConverter.ToUInt32(decompressedDataBuffer, 0);
-                                    var hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
-                                    var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
-                                    var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
-                                    dataRotationFlagsList.Add((byte) ((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE));
-
-                                    // assign data to rawID with the rotation flags cleared
-                                    layerDataList.Add((int) (rawID & ~(FLIPPED_HORIZONTALLY_FLAG |
-                                                                       FLIPPED_VERTICALLY_FLAG |
-                                                                       FLIPPED_DIAGONALLY_FLAG)));
-                                }
-
-                                tiledLayer.data = layerDataList.ToArray();
-                                tiledLayer.dataRotationFlags = dataRotationFlagsList.ToArray();
-                            }
-                        }
-                        else if (compression == "gzip")
-                        {
-                            using (var decompressionStream =
-                                   new GZipStream(base64DataStream, CompressionMode.Decompress))
-                            {
-                                // Parse the raw decompressed bytes and update the inner data as well as the data rotation flags
-                                var decompressedDataBuffer = new byte[4]; // size of each tile
-                                var dataRotationFlagsList = new List<byte>();
-                                var layerDataList = new List<int>();
-
-                                while (decompressionStream.Read(decompressedDataBuffer, 0,
-                                           decompressedDataBuffer.Length) == decompressedDataBuffer.Length)
-                                {
-                                    var rawID = BitConverter.ToUInt32(decompressedDataBuffer, 0);
-                                    var hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
-                                    var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
-                                    var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
-
-                                    dataRotationFlagsList.Add((byte) ((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE));
-
-                                    // assign data to rawID with the rotation flags cleared
-                                    layerDataList.Add((int) (rawID & ~(FLIPPED_HORIZONTALLY_FLAG |
-                                                                       FLIPPED_VERTICALLY_FLAG |
-                                                                       FLIPPED_DIAGONALLY_FLAG)));
-                                }
-
-                                tiledLayer.data = layerDataList.ToArray();
-                                tiledLayer.dataRotationFlags = dataRotationFlagsList.ToArray();
-                            }
-                        }
-                        else
-                        {
-                            throw new TiledException("Zstandard compression is currently not supported");
-                        }
-                    }
-                }
-                else
-                {
-                    throw new TiledException("Only CSV and Base64 encodings are currently supported");
-                }
-
-                result.Add(tiledLayer);
+                result.Add(ParseTileLayer(node));
             }
 
             foreach (XmlNode node in nodesObjectGroup)
             {
-                var nodesProperty = node.SelectNodes("properties/property");
-                var nodesObject = node.SelectNodes("object");
-                var attrVisible = node.Attributes["visible"];
-                var attrLocked = node.Attributes["locked"];
-                var attrTint = node.Attributes["tintcolor"];
-                var attrOffsetX = node.Attributes["offsetx"];
-                var attrOffsetY = node.Attributes["offsety"];
-
-                var tiledLayer = new TiledLayer();
-                tiledLayer.id = int.Parse(node.Attributes["id"].Value);
-                tiledLayer.name = node.Attributes["name"].Value;
-                tiledLayer.objects = ParseObjects(nodesObject);
-                tiledLayer.type = TiledLayerType.ObjectGroup;
-                tiledLayer.visible = true;
-
-                if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
-                if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
-                if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
-                if (attrOffsetX != null) tiledLayer.offsetX = int.Parse(attrOffsetX.Value);
-                if (attrOffsetY != null) tiledLayer.offsetY = int.Parse(attrOffsetY.Value);
-                if (nodesProperty != null) tiledLayer.properties = ParseProperties(nodesProperty);
-
-                result.Add(tiledLayer);
+                result.Add(ParseObjectLayer(node));
             }
 
             foreach (XmlNode node in nodesImageLayer)
             {
-                var nodesProperty = node.SelectNodes("properties/property");
-                var nodeImage = node.SelectSingleNode("image");
-                var attrVisible = node.Attributes["visible"];
-                var attrLocked = node.Attributes["locked"];
-                var attrTint = node.Attributes["tintcolor"];
-                var attrOffsetX = node.Attributes["offsetx"];
-                var attrOffsetY = node.Attributes["offsety"];
-
-                var tiledLayer = new TiledLayer();
-                tiledLayer.id = int.Parse(node.Attributes["id"].Value);
-                tiledLayer.name = node.Attributes["name"].Value;
-                tiledLayer.type = TiledLayerType.ImageLayer;
-                tiledLayer.visible = true;
-
-                if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
-                if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
-                if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
-                if (attrOffsetX != null) tiledLayer.offsetX = int.Parse(attrOffsetX.Value);
-                if (attrOffsetY != null) tiledLayer.offsetY = int.Parse(attrOffsetY.Value);
-                if (nodesProperty != null) tiledLayer.properties = ParseProperties(nodesProperty);
-                if (nodeImage != null) tiledLayer.image = ParseImage(nodeImage);
-
-                result.Add(tiledLayer);
+                result.Add(ParseImageLayer(node));
             }
 
             return result.ToArray();
+        }
+
+        private TiledLayer ParseTileLayer(XmlNode node)
+        {
+            var nodeData = node.SelectSingleNode("data");
+            var nodesProperty = node.SelectNodes("properties/property");
+            var attrVisible = node.Attributes["visible"];
+            var attrLocked = node.Attributes["locked"];
+            var attrTint = node.Attributes["tintcolor"];
+            var attrOffsetX = node.Attributes["offsetx"];
+            var attrOffsetY = node.Attributes["offsety"];
+            var attrParallaxX = node.Attributes["parallaxx"];
+            var attrParallaxY = node.Attributes["parallaxy"];
+
+            var tiledLayer = new TiledLayer();
+            tiledLayer.id = int.Parse(node.Attributes["id"].Value);
+            tiledLayer.name = node.Attributes["name"].Value;
+            tiledLayer.height = int.Parse(node.Attributes["height"].Value);
+            tiledLayer.width = int.Parse(node.Attributes["width"].Value);
+            tiledLayer.type = TiledLayerType.TileLayer;
+            tiledLayer.visible = true;
+
+            if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
+            if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
+            if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
+            if (attrOffsetX != null) tiledLayer.offsetX = float.Parse(attrOffsetX.Value);
+            if (attrOffsetY != null) tiledLayer.offsetY = float.Parse(attrOffsetY.Value);
+            if (attrParallaxX != null) tiledLayer.offsetX = float.Parse(attrParallaxX.Value);
+            if (attrParallaxY != null) tiledLayer.offsetY = float.Parse(attrParallaxY.Value);
+            if (nodesProperty != null) tiledLayer.properties = ParseProperties(nodesProperty);
+
+            ParseTileLayerData(nodeData, ref tiledLayer);
+
+            return tiledLayer;
+        }
+
+        private void ParseTileLayerData(XmlNode nodeData, ref TiledLayer tiledLayer)
+        {
+            var encoding = nodeData.Attributes["encoding"].Value;
+            var compression = nodeData.Attributes["compression"]?.Value;
+
+            if (encoding != "csv" && encoding != "base64")
+            {
+                throw new TiledException("Only CSV and Base64 encodings are currently supported");
+            }
+
+            if (Infinite)
+            {
+                var nodesChunk = nodeData.SelectNodes("chunk");
+                var chunks = new List<TiledChunk>();
+
+                foreach (XmlNode nodeChunk in nodesChunk)
+                {
+                    var chunk = new TiledChunk();
+                    chunk.x = int.Parse(nodeChunk.Attributes["x"].Value);
+                    chunk.y = int.Parse(nodeChunk.Attributes["y"].Value);
+                    chunk.width = int.Parse(nodeChunk.Attributes["width"].Value);
+                    chunk.height = int.Parse(nodeChunk.Attributes["height"].Value);
+                    
+                    if (encoding == "csv") ParseTileLayerDataAsCSV(nodeChunk.InnerText, ref chunk.data, ref chunk.dataRotationFlags);
+                    if (encoding == "base64") ParseTileLayerDataAsBase64(nodeChunk.InnerText, compression, ref chunk.data, ref chunk.dataRotationFlags);
+                    
+                    chunks.Add(chunk);
+                }
+
+                tiledLayer.chunks = chunks.ToArray();
+            }
+            else
+            {
+                if (encoding == "csv") ParseTileLayerDataAsCSV(nodeData.InnerText, ref tiledLayer.data, ref tiledLayer.dataRotationFlags);
+                if (encoding == "base64") ParseTileLayerDataAsBase64(nodeData.InnerText, compression, ref tiledLayer.data, ref tiledLayer.dataRotationFlags);
+            }
+        }
+
+        private void ParseTileLayerDataAsBase64(string input, string compression, ref int[] data, ref byte[] dataRotationFlags)
+        {
+            using (var base64DataStream = new MemoryStream(Convert.FromBase64String(input)))
+            {
+                if (compression == null)
+                {
+                    // Parse the decoded bytes and update the inner data as well as the data rotation flags
+                    var rawBytes = new byte[4];
+                    data = new int[base64DataStream.Length];
+                    dataRotationFlags = new byte[base64DataStream.Length];
+
+                    for (var i = 0; i < base64DataStream.Length; i++)
+                    {
+                        base64DataStream.Read(rawBytes, 0, rawBytes.Length);
+                        var rawID = BitConverter.ToUInt32(rawBytes, 0);
+                        var hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
+                        var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
+                        var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
+                        dataRotationFlags[i] = (byte) ((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE);
+
+                        // assign data to rawID with the rotation flags cleared
+                        data[i] = (int) (rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG));
+                    }
+                }
+                else if (compression == "zlib")
+                {
+                    // .NET doesn't play well with the headered zlib data that Tiled produces,
+                    // so we have to manually skip the 2-byte header to get what DeflateStream's looking for
+                    // Should an external library be used instead of this hack?
+                    base64DataStream.ReadByte();
+                    base64DataStream.ReadByte();
+
+                    using (var decompressionStream = new DeflateStream(base64DataStream, CompressionMode.Decompress))
+                    {
+                        // Parse the raw decompressed bytes and update the inner data as well as the data rotation flags
+                        var decompressedDataBuffer = new byte[4]; // size of each tile
+                        var dataRotationFlagsList = new List<byte>();
+                        var layerDataList = new List<int>();
+
+                        while (decompressionStream.Read(decompressedDataBuffer, 0, decompressedDataBuffer.Length) == decompressedDataBuffer.Length)
+                        {
+                            var rawID = BitConverter.ToUInt32(decompressedDataBuffer, 0);
+                            var hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
+                            var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
+                            var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
+                            dataRotationFlagsList.Add((byte) ((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE));
+
+                            // assign data to rawID with the rotation flags cleared
+                            layerDataList.Add((int) (rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG)));
+                        }
+
+                        data = layerDataList.ToArray();
+                        dataRotationFlags = dataRotationFlagsList.ToArray();
+                    }
+                }
+                else if (compression == "gzip")
+                {
+                    using (var decompressionStream =
+                           new GZipStream(base64DataStream, CompressionMode.Decompress))
+                    {
+                        // Parse the raw decompressed bytes and update the inner data as well as the data rotation flags
+                        var decompressedDataBuffer = new byte[4]; // size of each tile
+                        var dataRotationFlagsList = new List<byte>();
+                        var layerDataList = new List<int>();
+
+                        while (decompressionStream.Read(decompressedDataBuffer, 0, decompressedDataBuffer.Length) == decompressedDataBuffer.Length)
+                        {
+                            var rawID = BitConverter.ToUInt32(decompressedDataBuffer, 0);
+                            var hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
+                            var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
+                            var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
+
+                            dataRotationFlagsList.Add((byte) ((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE));
+
+                            // assign data to rawID with the rotation flags cleared
+                            layerDataList.Add((int) (rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG)));
+                        }
+
+                        data = layerDataList.ToArray();
+                        dataRotationFlags = dataRotationFlagsList.ToArray();
+                    }
+                }
+                else
+                {
+                    throw new TiledException("Zstandard compression is currently not supported");
+                }
+            }
+        }
+
+        private void ParseTileLayerDataAsCSV(string input, ref int[] data, ref byte[] dataRotationFlags)
+        {
+            var csvs = input.Split(',');
+
+            data = new int[csvs.Length];
+            dataRotationFlags = new byte[csvs.Length];
+
+            // Parse the comma separated csv string and update the inner data as well as the data rotation flags
+            for (var i = 0; i < csvs.Length; i++)
+            {
+                var rawID = uint.Parse(csvs[i]);
+                var hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
+                var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
+                var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
+                dataRotationFlags[i] = (byte) ((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE);
+
+                // assign data to rawID with the rotation flags cleared
+                data[i] = (int) (rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG));
+            }
+        }
+
+        private TiledLayer ParseObjectLayer(XmlNode node)
+        {
+            var nodesProperty = node.SelectNodes("properties/property");
+            var nodesObject = node.SelectNodes("object");
+            var attrVisible = node.Attributes["visible"];
+            var attrLocked = node.Attributes["locked"];
+            var attrTint = node.Attributes["tintcolor"];
+            var attrOffsetX = node.Attributes["offsetx"];
+            var attrOffsetY = node.Attributes["offsety"];
+
+            var tiledLayer = new TiledLayer();
+            tiledLayer.id = int.Parse(node.Attributes["id"].Value);
+            tiledLayer.name = node.Attributes["name"].Value;
+            tiledLayer.objects = ParseObjects(nodesObject);
+            tiledLayer.type = TiledLayerType.ObjectLayer;
+            tiledLayer.visible = true;
+
+            if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
+            if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
+            if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
+            if (attrOffsetX != null) tiledLayer.offsetX = int.Parse(attrOffsetX.Value);
+            if (attrOffsetY != null) tiledLayer.offsetY = int.Parse(attrOffsetY.Value);
+            if (nodesProperty != null) tiledLayer.properties = ParseProperties(nodesProperty);
+
+            return tiledLayer;
+        }
+
+        private TiledLayer ParseImageLayer(XmlNode node)
+        {
+            var nodesProperty = node.SelectNodes("properties/property");
+            var nodeImage = node.SelectSingleNode("image");
+            var attrVisible = node.Attributes["visible"];
+            var attrLocked = node.Attributes["locked"];
+            var attrTint = node.Attributes["tintcolor"];
+            var attrOffsetX = node.Attributes["offsetx"];
+            var attrOffsetY = node.Attributes["offsety"];
+
+            var tiledLayer = new TiledLayer();
+            tiledLayer.id = int.Parse(node.Attributes["id"].Value);
+            tiledLayer.name = node.Attributes["name"].Value;
+            tiledLayer.type = TiledLayerType.ImageLayer;
+            tiledLayer.visible = true;
+
+            if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
+            if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
+            if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
+            if (attrOffsetX != null) tiledLayer.offsetX = int.Parse(attrOffsetX.Value);
+            if (attrOffsetY != null) tiledLayer.offsetY = int.Parse(attrOffsetY.Value);
+            if (nodesProperty != null) tiledLayer.properties = ParseProperties(nodesProperty);
+            if (nodeImage != null) tiledLayer.image = ParseImage(nodeImage);
+
+            return tiledLayer;
         }
 
         private TiledImage ParseImage(XmlNode node)
@@ -604,6 +643,10 @@ namespace TiledCS
                 if (File.Exists(path))
                 {
                     tilesets.Add(mapTileset.firstgid, new TiledTileset(path));
+                }
+                else
+                {
+                    throw new TiledException("Cannot locate tileset '" + path + "'. Please make sure the source folder is correct and it ends with a slash.");
                 }
             }
 

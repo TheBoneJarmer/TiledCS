@@ -2,7 +2,7 @@ namespace TiledCS
 {
     public enum TiledLayerType
     {
-        ObjectGroup,
+        ObjectLayer,
         TileLayer,
         ImageLayer
     }
