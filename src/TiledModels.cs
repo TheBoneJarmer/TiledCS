@@ -170,7 +170,7 @@ namespace TiledCS
         /// <summary>
         /// The object's rotation
         /// </summary>
-        public int rotation;
+        public float rotation;
 
         /// <summary>
         /// The object's width in pixels
