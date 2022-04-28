@@ -682,8 +682,7 @@ namespace TiledCS
         /// <param name="gid">An element within a TiledLayer.data array</param>
         /// <returns>An int array of length 2 containing the x and y position of the source rect of the tileset image. Multiply the values by the tile width and height in pixels to get the actual x and y position. Returns null if the gid was not found</returns>
         /// <remarks>This method currently doesn't take margin into account</remarks>
-        [Obsolete(
-            "Please use GetSourceRect instead because with future versions of Tiled this method may no longer be sufficient")]
+        [Obsolete("Please use GetSourceRect instead because with future versions of Tiled this method may no longer be sufficient")]
         public int[] GetSourceVector(TiledMapTileset mapTileset, TiledTileset tileset, int gid)
         {
             var tileHor = 0;
