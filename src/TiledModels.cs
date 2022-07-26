@@ -103,6 +103,11 @@ namespace TiledCS
         public float parallaxY;
 
         /// <summary>
+        /// The layer opacity
+        /// </summary>
+        public float opacity;
+
+        /// <summary>
         /// An int array of gid numbers which define which tile is being used where. The length of the array equals the layer width * the layer height. Is null when the layer is not a tilelayer.
         /// </summary>
         public int[] data;

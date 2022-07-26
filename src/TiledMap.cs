@@ -152,16 +152,16 @@ namespace TiledCS
                 var attrParallaxOriginX = nodeMap.Attributes["parallaxoriginx"];
                 var attrParallaxOriginY = nodeMap.Attributes["parallaxoriginy"];
 
-                this.TiledVersion = nodeMap.Attributes["tiledversion"].Value;
-                this.Orientation = nodeMap.Attributes["orientation"].Value;
-                this.RenderOrder = nodeMap.Attributes["renderorder"].Value;
-                this.BackgroundColor = nodeMap.Attributes["backgroundcolor"]?.Value;
-                this.Infinite = nodeMap.Attributes["infinite"].Value == "1";
+                TiledVersion = nodeMap.Attributes["tiledversion"].Value;
+                Orientation = nodeMap.Attributes["orientation"].Value;
+                RenderOrder = nodeMap.Attributes["renderorder"].Value;
+                BackgroundColor = nodeMap.Attributes["backgroundcolor"]?.Value;
+                Infinite = nodeMap.Attributes["infinite"].Value == "1";
 
-                this.Width = int.Parse(nodeMap.Attributes["width"].Value);
-                this.Height = int.Parse(nodeMap.Attributes["height"].Value);
-                this.TileWidth = int.Parse(nodeMap.Attributes["tilewidth"].Value);
-                this.TileHeight = int.Parse(nodeMap.Attributes["tileheight"].Value);
+                Width = int.Parse(nodeMap.Attributes["width"].Value);
+                Height = int.Parse(nodeMap.Attributes["height"].Value);
+                TileWidth = int.Parse(nodeMap.Attributes["tilewidth"].Value);
+                TileHeight = int.Parse(nodeMap.Attributes["tileheight"].Value);
 
                 if (nodesProperty != null) Properties = ParseProperties(nodesProperty);
                 if (nodesTileset != null) Tilesets = ParseTilesets(nodesTileset);
@@ -277,6 +277,7 @@ namespace TiledCS
             var attrOffsetY = node.Attributes["offsety"];
             var attrParallaxX = node.Attributes["parallaxx"];
             var attrParallaxY = node.Attributes["parallaxy"];
+            var attrOpacity = node.Attributes["opacity"];
 
             var tiledLayer = new TiledLayer();
             tiledLayer.id = int.Parse(node.Attributes["id"].Value);
@@ -285,10 +286,12 @@ namespace TiledCS
             tiledLayer.width = int.Parse(node.Attributes["width"].Value);
             tiledLayer.type = TiledLayerType.TileLayer;
             tiledLayer.visible = true;
+            tiledLayer.opacity = 1.0f; // Default in Tiled editor but not saved until changed
 
             if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
             if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
             if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
+            if (attrOpacity != null) tiledLayer.opacity = float.Parse(attrOpacity.Value);
             if (attrOffsetX != null) tiledLayer.offsetX = float.Parse(attrOffsetX.Value);
             if (attrOffsetY != null) tiledLayer.offsetY = float.Parse(attrOffsetY.Value);
             if (attrParallaxX != null) tiledLayer.offsetX = float.Parse(attrParallaxX.Value);
