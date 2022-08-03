@@ -91,6 +91,18 @@ namespace TiledCS
         }
 
         /// <summary>
+        /// Loads a tileset in TSX format and parses it
+        /// </summary>
+        /// <param name="stream">The file stream of the TSX file</param>
+        /// <exception cref="TiledException">Thrown when the file could not be parsed</exception>
+        public TiledTileset(Stream stream)
+        {
+            var streamReader = new StreamReader(stream);
+            var content = streamReader.ReadToEnd();
+            ParseXml(content);
+        }
+
+        /// <summary>
         /// Can be used to parse the content of a TSX tileset manually instead of loading it using the constructor
         /// </summary>
         /// <param name="xml">The tmx file content as string</param>
