@@ -158,6 +158,11 @@ namespace TiledCS
         public string type;
 
         /// <summary>
+        /// The object's class
+        /// </summary>
+        public string @class;
+
+        /// <summary>
         /// The object's x position in pixels
         /// </summary>
         public float x;
