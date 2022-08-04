@@ -303,6 +303,7 @@ namespace TiledCS
             if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
             if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
             if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
+            if (attrOpacity != null) tiledLayer.opacity = float.Parse(attrOpacity.Value);
             if (attrOffsetX != null) tiledLayer.offsetX = float.Parse(attrOffsetX.Value, CultureInfo.InvariantCulture);
             if (attrOffsetY != null) tiledLayer.offsetY = float.Parse(attrOffsetY.Value, CultureInfo.InvariantCulture);
             if (attrParallaxX != null) tiledLayer.offsetX = float.Parse(attrParallaxX.Value, CultureInfo.InvariantCulture);
