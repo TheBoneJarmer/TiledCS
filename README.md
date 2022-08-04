@@ -111,7 +111,7 @@ You need **.NET 6** to compile TiledCS as it makes use of modern C# features tha
 If you want to know what package supports your version of Tiled, please read the package's description.
 
 ## Contribution
-Feel free to open up an issue with your question or request. If you do plan to make modifications to the code please open up an issue first with more details about what you'd like to change and why. If you open a pull request, please use the **develop** branch as both **source** and **target** branch. The **main** branch is supposed to be production-ready and stable. I follow the [GitFlow branching model](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) and I ask you do too.
+Feel free to open up an issue with your question or request. If you open a pull request, please use the **develop** branch as both **source** and **target** branch. The **main** branch is supposed to be production-ready and stable. I follow the [GitFlow branching model](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) and I ask you do too.
 
 ## Credits
 * A very respectful thank you to Goodlyay who introduced support for tile rotations aka flipped tiles and taught me about bitwise operators in C#.
