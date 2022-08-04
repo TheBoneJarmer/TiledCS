@@ -325,10 +325,10 @@ namespace TiledCS
                     chunk.y = int.Parse(nodeChunk.Attributes["y"].Value);
                     chunk.width = int.Parse(nodeChunk.Attributes["width"].Value);
                     chunk.height = int.Parse(nodeChunk.Attributes["height"].Value);
-                    
+
                     if (encoding == "csv") ParseTileLayerDataAsCSV(nodeChunk.InnerText, ref chunk.data, ref chunk.dataRotationFlags);
                     if (encoding == "base64") ParseTileLayerDataAsBase64(nodeChunk.InnerText, compression, ref chunk.data, ref chunk.dataRotationFlags);
-                    
+
                     chunks.Add(chunk);
                 }
 
@@ -359,10 +359,10 @@ namespace TiledCS
                         var hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
                         var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
                         var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
-                        dataRotationFlags[i] = (byte) ((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE);
+                        dataRotationFlags[i] = (byte)((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE);
 
                         // assign data to rawID with the rotation flags cleared
-                        data[i] = (int) (rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG));
+                        data[i] = (int)(rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG));
                     }
                 }
                 else if (compression == "zlib")
@@ -386,10 +386,10 @@ namespace TiledCS
                             var hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
                             var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
                             var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
-                            dataRotationFlagsList.Add((byte) ((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE));
+                            dataRotationFlagsList.Add((byte)((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE));
 
                             // assign data to rawID with the rotation flags cleared
-                            layerDataList.Add((int) (rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG)));
+                            layerDataList.Add((int)(rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG)));
                         }
 
                         data = layerDataList.ToArray();
@@ -413,10 +413,10 @@ namespace TiledCS
                             var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
                             var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
 
-                            dataRotationFlagsList.Add((byte) ((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE));
+                            dataRotationFlagsList.Add((byte)((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE));
 
                             // assign data to rawID with the rotation flags cleared
-                            layerDataList.Add((int) (rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG)));
+                            layerDataList.Add((int)(rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG)));
                         }
 
                         data = layerDataList.ToArray();
@@ -444,10 +444,10 @@ namespace TiledCS
                 var hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
                 var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
                 var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
-                dataRotationFlags[i] = (byte) ((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE);
+                dataRotationFlags[i] = (byte)((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE);
 
                 // assign data to rawID with the rotation flags cleared
-                data[i] = (int) (rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG));
+                data[i] = (int)(rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG));
             }
         }
 
@@ -550,10 +550,8 @@ namespace TiledCS
 
                     for (var i = 0; i < vertices.Length; i++)
                     {
-                        polygon.points[(i * 2) + 0] =
-                            float.Parse(vertices[i].Split(',')[0], CultureInfo.InvariantCulture);
-                        polygon.points[(i * 2) + 1] =
-                            float.Parse(vertices[i].Split(',')[1], CultureInfo.InvariantCulture);
+                        polygon.points[(i * 2) + 0] = float.Parse(vertices[i].Split(',')[0], CultureInfo.InvariantCulture);
+                        polygon.points[(i * 2) + 1] = float.Parse(vertices[i].Split(',')[1], CultureInfo.InvariantCulture);
                     }
 
                     obj.polygon = polygon;
@@ -696,7 +694,7 @@ namespace TiledCS
             {
                 if (i == gid - mapTileset.firstgid)
                 {
-                    return new[] {tileHor, tileVert};
+                    return new[] { tileHor, tileVert };
                 }
 
                 // Update x and y position
