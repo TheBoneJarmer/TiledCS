@@ -72,7 +72,7 @@ foreach (var layer in tileLayers)
     {
         for (var x = 0; x < layer.width; x++)
         {
-            var index = (y * layer.height) + x; // Assuming the default render order is used which is from right to bottom
+            var index = (y * layer.width) + x; // Assuming the default render order is used which is from right to bottom
             var gid = layer.data[index]; // The tileset tile index
             var tileX = (x * map.TileWidth);
             var tileY = (y * map.TileHeight);
