@@ -239,6 +239,7 @@ namespace TiledCS
                 var obj = new TiledObject();
                 obj.id = int.Parse(node.Attributes["id"].Value);
                 obj.name = node.Attributes["name"]?.Value;
+                obj.@class = node.Attributes["class"]?.Value;
                 obj.type = node.Attributes["type"]?.Value;
                 obj.gid = int.Parse(node.Attributes["gid"]?.Value ?? "0");
                 obj.x = float.Parse(node.Attributes["x"].Value, CultureInfo.InvariantCulture);
