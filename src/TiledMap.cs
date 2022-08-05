@@ -130,6 +130,18 @@ namespace TiledCS
         }
 
         /// <summary>
+        /// Loads a Tiled map in TMX format and parses it
+        /// </summary>
+        /// <param name="stream">Stream of opened tmx file</param>
+        /// <exception cref="TiledException">Thrown when the map could not be loaded</exception>
+        public TiledMap(Stream stream)
+        {
+            var streamReader = new StreamReader(stream);
+            var content = streamReader.ReadToEnd();
+            ParseXml(content);
+        }
+
+        /// <summary>
         /// Can be used to parse the content of a TMX map manually instead of loading it using the constructor
         /// </summary>
         /// <param name="xml">The tmx file content as string</param>
@@ -292,10 +304,10 @@ namespace TiledCS
             if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
             if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
             if (attrOpacity != null) tiledLayer.opacity = float.Parse(attrOpacity.Value);
-            if (attrOffsetX != null) tiledLayer.offsetX = float.Parse(attrOffsetX.Value);
-            if (attrOffsetY != null) tiledLayer.offsetY = float.Parse(attrOffsetY.Value);
-            if (attrParallaxX != null) tiledLayer.offsetX = float.Parse(attrParallaxX.Value);
-            if (attrParallaxY != null) tiledLayer.offsetY = float.Parse(attrParallaxY.Value);
+            if (attrOffsetX != null) tiledLayer.offsetX = float.Parse(attrOffsetX.Value, CultureInfo.InvariantCulture);
+            if (attrOffsetY != null) tiledLayer.offsetY = float.Parse(attrOffsetY.Value, CultureInfo.InvariantCulture);
+            if (attrParallaxX != null) tiledLayer.offsetX = float.Parse(attrParallaxX.Value, CultureInfo.InvariantCulture);
+            if (attrParallaxY != null) tiledLayer.offsetY = float.Parse(attrParallaxY.Value, CultureInfo.InvariantCulture);
             if (nodesProperty != null) tiledLayer.properties = ParseProperties(nodesProperty);
 
             ParseTileLayerData(nodeData, ref tiledLayer);
@@ -471,8 +483,8 @@ namespace TiledCS
             if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
             if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
             if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
-            if (attrOffsetX != null) tiledLayer.offsetX = int.Parse(attrOffsetX.Value);
-            if (attrOffsetY != null) tiledLayer.offsetY = int.Parse(attrOffsetY.Value);
+            if (attrOffsetX != null) tiledLayer.offsetX = float.Parse(attrOffsetX.Value, CultureInfo.InvariantCulture);
+            if (attrOffsetY != null) tiledLayer.offsetY = float.Parse(attrOffsetY.Value, CultureInfo.InvariantCulture);
             if (nodesProperty != null) tiledLayer.properties = ParseProperties(nodesProperty);
 
             return tiledLayer;
@@ -497,8 +509,8 @@ namespace TiledCS
             if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
             if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
             if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
-            if (attrOffsetX != null) tiledLayer.offsetX = int.Parse(attrOffsetX.Value);
-            if (attrOffsetY != null) tiledLayer.offsetY = int.Parse(attrOffsetY.Value);
+            if (attrOffsetX != null) tiledLayer.offsetX = float.Parse(attrOffsetX.Value, CultureInfo.InvariantCulture);
+            if (attrOffsetY != null) tiledLayer.offsetY = float.Parse(attrOffsetY.Value, CultureInfo.InvariantCulture);
             if (nodesProperty != null) tiledLayer.properties = ParseProperties(nodesProperty);
             if (nodeImage != null) tiledLayer.image = ParseImage(nodeImage);
 
