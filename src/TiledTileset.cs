@@ -56,6 +56,8 @@ namespace TiledCS
         /// An array of tileset properties
         /// </summary>
         public TiledProperty[] Properties { get; set; }
+        
+        public TiledOffset Offset { get; set; }
 
         /// <summary>
         /// Returns an empty instance of TiledTileset
@@ -116,6 +118,7 @@ namespace TiledCS
 
                 var nodeTileset = document.SelectSingleNode("tileset");
                 var nodeImage = nodeTileset.SelectSingleNode("image");
+                var nodeOffset = nodeTileset.SelectSingleNode("tileoffset");
                 var nodesTile = nodeTileset.SelectNodes("tile");
                 var nodesProperty = nodeTileset.SelectNodes("properties/property");
 
@@ -132,6 +135,7 @@ namespace TiledCS
                 if (attrMargin != null) Margin = int.Parse(nodeTileset.Attributes["margin"].Value);
                 if (attrSpacing != null) Spacing = int.Parse(nodeTileset.Attributes["spacing"].Value);
                 if (nodeImage != null) Image = ParseImage(nodeImage);
+                if (nodeOffset != null) Offset = ParseOffset(nodeOffset);
 
                 Tiles = ParseTiles(nodesTile);
                 Properties = ParseProperties(nodesProperty);
@@ -140,6 +144,15 @@ namespace TiledCS
             {
                 throw new TiledException("An error occurred while trying to parse the Tiled tileset file", ex);
             }
+        }
+
+        private TiledOffset ParseOffset(XmlNode node)
+        {
+            var tiledOffset = new TiledOffset();
+            tiledOffset.x = int.Parse(node.Attributes["x"].Value);
+            tiledOffset.y = int.Parse(node.Attributes["y"].Value);
+
+            return tiledOffset;
         }
 
         private TiledImage ParseImage(XmlNode node)
