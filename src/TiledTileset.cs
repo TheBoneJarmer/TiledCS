@@ -57,6 +57,9 @@ namespace TiledCS
         /// </summary>
         public TiledProperty[] Properties { get; set; }
         
+        /// <summary>
+        /// The tile offset in pixels
+        /// </summary>
         public TiledOffset Offset { get; set; }
 
         /// <summary>
@@ -192,7 +195,7 @@ namespace TiledCS
                 property.type = node.Attributes["type"]?.Value;
                 property.value = node.Attributes["value"]?.Value;
 
-                if (property.value == null && node.InnerText != null)
+                if (property.value == null)
                 {
                     property.value = node.InnerText;
                 }
