@@ -199,7 +199,7 @@ namespace TiledCS
                 property.type = node.Attributes["type"]?.Value;
                 property.value = node.Attributes["value"]?.Value;
 
-                if (property.value == null && node.InnerText != null)
+                if (property.value == null)
                 {
                     property.value = node.InnerText;
                 }
