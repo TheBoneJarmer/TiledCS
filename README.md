@@ -39,7 +39,7 @@ if (map.IsTileFlippedHorizontal(myLayer, 3, 5))
 ### Rendering all tile layers
 Within a layer whose `type` equals that of `tilelayer`, exists a field of type `int[]` called `data`. This array represents the gids of all tiles. A gid is a tile **index** from a tileset, _not_ the tile id as some think. In order to render a specific tile from a tileset into your spritebatch, you would need to link the gid to a tileset.
 
-Tiled stores its tiles as a gid value, which is an index from a tileset. If you have multiple tilesets, you need to figure out which gid belongs to which. To help you with this process, I have added some helper methods to make this more easier for you. Let's say for example you have the following list of tilesets:
+If you have multiple tilesets, you need to figure out which gid belongs to which. To help you with this process, I have added some helper methods to make this more easier for you. Let's say for example you have the following list of tilesets:
 
 ```
 main.tsx
@@ -55,11 +55,11 @@ dungeon.tsx 101..200
 overworld.tsx 201..300
 ```
 
-Why? Because a tileset of 10x10 has 100 tiles in total and since 0 is used to tell that there is no tile set, it starts with 1. Then the next included tileset's gid starts with the total amount of tiles from the tileset included before. Therefore you should be careful when extending an existing tileset when your map has already been drawn. The helper method `TiledMap.GetTiledMapTileset` returns a dictionary where the key represent the tileset's first gid and the value represents the tileset which is of type `TiledTileset`.
+Why? Because a tileset of 10x10 has 100 tiles in total and since 0 is used to tell that there is no tile, it starts with 1. Then the next included tileset's gid starts with the total amount of tiles from the tileset included before. Therefore you should be careful when extending an existing tileset when your map has already been drawn. The helper method `TiledMap.GetTiledMapTileset` returns a dictionary where the key represent the tileset's first gid and the value represents the tileset which is of type `TiledTileset`.
 
-> **Warning!** _This works with external tilesets only for the moment. Support for embedded is on the way_
+> **Warning!** _This works with external tilesets only for the moment. Support for embedded is on the way!_
 
-Once you have the tileset and the gid, you can use that data to retrieve the tile's source rect. This would be similar to your `Rectangle tilesetRec`. You can than use this data to render the tile. See the example below. You may need to tweak things a bit to fit for you case but below should do the trick. Be aware the `layer.width` does **not** equal the layer's total width in pixels. The `layer.width` and `layer.height` value represents the layer's horizontal tiles and vertical tiles. So you need to know your tile's size in pixels too, which can be fetched from the `TiledMap.TileWidth` and `TiledMap.TileHeight` property. 
+Once you have the tileset and the gid, you can use that data to retrieve the tile's source rect. You can than use this data to render the tile. See the example below. You may need to tweak things a bit to fit for you case but below should do the trick. Be aware the `layer.width` does **not** equal the layer's total width in pixels. The `layer.width` and `layer.height` value represents the layer's horizontal tiles and vertical tiles. So you need to know your tile's size in pixels too, which can be fetched from the `TiledMap.TileWidth` and `TiledMap.TileHeight` property. 
 
 ```cs
 var map = new TiledMap("path-to-map.tmx");
@@ -90,7 +90,7 @@ foreach (var layer in tileLayers)
             // Retrieve the actual tileset based on the firstgid property of the connection object we retrieved just now
             var tileset = tilesets[mapTileset.firstgid];
             
-            // Use the connection object as well as the tileset to figure out the source rectangle. In Tiled each tileset's first tile has index 0. But 
+            // Use the connection object as well as the tileset to figure out the source rectangle.
             var rect = map.GetSourceRect(mapTileset, tileset, gid);
             
             // Render sprite at position tileX, tileY using the rect
