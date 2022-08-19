@@ -707,8 +707,8 @@ namespace TiledCS
                 if (i == gid - mapTileset.firstgid)
                 {
                     var result = new TiledSourceRect();
-                    result.x = tileHor * tileset.TileWidth;
-                    result.y = tileVert * tileset.TileHeight;
+                    result.x = tileHor * tileset.TileWidth + tileset.Spacing * tileHor;
+                    result.y = tileVert * tileset.TileHeight + tileset.Spacing * tileVert;
                     result.width = tileset.TileWidth;
                     result.height = tileset.TileHeight;
 
