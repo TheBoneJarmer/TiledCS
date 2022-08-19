@@ -298,12 +298,14 @@ namespace TiledCS
             tiledLayer.width = int.Parse(node.Attributes["width"].Value);
             tiledLayer.type = TiledLayerType.TileLayer;
             tiledLayer.visible = true;
-            tiledLayer.opacity = 1.0f; // Default in Tiled editor but not saved until changed
+            tiledLayer.opacity = 1.0f;
+            tiledLayer.parallaxX = 1.0f;
+            tiledLayer.parallaxY = 1.0f;
 
             if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
             if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
             if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
-            if (attrOpacity != null) tiledLayer.opacity = float.Parse(attrOpacity.Value);
+            if (attrOpacity != null) tiledLayer.opacity = float.Parse(attrOpacity.Value, CultureInfo.InvariantCulture);
             if (attrOffsetX != null) tiledLayer.offsetX = float.Parse(attrOffsetX.Value, CultureInfo.InvariantCulture);
             if (attrOffsetY != null) tiledLayer.offsetY = float.Parse(attrOffsetY.Value, CultureInfo.InvariantCulture);
             if (attrParallaxX != null) tiledLayer.parallaxX = float.Parse(attrParallaxX.Value, CultureInfo.InvariantCulture);
