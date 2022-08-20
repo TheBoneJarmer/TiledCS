@@ -230,7 +230,7 @@ namespace TiledCS
             {
                 var tileset = new TiledMapTileset();
                 tileset.firstgid = int.Parse(node.Attributes["firstgid"].Value);
-                tileset.source = node.Attributes["source"].Value;
+                tileset.source = node.Attributes["source"]?.Value;
 
                 result.Add(tileset);
             }
@@ -302,18 +302,20 @@ namespace TiledCS
             var attrParallaxY = node.Attributes["parallaxy"];
             var attrOpacity = node.Attributes["opacity"];
             var attrClass = node.Attributes["class"];
+            var attrWidth = node.Attributes["width"];
+            var attrHeight = node.Attributes["height"];
 
             var tiledLayer = new TiledLayer();
             tiledLayer.id = int.Parse(node.Attributes["id"].Value);
             tiledLayer.type = type;
             tiledLayer.name = node.Attributes["name"].Value;
-            tiledLayer.height = int.Parse(node.Attributes["height"].Value);
-            tiledLayer.width = int.Parse(node.Attributes["width"].Value);
             tiledLayer.visible = true;
             tiledLayer.opacity = 1.0f;
             tiledLayer.parallaxX = 1.0f;
             tiledLayer.parallaxY = 1.0f;
 
+            if (attrWidth != null) tiledLayer.width = int.Parse(attrWidth.Value);
+            if (attrHeight != null) tiledLayer.height = int.Parse(attrHeight.Value);
             if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
             if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
             if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
@@ -633,6 +635,11 @@ namespace TiledCS
             foreach (var mapTileset in Tilesets)
             {
                 var path = $"{srcFolder}/{mapTileset.source}";
+
+                if (mapTileset.source == null)
+                {
+                    continue;
+                }
 
                 if (File.Exists(path))
                 {
