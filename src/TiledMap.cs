@@ -194,10 +194,22 @@ namespace TiledCS
 
             foreach (XmlNode node in nodeList)
             {
+                var attrType = node.Attributes["type"];
+                
                 var property = new TiledProperty();
                 property.name = node.Attributes["name"].Value;
-                property.type = node.Attributes["type"]?.Value;
                 property.value = node.Attributes["value"]?.Value;
+                property.type = TiledPropertyType.String;
+
+                if (attrType != null)
+                {
+                    if (attrType.Value == "bool") property.type = TiledPropertyType.Bool;
+                    if (attrType.Value == "color") property.type = TiledPropertyType.Color;
+                    if (attrType.Value == "file") property.type = TiledPropertyType.File;
+                    if (attrType.Value == "float") property.type = TiledPropertyType.Float;
+                    if (attrType.Value == "int") property.type = TiledPropertyType.Int;
+                    if (attrType.Value == "object") property.type = TiledPropertyType.Object;
+                }
 
                 if (property.value == null)
                 {

@@ -29,7 +29,7 @@ namespace TiledCS
         /// <summary>
         /// The property type as used in Tiled. Can be bool, number, string, ...
         /// </summary>
-        public string type;
+        public TiledPropertyType type;
 
         /// <summary>
         /// The value in string format
