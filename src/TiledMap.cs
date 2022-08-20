@@ -31,11 +31,16 @@ namespace TiledCS
         /// Returns an array of properties defined in the map
         /// </summary>
         public TiledProperty[] Properties { get; set; }
+        
+        /// <summary>
+        /// Returns an array of embedded tilesets
+        /// </summary>
+        public TiledTileset[] Tilesets { get; set; }
 
         /// <summary>
         /// Returns an array of tileset definitions in the map
         /// </summary>
-        public TiledMapTileset[] Tilesets { get; set; }
+        public TiledTilesetDefinition[] TilesetDefinitions { get; set; }
 
         /// <summary>
         /// Returns an array of layers or null if none were defined
@@ -176,7 +181,7 @@ namespace TiledCS
                 TileHeight = int.Parse(nodeMap.Attributes["tileheight"].Value);
 
                 if (nodesProperty != null) Properties = ParseProperties(nodesProperty);
-                if (nodesTileset != null) Tilesets = ParseTilesets(nodesTileset);
+                if (nodesTileset != null) TilesetDefinitions = ParseTilesetDefinitions(nodesTileset);
                 if (nodesLayer != null) Layers = ParseLayers(nodesLayer, nodesObjectGroup, nodesImageLayer);
                 if (nodesGroup != null) Groups = ParseGroups(nodesGroup);
                 if (attrParallaxOriginX != null) ParallaxOriginX = float.Parse(attrParallaxOriginX.Value, CultureInfo.InvariantCulture);
@@ -222,13 +227,13 @@ namespace TiledCS
             return result.ToArray();
         }
 
-        private TiledMapTileset[] ParseTilesets(XmlNodeList nodeList)
+        private TiledTilesetDefinition[] ParseTilesetDefinitions(XmlNodeList nodeList)
         {
-            var result = new List<TiledMapTileset>();
+            var result = new List<TiledTilesetDefinition>();
 
             foreach (XmlNode node in nodeList)
             {
-                var tileset = new TiledMapTileset();
+                var tileset = new TiledTilesetDefinition();
                 tileset.firstgid = int.Parse(node.Attributes["firstgid"].Value);
                 tileset.source = node.Attributes["source"].Value;
 
@@ -582,36 +587,36 @@ namespace TiledCS
 
         /* HELPER METHODS */
         /// <summary>
-        /// Locates the right TiledMapTileset object for you within the Tilesets array
+        /// Locates the right defintion object for you
         /// </summary>
         /// <param name="gid">A value from the TiledLayer.data array</param>
-        /// <returns>An element within the Tilesets array or null if no match was found</returns>
-        public TiledMapTileset GetTiledMapTileset(int gid)
+        /// <returns>A definition object or null if no match was found</returns>
+        public TiledTilesetDefinition GetTiledTilesetDefinition(int gid)
         {
-            if (Tilesets == null)
+            if (TilesetDefinitions == null)
             {
                 return null;
             }
 
-            for (var i = 0; i < Tilesets.Length; i++)
+            for (var i = 0; i < TilesetDefinitions.Length; i++)
             {
-                if (i < Tilesets.Length - 1)
+                if (i < TilesetDefinitions.Length - 1)
                 {
-                    int gid1 = Tilesets[i + 0].firstgid;
-                    int gid2 = Tilesets[i + 1].firstgid;
+                    int gid1 = TilesetDefinitions[i + 0].firstgid;
+                    int gid2 = TilesetDefinitions[i + 1].firstgid;
 
                     if (gid >= gid1 && gid < gid2)
                     {
-                        return Tilesets[i];
+                        return TilesetDefinitions[i];
                     }
                 }
                 else
                 {
-                    return Tilesets[i];
+                    return TilesetDefinitions[i];
                 }
             }
 
-            return new TiledMapTileset();
+            return new TiledTilesetDefinition();
         }
 
         /// <summary>
@@ -625,12 +630,12 @@ namespace TiledCS
             var info = new FileInfo(src);
             var srcFolder = info.Directory;
 
-            if (Tilesets == null)
+            if (TilesetDefinitions == null)
             {
                 return tilesets;
             }
 
-            foreach (var mapTileset in Tilesets)
+            foreach (var mapTileset in TilesetDefinitions)
             {
                 var path = $"{srcFolder}/{mapTileset.source}";
 
@@ -643,6 +648,8 @@ namespace TiledCS
                     throw new TiledException("Cannot locate tileset '" + path + "'. Please make sure the source folder is correct and it ends with a slash.");
                 }
             }
+            
+            // Also add all embedded tilesets to it
 
             return tilesets;
         }
@@ -655,7 +662,7 @@ namespace TiledCS
         /// <param name="gid">An element from within a TiledLayer.data array</param>
         /// <returns>An entry of the TiledTileset.tiles array or null if none of the tile id's matches the gid</returns>
         /// <remarks>Tip: Use the GetTiledMapTileset and GetTiledTilesets methods for retrieving the correct TiledMapTileset and TiledTileset objects</remarks>
-        public TiledTile GetTiledTile(TiledMapTileset mapTileset, TiledTileset tileset, int gid)
+        public TiledTile GetTiledTile(TiledTilesetDefinition mapTileset, TiledTileset tileset, int gid)
         {
             foreach (var tile in tileset.Tiles)
             {
@@ -671,18 +678,18 @@ namespace TiledCS
         /// <summary>
         /// This method can be used to figure out the source rect on a Tileset image for rendering tiles.
         /// </summary>
-        /// <param name="mapTileset"></param>
+        /// <param name="definition"></param>
         /// <param name="tileset"></param>
         /// <param name="gid"></param>
         /// <returns>An instance of the class TiledSourceRect that represents a rectangle. Returns null if the provided gid was not found within the tileset.</returns>
-        public TiledSourceRect GetSourceRect(TiledMapTileset mapTileset, TiledTileset tileset, int gid)
+        public TiledSourceRect GetSourceRect(TiledTilesetDefinition definition, TiledTileset tileset, int gid)
         {
             var tileHor = 0;
             var tileVert = 0;
 
             for (var i = 0; i < tileset.TileCount; i++)
             {
-                if (i == gid - mapTileset.firstgid)
+                if (i == gid - definition.firstgid)
                 {
                     var result = new TiledSourceRect();
                     result.x = tileHor * tileset.TileWidth;

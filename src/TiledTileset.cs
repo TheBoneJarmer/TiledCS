@@ -112,11 +112,20 @@ namespace TiledCS
         }
 
         /// <summary>
+        /// Loads an tileset from an existing node which is done for embedded tilesets
+        /// </summary>
+        /// <param name="nodeTilset">The xml node</param>
+        internal TiledTileset(XmlNode nodeTilset)
+        {
+            ParseTileset(nodeTilset);
+        }
+
+        /// <summary>
         /// Can be used to parse the content of a TSX tileset manually instead of loading it using the constructor
         /// </summary>
         /// <param name="xml">The tmx file content as string</param>
         /// <exception cref="TiledException"></exception>
-        public void ParseXml(string xml)
+        private void ParseXml(string xml)
         {
             try
             {
@@ -124,35 +133,41 @@ namespace TiledCS
                 document.LoadXml(xml);
 
                 var nodeTileset = document.SelectSingleNode("tileset");
-                var nodeImage = nodeTileset.SelectSingleNode("image");
-                var nodeOffset = nodeTileset.SelectSingleNode("tileoffset");
-                var nodesTile = nodeTileset.SelectNodes("tile");
-                var nodesProperty = nodeTileset.SelectNodes("properties/property");
-
-                var attrMargin = nodeTileset.Attributes["margin"];
-                var attrSpacing = nodeTileset.Attributes["spacing"];
-                var attrClass = nodeTileset.Attributes["class"];
-
                 TiledVersion = nodeTileset.Attributes["tiledversion"].Value;
-                Name = nodeTileset.Attributes["name"]?.Value;
-                TileWidth = int.Parse(nodeTileset.Attributes["tilewidth"].Value);
-                TileHeight = int.Parse(nodeTileset.Attributes["tileheight"].Value);
-                TileCount = int.Parse(nodeTileset.Attributes["tilecount"].Value);
-                Columns = int.Parse(nodeTileset.Attributes["columns"].Value);
-
-                if (attrMargin != null) Margin = int.Parse(nodeTileset.Attributes["margin"].Value);
-                if (attrSpacing != null) Spacing = int.Parse(nodeTileset.Attributes["spacing"].Value);
-                if (attrClass != null) Class = attrClass.Value;
-                if (nodeImage != null) Image = ParseImage(nodeImage);
-                if (nodeOffset != null) Offset = ParseOffset(nodeOffset);
-
-                Tiles = ParseTiles(nodesTile);
-                Properties = ParseProperties(nodesProperty);
+                
+                ParseTileset(nodeTileset);
             }
             catch (Exception ex)
             {
                 throw new TiledException("An error occurred while trying to parse the Tiled tileset file", ex);
             }
+        }
+
+        private void ParseTileset(XmlNode nodeTileset)
+        {
+            var nodeImage = nodeTileset.SelectSingleNode("image");
+            var nodeOffset = nodeTileset.SelectSingleNode("tileoffset");
+            var nodesTile = nodeTileset.SelectNodes("tile");
+            var nodesProperty = nodeTileset.SelectNodes("properties/property");
+
+            var attrMargin = nodeTileset.Attributes["margin"];
+            var attrSpacing = nodeTileset.Attributes["spacing"];
+            var attrClass = nodeTileset.Attributes["class"];
+            
+            Name = nodeTileset.Attributes["name"]?.Value;
+            TileWidth = int.Parse(nodeTileset.Attributes["tilewidth"].Value);
+            TileHeight = int.Parse(nodeTileset.Attributes["tileheight"].Value);
+            TileCount = int.Parse(nodeTileset.Attributes["tilecount"].Value);
+            Columns = int.Parse(nodeTileset.Attributes["columns"].Value);
+
+            if (attrMargin != null) Margin = int.Parse(nodeTileset.Attributes["margin"].Value);
+            if (attrSpacing != null) Spacing = int.Parse(nodeTileset.Attributes["spacing"].Value);
+            if (attrClass != null) Class = attrClass.Value;
+            if (nodeImage != null) Image = ParseImage(nodeImage);
+            if (nodeOffset != null) Offset = ParseOffset(nodeOffset);
+
+            Tiles = ParseTiles(nodesTile);
+            Properties = ParseProperties(nodesProperty);
         }
 
         private TiledOffset ParseOffset(XmlNode node)
