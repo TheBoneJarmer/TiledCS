@@ -20,6 +20,10 @@ namespace TiledCS
         /// </summary>
         public string Name { get; set; }
         /// <summary>
+        /// The tileset class
+        /// </summary>
+        public string Class { get; set; }
+        /// <summary>
         /// The tile width in pixels
         /// </summary>
         public int TileWidth { get; set; }
@@ -127,6 +131,7 @@ namespace TiledCS
 
                 var attrMargin = nodeTileset.Attributes["margin"];
                 var attrSpacing = nodeTileset.Attributes["spacing"];
+                var attrClass = nodeTileset.Attributes["class"];
 
                 TiledVersion = nodeTileset.Attributes["tiledversion"].Value;
                 Name = nodeTileset.Attributes["name"]?.Value;
@@ -137,6 +142,7 @@ namespace TiledCS
 
                 if (attrMargin != null) Margin = int.Parse(nodeTileset.Attributes["margin"].Value);
                 if (attrSpacing != null) Spacing = int.Parse(nodeTileset.Attributes["spacing"].Value);
+                if (attrClass != null) Class = attrClass.Value;
                 if (nodeImage != null) Image = ParseImage(nodeImage);
                 if (nodeOffset != null) Offset = ParseOffset(nodeOffset);
 
