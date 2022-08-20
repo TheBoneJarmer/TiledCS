@@ -262,25 +262,24 @@ namespace TiledCS
 
             foreach (XmlNode node in nodesLayer)
             {
-                result.Add(ParseTileLayer(node));
+                result.Add(ParseLayer(node, TiledLayerType.TileLayer));
             }
 
             foreach (XmlNode node in nodesObjectGroup)
             {
-                result.Add(ParseObjectLayer(node));
+                result.Add(ParseLayer(node, TiledLayerType.ObjectLayer));
             }
 
             foreach (XmlNode node in nodesImageLayer)
             {
-                result.Add(ParseImageLayer(node));
+                result.Add(ParseLayer(node, TiledLayerType.ImageLayer));
             }
 
             return result.ToArray();
         }
 
-        private TiledLayer ParseTileLayer(XmlNode node)
+        private TiledLayer ParseLayer(XmlNode node, TiledLayerType type)
         {
-            var nodeData = node.SelectSingleNode("data");
             var nodesProperty = node.SelectNodes("properties/property");
             var attrVisible = node.Attributes["visible"];
             var attrLocked = node.Attributes["locked"];
@@ -290,13 +289,14 @@ namespace TiledCS
             var attrParallaxX = node.Attributes["parallaxx"];
             var attrParallaxY = node.Attributes["parallaxy"];
             var attrOpacity = node.Attributes["opacity"];
+            var attrClass = node.Attributes["class"];
 
             var tiledLayer = new TiledLayer();
             tiledLayer.id = int.Parse(node.Attributes["id"].Value);
+            tiledLayer.type = type;
             tiledLayer.name = node.Attributes["name"].Value;
             tiledLayer.height = int.Parse(node.Attributes["height"].Value);
             tiledLayer.width = int.Parse(node.Attributes["width"].Value);
-            tiledLayer.type = TiledLayerType.TileLayer;
             tiledLayer.visible = true;
             tiledLayer.opacity = 1.0f;
             tiledLayer.parallaxX = 1.0f;
@@ -305,6 +305,7 @@ namespace TiledCS
             if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
             if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
             if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
+            if (attrClass != null) tiledLayer.@class = attrClass.Value;
             if (attrOpacity != null) tiledLayer.opacity = float.Parse(attrOpacity.Value, CultureInfo.InvariantCulture);
             if (attrOffsetX != null) tiledLayer.offsetX = float.Parse(attrOffsetX.Value, CultureInfo.InvariantCulture);
             if (attrOffsetY != null) tiledLayer.offsetY = float.Parse(attrOffsetY.Value, CultureInfo.InvariantCulture);
@@ -312,7 +313,26 @@ namespace TiledCS
             if (attrParallaxY != null) tiledLayer.parallaxY = float.Parse(attrParallaxY.Value, CultureInfo.InvariantCulture);
             if (nodesProperty != null) tiledLayer.properties = ParseProperties(nodesProperty);
 
-            ParseTileLayerData(nodeData, ref tiledLayer);
+            if (type == TiledLayerType.TileLayer)
+            {
+                var nodeData = node.SelectSingleNode("data");
+                
+                ParseTileLayerData(nodeData, ref tiledLayer);
+            }
+
+            if (type == TiledLayerType.ObjectLayer)
+            {
+                var nodesObject = node.SelectNodes("object");
+                
+                tiledLayer.objects = ParseObjects(nodesObject);
+            }
+
+            if (type == TiledLayerType.ImageLayer)
+            {
+                var nodeImage = node.SelectSingleNode("image");
+                
+                if (nodeImage != null) tiledLayer.image = ParseImage(nodeImage);
+            }
 
             return tiledLayer;
         }
@@ -463,60 +483,6 @@ namespace TiledCS
                 // assign data to rawID with the rotation flags cleared
                 data[i] = (int)(rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG));
             }
-        }
-
-        private TiledLayer ParseObjectLayer(XmlNode node)
-        {
-            var nodesProperty = node.SelectNodes("properties/property");
-            var nodesObject = node.SelectNodes("object");
-            var attrVisible = node.Attributes["visible"];
-            var attrLocked = node.Attributes["locked"];
-            var attrTint = node.Attributes["tintcolor"];
-            var attrOffsetX = node.Attributes["offsetx"];
-            var attrOffsetY = node.Attributes["offsety"];
-
-            var tiledLayer = new TiledLayer();
-            tiledLayer.id = int.Parse(node.Attributes["id"].Value);
-            tiledLayer.name = node.Attributes["name"].Value;
-            tiledLayer.objects = ParseObjects(nodesObject);
-            tiledLayer.type = TiledLayerType.ObjectLayer;
-            tiledLayer.visible = true;
-
-            if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
-            if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
-            if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
-            if (attrOffsetX != null) tiledLayer.offsetX = float.Parse(attrOffsetX.Value, CultureInfo.InvariantCulture);
-            if (attrOffsetY != null) tiledLayer.offsetY = float.Parse(attrOffsetY.Value, CultureInfo.InvariantCulture);
-            if (nodesProperty != null) tiledLayer.properties = ParseProperties(nodesProperty);
-
-            return tiledLayer;
-        }
-
-        private TiledLayer ParseImageLayer(XmlNode node)
-        {
-            var nodesProperty = node.SelectNodes("properties/property");
-            var nodeImage = node.SelectSingleNode("image");
-            var attrVisible = node.Attributes["visible"];
-            var attrLocked = node.Attributes["locked"];
-            var attrTint = node.Attributes["tintcolor"];
-            var attrOffsetX = node.Attributes["offsetx"];
-            var attrOffsetY = node.Attributes["offsety"];
-
-            var tiledLayer = new TiledLayer();
-            tiledLayer.id = int.Parse(node.Attributes["id"].Value);
-            tiledLayer.name = node.Attributes["name"].Value;
-            tiledLayer.type = TiledLayerType.ImageLayer;
-            tiledLayer.visible = true;
-
-            if (attrVisible != null) tiledLayer.visible = attrVisible.Value == "1";
-            if (attrLocked != null) tiledLayer.locked = attrLocked.Value == "1";
-            if (attrTint != null) tiledLayer.tintcolor = attrTint.Value;
-            if (attrOffsetX != null) tiledLayer.offsetX = float.Parse(attrOffsetX.Value, CultureInfo.InvariantCulture);
-            if (attrOffsetY != null) tiledLayer.offsetY = float.Parse(attrOffsetY.Value, CultureInfo.InvariantCulture);
-            if (nodesProperty != null) tiledLayer.properties = ParseProperties(nodesProperty);
-            if (nodeImage != null) tiledLayer.image = ParseImage(nodeImage);
-
-            return tiledLayer;
         }
 
         private TiledImage ParseImage(XmlNode node)
