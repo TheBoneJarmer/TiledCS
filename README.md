@@ -56,9 +56,6 @@ overworld.tsx 201..300
 ```
 
 Why? Because a tileset of 10x10 has 100 tiles in total and since 0 is used to tell that there is no tile, it starts with 1. Then the next included tileset's gid starts with the total amount of tiles from the tileset included before. Therefore you should be careful when extending an existing tileset when your map has already been drawn. The helper method `TiledMap.GetTiledMapTileset` returns a dictionary where the key represent the tileset's first gid and the value represents the tileset which is of type `TiledTileset`.
-
-> **Warning!** _This works with external tilesets only for the moment. Support for embedded is on the way!_
-
 Once you have the tileset and the gid, you can use that data to retrieve the tile's source rect. You can than use this data to render the tile. See the example below. You may need to tweak things a bit to fit for you case but below should do the trick. Be aware the `layer.width` does **not** equal the layer's total width in pixels. The `layer.width` and `layer.height` value represents the layer's horizontal tiles and vertical tiles. So you need to know your tile's size in pixels too, which can be fetched from the `TiledMap.TileWidth` and `TiledMap.TileHeight` property. 
 
 ```cs
