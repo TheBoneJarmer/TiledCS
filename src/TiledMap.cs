@@ -446,8 +446,7 @@ namespace TiledCS
                 }
                 else if (compression == "gzip")
                 {
-                    using (var decompressionStream =
-                           new GZipStream(base64DataStream, CompressionMode.Decompress))
+                    using (var decompressionStream = new GZipStream(base64DataStream, CompressionMode.Decompress))
                     {
                         // Parse the raw decompressed bytes and update the inner data as well as the data rotation flags
                         var decompressedDataBuffer = new byte[4]; // size of each tile
@@ -519,15 +518,20 @@ namespace TiledCS
                 var nodePolygon = node.SelectSingleNode("polygon");
                 var nodePoint = node.SelectSingleNode("point");
                 var nodeEllipse = node.SelectSingleNode("ellipse");
+                var attrGid = node.Attributes["gid"];
 
                 var obj = new TiledObject();
                 obj.id = int.Parse(node.Attributes["id"].Value);
                 obj.name = node.Attributes["name"]?.Value;
                 obj.@class = node.Attributes["class"]?.Value;
                 obj.type = node.Attributes["type"]?.Value;
-                obj.gid = int.Parse(node.Attributes["gid"]?.Value ?? "0");
                 obj.x = float.Parse(node.Attributes["x"].Value, CultureInfo.InvariantCulture);
                 obj.y = float.Parse(node.Attributes["y"].Value, CultureInfo.InvariantCulture);
+
+                if (attrGid != null)
+                {
+                    ParseObjectGid(ref obj, attrGid.Value);
+                }
 
                 if (nodesProperty != null)
                 {
@@ -580,6 +584,17 @@ namespace TiledCS
             }
 
             return result.ToArray();
+        }
+
+        private void ParseObjectGid(ref TiledObject tiledObject, String gid)
+        {
+            var rawID = uint.Parse(gid);
+            var hor = ((rawID & FLIPPED_HORIZONTALLY_FLAG));
+            var ver = ((rawID & FLIPPED_VERTICALLY_FLAG));
+            var dia = ((rawID & FLIPPED_DIAGONALLY_FLAG));
+            
+            tiledObject.dataRotationFlag = (byte)((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE);
+            tiledObject.gid = (int)(rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG));
         }
 
         /* HELPER METHODS */
@@ -722,6 +737,11 @@ namespace TiledCS
         /// <returns>True if the tile was flipped horizontally or False if not</returns>
         public bool IsTileFlippedHorizontal(TiledLayer layer, int tileHor, int tileVert)
         {
+            if (layer.type != TiledLayerType.TileLayer)
+            {
+                throw new TiledException("Retrieving tile flipped state for a tile does not work for non-tile layers");
+            }
+            
             return IsTileFlippedHorizontal(layer, tileHor + (tileVert * layer.width));
         }
 
@@ -735,6 +755,21 @@ namespace TiledCS
         {
             return (layer.dataRotationFlags[dataIndex] & (FLIPPED_HORIZONTALLY_FLAG >> SHIFT_FLIP_FLAG_TO_BYTE)) > 0;
         }
+        
+        /// <summary>
+        /// Checks is a tile linked to an object is flipped horizontally
+        /// </summary>
+        /// <param name="tiledObject">The tiled object</param>
+        /// <returns>True if the tile was flipped horizontally or False if not</returns>
+        public bool IsTileFlippedHorizontal(TiledObject tiledObject)
+        {
+            if (tiledObject.gid == 0)
+            {
+                throw new TiledException("Tiled object not linked to a tile");
+            }
+            
+            return (tiledObject.dataRotationFlag & (FLIPPED_HORIZONTALLY_FLAG >> SHIFT_FLIP_FLAG_TO_BYTE)) > 0;
+        }
 
         /// <summary>
         /// Checks is a tile is flipped vertically
@@ -745,6 +780,11 @@ namespace TiledCS
         /// <returns>True if the tile was flipped vertically or False if not</returns>
         public bool IsTileFlippedVertical(TiledLayer layer, int tileHor, int tileVert)
         {
+            if (layer.type != TiledLayerType.TileLayer)
+            {
+                throw new TiledException("Retrieving tile flipped state for a tile does not work for non-tile layers");
+            }
+            
             return IsTileFlippedVertical(layer, tileHor + (tileVert * layer.width));
         }
 
@@ -758,6 +798,22 @@ namespace TiledCS
         {
             return (layer.dataRotationFlags[dataIndex] & (FLIPPED_VERTICALLY_FLAG >> SHIFT_FLIP_FLAG_TO_BYTE)) > 0;
         }
+        
+        /// <summary>
+        /// Checks is a tile linked to an object is flipped vertically
+        /// </summary>
+        /// <param name="layer">An entry of the TiledMap.layers array</param>
+        /// <param name="tiledObject">The tiled object</param>
+        /// <returns>True if the tile was flipped horizontally or False if not</returns>
+        public bool IsTileFlippedVertical(TiledObject tiledObject)
+        {
+            if (tiledObject.gid == 0)
+            {
+                throw new TiledException("Tiled object not linked to a tile");
+            }
+            
+            return (tiledObject.dataRotationFlag & (FLIPPED_VERTICALLY_FLAG >> SHIFT_FLIP_FLAG_TO_BYTE)) > 0;
+        }
 
         /// <summary>
         /// Checks is a tile is flipped diagonally
@@ -768,6 +824,11 @@ namespace TiledCS
         /// <returns>True if the tile was flipped diagonally or False if not</returns>
         public bool IsTileFlippedDiagonal(TiledLayer layer, int tileHor, int tileVert)
         {
+            if (layer.type != TiledLayerType.TileLayer)
+            {
+                throw new TiledException("Retrieving tile flipped state for a tile does not work for non-tile layers");
+            }
+            
             return IsTileFlippedDiagonal(layer, tileHor + (tileVert * layer.width));
         }
 
@@ -780,6 +841,21 @@ namespace TiledCS
         public bool IsTileFlippedDiagonal(TiledLayer layer, int dataIndex)
         {
             return (layer.dataRotationFlags[dataIndex] & (FLIPPED_DIAGONALLY_FLAG >> SHIFT_FLIP_FLAG_TO_BYTE)) > 0;
+        }
+        
+        /// <summary>
+        /// Checks is a tile linked to an object is flipped diagonally
+        /// </summary>
+        /// <param name="tiledObject">The tiled object</param>
+        /// <returns>True if the tile was flipped horizontally or False if not</returns>
+        public bool IsTileFlippedDiagonal(TiledObject tiledObject)
+        {
+            if (tiledObject.gid == 0)
+            {
+                throw new TiledException("Tiled object not linked to a tile");
+            }
+            
+            return (tiledObject.dataRotationFlag & (FLIPPED_DIAGONALLY_FLAG >> SHIFT_FLIP_FLAG_TO_BYTE)) > 0;
         }
     }
 }

@@ -201,6 +201,15 @@ namespace TiledCS
         /// The tileset gid when the object is linked to a tile
         /// </summary>
         public int gid;
+        
+        /// <summary>
+        /// A byte which stores the rotation flags of the tile linked to the object's gid.
+        /// Bit 3 is horizontal flip,
+        /// bit 2 is vertical flip, and
+        /// bit 1 is (anti) diagonal flip.
+        /// Is null when the layer is not a tilelayer.
+        /// </summary>
+        public byte dataRotationFlag;
 
         /// <summary>
         /// An array of properties. Is null if none were defined.
