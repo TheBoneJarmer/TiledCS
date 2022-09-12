@@ -100,9 +100,12 @@ foreach (var layer in tileLayers)
 ```
 
 ### MonoGame
-As you already know, TiledCS is a generic library which does not aim at specific frameworks or libraries. That said, I have been receiving lots of requests for an example on MonoGame. However, **I do not use MonoGame**. So it is up to the community to come up with an example on how to use TiledCS within monogame. And they did. [Temeez](https://github.com/Temeez) has been so kind on creating such an example. His repository can be located [here](https://github.com/Temeez/TiledCS-MonoGame-Example).
+As you already know, TiledCS is a generic library which does not aim at specific frameworks or libraries. That said, I have been receiving lots of requests for an example on MonoGame. However, **I do not use MonoGame**. So it is up to the community to come up with an example on how to use TiledCS within monogame. And they did:
 
-> **Note!** Temeez has also mentioned he is no longer actively working with C# anymore. So while the example may or may not work, it is not actively maintained anymore. Be aware of that.
+* https://github.com/Temeez/TiledCS-MonoGame-Example.
+* https://github.com/ironcutter24/TiledCS-example-MonoGame
+
+> **Note!** Temeez has mentioned he is no longer actively working with C# anymore. So while the example may or may not work, it is not actively maintained anymore. Be aware of that.
 
 ## Building
 You need **.NET 6** to compile TiledCS as it makes use of modern C# features that may or may not be included in earlier versions.
@@ -115,6 +118,7 @@ Feel free to open up an issue with your question or request. If you open a pull 
 
 ## Credits
 * A very respectful thank you to Goodlyay who introduced support for tile rotations aka flipped tiles and taught me about bitwise operators in C#.
+* A very huge thanks towards user [Temeez](https://github.com/Temeez) and [IronCutter24](https://github.com/ironcutter24) who put effort into providing a MonoGame example.
 
 ## License
 [MIT](LICENSE)
