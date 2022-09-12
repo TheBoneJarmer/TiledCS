@@ -102,8 +102,8 @@ foreach (var layer in tileLayers)
 ### MonoGame
 As you already know, TiledCS is a generic library which does not aim at specific frameworks or libraries. That said, I have been receiving lots of requests for an example on MonoGame. However, **I do not use MonoGame**. So it is up to the community to come up with an example on how to use TiledCS within monogame. And they did:
 
-https://github.com/Temeez/TiledCS-MonoGame-Example.
-https://github.com/ironcutter24/TiledCS-example-MonoGame
+* https://github.com/Temeez/TiledCS-MonoGame-Example.
+* https://github.com/ironcutter24/TiledCS-example-MonoGame
 
 > **Note!** Temeez has mentioned he is no longer actively working with C# anymore. So while the example may or may not work, it is not actively maintained anymore. Be aware of that.
 
