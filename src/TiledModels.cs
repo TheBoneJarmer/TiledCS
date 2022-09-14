@@ -397,4 +397,71 @@ namespace TiledCS
         public int[] data;
         public byte[] dataRotationFlags;
     }
+
+    /// <summary>
+    /// Represents a wangset from the list of wangsets. There can be many wangsets representing different sets of tiles
+    /// </summary>
+    public class TiledWangset
+    {
+        /// <summary>
+        /// The wangsets name
+        /// </summary>
+        public string name;
+
+        /// <summary>
+        /// The wangsets type
+        /// </summary>
+        public string type;
+
+        /// <summary>
+        /// The array of wangsets colors
+        /// </summary>
+        public TiledWangcolor[] wangcolors;
+
+        /// <summary>
+        /// The array of wangsets tiles
+        /// </summary>
+        public TiledWangtile[] wangtiles;
+    }
+    /// <summary>
+    /// Represents colors used in the wangset. These nodes are set as direct childs of wangset and could be many.
+    /// </summary>
+    public class TiledWangcolor
+    {
+    /// <summary>
+    /// Represents an ID. An editor is not always generate them.
+    /// </summary>
+        public int id;
+    /// <summary>
+    /// Represents the colour name set by a user, which is more like a name of the whole group of tiles.
+    /// </summary>
+        public string name;
+    /// <summary>
+    /// Represents the colour code in hex started with #. (e.g. #ff00ff)
+    /// </summary>
+        public string color;
+    /// <summary>
+    /// Perhaps represents the sorting order. Usually it is set to -1
+    /// </summary>
+        public int tile;
+    /// <summary>
+    /// Represents the multiplier of probability 0.0 - 1.0
+    /// </summary>
+        public float probability;
+    }
+    /// <summary>
+    /// Represents a direction of the wangtile marker. 
+    /// </summary>
+    public class TiledWangtile
+    {
+    /// <summary>
+    /// Represents an ID of the tile.
+    /// </summary>
+        public int id;
+    /// <summary>
+    /// Represents the direction where counting CCW
+    /// 0 - east, 1 - east-south, 2 - south, 3 - west-south, 4 - west, 5 - north-west, 6 - north, 7 - north-east. 
+    /// </summary>
+        public int[] wangs;
+    }
 }
