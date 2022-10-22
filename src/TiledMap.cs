@@ -876,15 +876,16 @@ namespace TiledCS
         /// <param name="dataIndex">An index of the TiledLayer.data array</param>
         public TileTransform GetTileTransform(TiledLayer layer, int dataIndex)
         {
-            switch ((Trans)layer.dataRotationFlags[dataIndex])
+            Flip flipRaw = (Flip)layer.dataRotationFlags[dataIndex];
+            switch ((Trans)flipRaw)
             {
-                case Trans.Flip_H:              return new TileTransform(Flip.Horizontal,  0, default);
-                case Trans.Flip_V:              return new TileTransform(Flip.Vertical,    0, default);
-                case Trans.Rotate_90:           return new TileTransform(Flip.None,       90, new Point(1, 0));
-                case Trans.Rotate_180:          return new TileTransform(Flip.None,      180, new Point(1, 1));
-                case Trans.Rotate_270:          return new TileTransform(Flip.None,      270, new Point(0, 1));
-                case Trans.Rotate_90AndFlip_H:  return new TileTransform(Flip.Horizontal, 90, new Point(1, 0));
-                default:                        return new TileTransform();
+                case Trans.Rotate_270:          return new TileTransform(flipRaw, Flip.None,      270, new Point(0, 1));
+                case Trans.Rotate_180:          return new TileTransform(flipRaw, Flip.None,      180, new Point(1, 1));
+                case Trans.Rotate_90:           return new TileTransform(flipRaw, Flip.None,       90, new Point(1, 0));
+                case Trans.Rotate_90AndFlip_H:  return new TileTransform(flipRaw, Flip.Horizontal, 90, new Point(1, 0));
+                case Trans.Flip_H:              return new TileTransform(flipRaw, Flip.Horizontal,  0, default);
+                case Trans.Flip_V:              return new TileTransform(flipRaw, Flip.Vertical,    0, default);
+                default:                        return new TileTransform(flipRaw, Flip.None,        0, default);
             }
         }
 
@@ -895,7 +896,13 @@ namespace TiledCS
         {
             /// <summary>
             /// Bitmap of a tile flip states.
+            /// </summary>
+            public Flip flipRaw;
+
+            /// <summary>
+            /// Bitmap of a tile flip states.
             /// Ignores flips that are translated into a rotation.
+            /// Use rawFlip to get the original flips.
             /// </summary>
             public Flip flip;
 
@@ -914,8 +921,9 @@ namespace TiledCS
             /// <summary>
             /// Creates a TileTransform with the given parameters.
             /// </summary>
-            public TileTransform(Flip flip, int rotation, Point offset)
+            public TileTransform(Flip flipRaw, Flip flip, int rotation, Point offset)
             {
+                this.flipRaw = flipRaw;
                 this.flip = flip;
                 this.rotation = rotation;
                 this.offset = offset;
