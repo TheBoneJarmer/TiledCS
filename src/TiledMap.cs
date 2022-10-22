@@ -890,17 +890,17 @@ namespace TiledCS
         }
 
         /// <summary>
-        /// Object containing a tile transformation data
+        /// Object containing a tile transform data
         /// </summary>
         public struct TileTransform
         {
             /// <summary>
-            /// Bitmap of a tile flip states.
+            /// Bitmap of flip states for the current tile
             /// </summary>
             public Flip flipRaw;
 
             /// <summary>
-            /// Bitmap of a tile flip states.
+            /// Bitmap of flip states for the current tile.
             /// Ignores flips that are translated into a rotation.
             /// Use rawFlip to get the original flips.
             /// </summary>
@@ -919,7 +919,7 @@ namespace TiledCS
             public Point offset;
 
             /// <summary>
-            /// Creates a TileTransform with the given parameters.
+            /// Creates a TileTransform with the given parameters
             /// </summary>
             public TileTransform(Flip flipRaw, Flip flip, int rotation, Point offset)
             {
