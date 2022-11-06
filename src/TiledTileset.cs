@@ -20,6 +20,10 @@ namespace TiledCS
         /// </summary>
         public string Name { get; set; }
         /// <summary>
+        /// The tileset class
+        /// </summary>
+        public string Class { get; set; }
+        /// <summary>
         /// The tile width in pixels
         /// </summary>
         public int TileWidth { get; set; }
@@ -60,6 +64,11 @@ namespace TiledCS
         /// An array of tileset properties
         /// </summary>
         public TiledProperty[] Properties { get; set; }
+        
+        /// <summary>
+        /// The tile offset in pixels
+        /// </summary>
+        public TiledOffset Offset { get; set; }
 
         /// <summary>
         /// Returns an empty instance of TiledTileset
@@ -95,6 +104,18 @@ namespace TiledCS
         }
 
         /// <summary>
+        /// Loads a tileset in TSX format and parses it
+        /// </summary>
+        /// <param name="stream">The file stream of the TSX file</param>
+        /// <exception cref="TiledException">Thrown when the file could not be parsed</exception>
+        public TiledTileset(Stream stream)
+        {
+            var streamReader = new StreamReader(stream);
+            var content = streamReader.ReadToEnd();
+            ParseXml(content);
+        }
+
+        /// <summary>
         /// Can be used to parse the content of a TSX tileset manually instead of loading it using the constructor
         /// </summary>
         /// <param name="xml">The tmx file content as string</param>
@@ -108,12 +129,14 @@ namespace TiledCS
 
                 var nodeTileset = document.SelectSingleNode("tileset");
                 var nodeImage = nodeTileset.SelectSingleNode("image");
+                var nodeOffset = nodeTileset.SelectSingleNode("tileoffset");
                 var nodesTile = nodeTileset.SelectNodes("tile");
                 var nodesProperty = nodeTileset.SelectNodes("properties/property");
                 var nodeWangsets = nodeTileset.SelectNodes("wangsets/wangset");
 
                 var attrMargin = nodeTileset.Attributes["margin"];
                 var attrSpacing = nodeTileset.Attributes["spacing"];
+                var attrClass = nodeTileset.Attributes["class"];
 
                 TiledVersion = nodeTileset.Attributes["tiledversion"].Value;
                 Name = nodeTileset.Attributes["name"]?.Value;
@@ -124,8 +147,11 @@ namespace TiledCS
 
                 if (attrMargin != null) Margin = int.Parse(nodeTileset.Attributes["margin"].Value);
                 if (attrSpacing != null) Spacing = int.Parse(nodeTileset.Attributes["spacing"].Value);
+                if (attrClass != null) Class = attrClass.Value;
                 if (nodeImage != null) Image = ParseImage(nodeImage);
+
                 if (nodeWangsets != null) Wangsets = ParseWangsets(nodeWangsets);
+                if (nodeOffset != null) Offset = ParseOffset(nodeOffset);
 
                 Tiles = ParseTiles(nodesTile);
                 Properties = ParseProperties(nodesProperty);
@@ -189,6 +215,15 @@ namespace TiledCS
             }
             
             return result.ToArray();
+
+        private TiledOffset ParseOffset(XmlNode node)
+        {
+            var tiledOffset = new TiledOffset();
+            tiledOffset.x = int.Parse(node.Attributes["x"].Value);
+            tiledOffset.y = int.Parse(node.Attributes["y"].Value);
+
+            return tiledOffset;
+
         }
 
         private TiledImage ParseImage(XmlNode node)
@@ -223,12 +258,24 @@ namespace TiledCS
 
             foreach (XmlNode node in nodeList)
             {
+                var attrType = node.Attributes["type"];
+
                 var property = new TiledProperty();
                 property.name = node.Attributes["name"].Value;
-                property.type = node.Attributes["type"]?.Value;
                 property.value = node.Attributes["value"]?.Value;
+                property.type = TiledPropertyType.String;
 
-                if (property.value == null && node.InnerText != null)
+                if (attrType != null)
+                {
+                    if (attrType.Value == "bool") property.type = TiledPropertyType.Bool;
+                    if (attrType.Value == "color") property.type = TiledPropertyType.Color;
+                    if (attrType.Value == "file") property.type = TiledPropertyType.File;
+                    if (attrType.Value == "float") property.type = TiledPropertyType.Float;
+                    if (attrType.Value == "int") property.type = TiledPropertyType.Int;
+                    if (attrType.Value == "object") property.type = TiledPropertyType.Object;
+                }
+
+                if (property.value == null)
                 {
                     property.value = node.InnerText;
                 }
@@ -288,6 +335,7 @@ namespace TiledCS
                 var obj = new TiledObject();
                 obj.id = int.Parse(node.Attributes["id"].Value);
                 obj.name = node.Attributes["name"]?.Value;
+                obj.@class = node.Attributes["class"]?.Value;
                 obj.type = node.Attributes["type"]?.Value;
                 obj.gid = int.Parse(node.Attributes["gid"]?.Value ?? "0");
                 obj.x = float.Parse(node.Attributes["x"].Value, CultureInfo.InvariantCulture);

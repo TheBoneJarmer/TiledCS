@@ -29,7 +29,7 @@ namespace TiledCS
         /// <summary>
         /// The property type as used in Tiled. Can be bool, number, string, ...
         /// </summary>
-        public string type;
+        public TiledPropertyType type;
 
         /// <summary>
         /// The value in string format
@@ -103,6 +103,16 @@ namespace TiledCS
         public float parallaxY;
 
         /// <summary>
+        /// The layer opacity
+        /// </summary>
+        public float opacity;
+
+        /// <summary>
+        /// The layer class
+        /// </summary>
+        public string @class;
+
+        /// <summary>
         /// An int array of gid numbers which define which tile is being used where. The length of the array equals the layer width * the layer height. Is null when the layer is not a tilelayer.
         /// </summary>
         public int[] data;
@@ -158,6 +168,11 @@ namespace TiledCS
         public string type;
 
         /// <summary>
+        /// The object's class
+        /// </summary>
+        public string @class;
+
+        /// <summary>
         /// The object's x position in pixels
         /// </summary>
         public float x;
@@ -186,6 +201,15 @@ namespace TiledCS
         /// The tileset gid when the object is linked to a tile
         /// </summary>
         public int gid;
+        
+        /// <summary>
+        /// A byte which stores the rotation flags of the tile linked to the object's gid.
+        /// Bit 3 is horizontal flip,
+        /// bit 2 is vertical flip, and
+        /// bit 1 is (anti) diagonal flip.
+        /// Is null when the layer is not a tilelayer.
+        /// </summary>
+        public byte dataRotationFlag;
 
         /// <summary>
         /// An array of properties. Is null if none were defined.
@@ -390,11 +414,34 @@ namespace TiledCS
     /// </summary>
     public class TiledChunk
     {
+        /// <summary>
+        /// The chunk's x position
+        /// </summary>
         public int x;
+        
+        /// <summary>
+        /// The chunk's y position
+        /// </summary>
         public int y;
+        
+        /// <summary>
+        /// The chunk's width
+        /// </summary>
         public int width;
+        
+        /// <summary>
+        /// The chunk's height
+        /// </summary>
         public int height;
+        
+        /// <summary>
+        /// The chunk's data is similar to the data array in the TiledLayer class
+        /// </summary>
         public int[] data;
+        
+        /// <summary>
+        /// The chunk's data rotation flags are similar to the data rotation flags array in the TiledLayer class
+        /// </summary>
         public byte[] dataRotationFlags;
     }
 
@@ -423,45 +470,63 @@ namespace TiledCS
         /// </summary>
         public TiledWangtile[] wangtiles;
     }
+    
     /// <summary>
     /// Represents colors used in the wangset. These nodes are set as direct childs of wangset and could be many.
     /// </summary>
     public class TiledWangcolor
     {
-    /// <summary>
-    /// Represents an ID. An editor is not always generate them.
-    /// </summary>
+        /// <summary>
+        /// Represents an ID. An editor is not always generate them.
+        /// </summary>
         public int id;
-    /// <summary>
-    /// Represents the colour name set by a user, which is more like a name of the whole group of tiles.
-    /// </summary>
+        /// <summary>
+        /// Represents the colour name set by a user, which is more like a name of the whole group of tiles.
+        /// </summary>
         public string name;
-    /// <summary>
-    /// Represents the colour code in hex started with #. (e.g. #ff00ff)
-    /// </summary>
+        /// <summary>
+        /// Represents the colour code in hex started with #. (e.g. #ff00ff)
+        /// </summary>
         public string color;
-    /// <summary>
-    /// Perhaps represents the sorting order. Usually it is set to -1
-    /// </summary>
+        /// <summary>
+        /// Perhaps represents the sorting order. Usually it is set to -1
+        /// </summary>
         public int tile;
-    /// <summary>
-    /// Represents the multiplier of probability 0.0 - 1.0
-    /// </summary>
+        /// <summary>
+        /// Represents the multiplier of probability 0.0 - 1.0
+        /// </summary>
         public float probability;
     }
+    
     /// <summary>
     /// Represents a direction of the wangtile marker. 
     /// </summary>
     public class TiledWangtile
     {
-    /// <summary>
-    /// Represents an ID of the tile.
-    /// </summary>
+        /// <summary>
+        /// Represents an ID of the tile.
+        /// </summary>
         public int id;
-    /// <summary>
-    /// Represents the direction where counting CCW
-    /// 0 - east, 1 - east-south, 2 - south, 3 - west-south, 4 - west, 5 - north-west, 6 - north, 7 - north-east. 
-    /// </summary>
+        /// <summary>
+        /// Represents the direction where counting CCW
+        /// 0 - east, 1 - east-south, 2 - south, 3 - west-south, 4 - west, 5 - north-west, 6 - north, 7 - north-east. 
+        /// </summary>
         public int[] wangs;
+    }
+    
+    /// <summary>
+    /// Represents a tile offset data object
+    /// </summary>
+    public class TiledOffset
+    {
+        /// <summary>
+        /// The x offset in pixels
+        /// </summary>
+        public int x;
+        
+        /// <summary>
+        /// The y offset in pixels
+        /// </summary>
+        public int y;
     }
 }
