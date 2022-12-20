@@ -1,3 +1,5 @@
+> **Important!** It is with great sadness that I have to anounce that I no longer can find enough time to care for the project as it is. Not only do I personally no longer work with C#, there are other projects that require my attention.
+
 # TiledCS
 TiledCS is a .NET library for loading Tiled maps and tilesets. It supports only the _TMX_ and _TSX_ file formats. The library requires no 3rd-party dependencies. This way the library can be used with popular game engines like Unity3D, MonoGame and Godot.
 
