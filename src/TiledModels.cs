@@ -274,6 +274,11 @@ namespace TiledCS
         public string type;
 
         /// <summary>
+        /// The custom tile class, set by the user
+        /// </summary>
+        public string @class;
+
+        /// <summary>
         /// The terrain definitions as int array. These are indices indicating what part of a terrain and which terrain this tile represents.
         /// </summary>
         /// <remarks>In the map file empty space is used to indicate null or no value. However, since it is an int array I needed something so I decided to replace empty values with -1.</remarks>
