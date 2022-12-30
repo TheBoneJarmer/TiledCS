@@ -57,6 +57,10 @@ namespace TiledCS
         /// <remarks>Not all tiles within a tileset have definitions. Only those with properties, animations, terrains, ...</remarks>
         public TiledTile[] Tiles { get; set; }
         /// <summary>
+        /// Set of wangsets
+        /// </summary>
+        public TiledWangset[] Wangsets { get; set; }
+        /// <summary>
         /// An array of tileset properties
         /// </summary>
         public TiledProperty[] Properties { get; set; }
@@ -128,6 +132,7 @@ namespace TiledCS
                 var nodeOffset = nodeTileset.SelectSingleNode("tileoffset");
                 var nodesTile = nodeTileset.SelectNodes("tile");
                 var nodesProperty = nodeTileset.SelectNodes("properties/property");
+                var nodeWangsets = nodeTileset.SelectNodes("wangsets/wangset");
 
                 var attrMargin = nodeTileset.Attributes["margin"];
                 var attrSpacing = nodeTileset.Attributes["spacing"];
@@ -144,6 +149,8 @@ namespace TiledCS
                 if (attrSpacing != null) Spacing = int.Parse(nodeTileset.Attributes["spacing"].Value);
                 if (attrClass != null) Class = attrClass.Value;
                 if (nodeImage != null) Image = ParseImage(nodeImage);
+
+                if (nodeWangsets != null) Wangsets = ParseWangsets(nodeWangsets);
                 if (nodeOffset != null) Offset = ParseOffset(nodeOffset);
 
                 Tiles = ParseTiles(nodesTile);
@@ -155,6 +162,60 @@ namespace TiledCS
             }
         }
 
+        private TiledWangset[] ParseWangsets(XmlNodeList nodeWangsets)
+        {
+            var result = new List<TiledWangset>();
+
+            foreach (XmlNode node in nodeWangsets)
+            {
+                
+                var Wangsets = new TiledWangset();
+                Wangsets.name = node.Attributes["name"].Value;
+                Wangsets.type = node.Attributes["type"]?.Value;
+                ///layers
+                var nodeWangcolor = node.SelectNodes("wangcolor");
+                if (nodeWangcolor != null)
+                {
+                    var wangcolors = new List<TiledWangcolor>();
+                    int id = 1;
+                    foreach (XmlNode wangcolornode in nodeWangcolor)
+                    {  
+                        var wangcolor = new TiledWangcolor();
+                        wangcolor.id = id;
+                        wangcolor.name = wangcolornode.Attributes["name"].Value;
+                        wangcolor.color = wangcolornode.Attributes["color"].Value;
+                        wangcolor.probability =  int.Parse(wangcolornode.Attributes["probability"].Value);
+                        wangcolors.Add(wangcolor);
+                        id++;
+                    }
+                    Wangsets.wangcolors = wangcolors.ToArray();
+                }
+                //tiles
+                var nodeWangtiles = node.SelectNodes("wangtile");
+                if (nodeWangtiles != null)
+                {
+                    var wangtiles = new List<TiledWangtile>();
+                    foreach (XmlNode wangtilenode in nodeWangtiles)
+                    {  
+                        var wangtile = new TiledWangtile();
+                        wangtile.id =  int.Parse(wangtilenode.Attributes["tileid"].Value);
+                        wangtile.wangs = new int[8];
+                        var wangs = wangtilenode.Attributes["wangid"].Value.Split(",");
+                        int counter = 0;
+                        foreach (string w in wangs)
+                        {
+                            wangtile.wangs[counter] = int.Parse(w);
+                            counter++;
+                        }
+                        wangtiles.Add(wangtile);
+                    }
+                    Wangsets.wangtiles = wangtiles.ToArray();
+                }
+                result.Add(Wangsets);
+            }
+            
+            return result.ToArray();
+
         private TiledOffset ParseOffset(XmlNode node)
         {
             var tiledOffset = new TiledOffset();
@@ -162,6 +223,7 @@ namespace TiledCS
             tiledOffset.y = int.Parse(node.Attributes["y"].Value);
 
             return tiledOffset;
+
         }
 
         private TiledImage ParseImage(XmlNode node)
