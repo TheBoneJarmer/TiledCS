@@ -155,10 +155,8 @@ namespace TiledCS
                 document.LoadXml(xml);
 
                 var nodeMap = document.SelectSingleNode("map");
+
                 var nodesProperty = nodeMap.SelectNodes("properties/property");
-                var nodesLayer = nodeMap.SelectNodes("layer");
-                var nodesImageLayer = nodeMap.SelectNodes("imagelayer");
-                var nodesObjectGroup = nodeMap.SelectNodes("objectgroup");
                 var nodesTileset = nodeMap.SelectNodes("tileset");
                 var nodesGroup = nodeMap.SelectNodes("group");
                 var attrParallaxOriginX = nodeMap.Attributes["parallaxoriginx"];
@@ -177,7 +175,7 @@ namespace TiledCS
 
                 if (nodesProperty != null) Properties = ParseProperties(nodesProperty);
                 if (nodesTileset != null) Tilesets = ParseTilesets(nodesTileset);
-                if (nodesLayer != null) Layers = ParseLayers(nodesLayer, nodesObjectGroup, nodesImageLayer);
+                Layers = ParseLayers(nodeMap);
                 if (nodesGroup != null) Groups = ParseGroups(nodesGroup);
                 if (attrParallaxOriginX != null) ParallaxOriginX = float.Parse(attrParallaxOriginX.Value, CultureInfo.InvariantCulture);
                 if (attrParallaxOriginY != null) ParallaxOriginY = float.Parse(attrParallaxOriginY.Value, CultureInfo.InvariantCulture);
@@ -260,7 +258,7 @@ namespace TiledCS
                 if (attrLocked != null) tiledGroup.locked = attrLocked.Value == "1";
                 if (nodesProperty != null) tiledGroup.properties = ParseProperties(nodesProperty);
                 if (nodesGroup != null) tiledGroup.groups = ParseGroups(nodesGroup);
-                if (nodesLayer != null) tiledGroup.layers = ParseLayers(nodesLayer, nodesObjectGroup, nodesImageLayer);
+                if (nodesLayer != null) tiledGroup.layers = ParseLayers(node);
 
                 result.Add(tiledGroup);
             }
@@ -268,25 +266,18 @@ namespace TiledCS
             return result.ToArray();
         }
 
-        private TiledLayer[] ParseLayers(XmlNodeList nodesLayer, XmlNodeList nodesObjectGroup, XmlNodeList nodesImageLayer)
+        private TiledLayer[] ParseLayers(XmlNode nodeMap)
         {
             var result = new List<TiledLayer>();
-
-            foreach (XmlNode node in nodesLayer)
+            foreach (XmlElement childNode in nodeMap.ChildNodes)
             {
-                result.Add(ParseLayer(node, TiledLayerType.TileLayer));
+                if (childNode.Name == "layer")
+                    result.Add(ParseLayer(childNode, TiledLayerType.TileLayer));
+                if (childNode.Name == "objectgroup")
+                    result.Add(ParseLayer(childNode, TiledLayerType.ObjectLayer));
+                if (childNode.Name == "imagelayer")
+                    result.Add(ParseLayer(childNode, TiledLayerType.ImageLayer));
             }
-
-            foreach (XmlNode node in nodesObjectGroup)
-            {
-                result.Add(ParseLayer(node, TiledLayerType.ObjectLayer));
-            }
-
-            foreach (XmlNode node in nodesImageLayer)
-            {
-                result.Add(ParseLayer(node, TiledLayerType.ImageLayer));
-            }
-
             return result.ToArray();
         }
 
