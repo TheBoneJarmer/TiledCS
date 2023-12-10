@@ -67,6 +67,11 @@ namespace TiledCS
         public TiledOffset Offset { get; set; }
 
         /// <summary>
+        /// The local path to the tileset
+        /// </summary>
+        public string Source { get; set; }
+
+        /// <summary>
         /// Returns an empty instance of TiledTileset
         /// </summary>
         public TiledTileset()
@@ -78,8 +83,9 @@ namespace TiledCS
         /// Loads a tileset in TSX format and parses it
         /// </summary>
         /// <param name="path">The file path of the TSX file</param>
+        /// <param name="source">The local file path from the map of the TSX file</param>
         /// <exception cref="TiledException">Thrown when the file could not be found or parsed</exception>
-        public TiledTileset(string path)
+        public TiledTileset(string path, string source)
         {
             // Check the file
             if (!File.Exists(path))
@@ -97,6 +103,8 @@ namespace TiledCS
             {
                 throw new TiledException("Unsupported file format");
             }
+
+            Source = source;
         }
 
         /// <summary>

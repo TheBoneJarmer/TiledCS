@@ -649,7 +649,7 @@ namespace TiledCS
 
                 if (File.Exists(path))
                 {
-                    tilesets.Add(mapTileset.firstgid, new TiledTileset(path));
+                    tilesets.Add(mapTileset.firstgid, new TiledTileset(path, mapTileset.source));
                 }
                 else
                 {
