@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
@@ -12,9 +13,9 @@ namespace TiledCS
     /// </summary>
     public class TiledMap
     {
-        const uint FLIPPED_HORIZONTALLY_FLAG = 0b10000000000000000000000000000000;
-        const uint FLIPPED_VERTICALLY_FLAG = 0b01000000000000000000000000000000;
-        const uint FLIPPED_DIAGONALLY_FLAG = 0b00100000000000000000000000000000;
+        const uint FLIPPED_HORIZONTALLY_FLAG = (uint)1 << 31; //0b10000000000000000000000000000000;
+        const uint FLIPPED_VERTICALLY_FLAG = (uint)1 << 30; //0b01000000000000000000000000000000;
+        const uint FLIPPED_DIAGONALLY_FLAG = (uint)1 << 29; //0b00100000000000000000000000000000;
 
         /// <summary>
         /// How many times we shift the FLIPPED flags to the right in order to store it in a byte.
@@ -802,7 +803,6 @@ namespace TiledCS
         /// <summary>
         /// Checks is a tile linked to an object is flipped vertically
         /// </summary>
-        /// <param name="layer">An entry of the TiledMap.layers array</param>
         /// <param name="tiledObject">The tiled object</param>
         /// <returns>True if the tile was flipped horizontally or False if not</returns>
         public bool IsTileFlippedVertical(TiledObject tiledObject)
@@ -856,6 +856,78 @@ namespace TiledCS
             }
             
             return (tiledObject.dataRotationFlag & (FLIPPED_DIAGONALLY_FLAG >> SHIFT_FLIP_FLAG_TO_BYTE)) > 0;
+        }
+
+        /// <summary>
+        /// This method returns an object containing transform information for the given tile
+        /// </summary>
+        /// <param name="layer">An entry of the TiledMap.layers array</param>
+        /// <param name="tileHor">The tile's horizontal position</param>
+        /// <param name="tileVert">The tile's vertical position</param>
+        public TileTransform GetTileTransform(TiledLayer layer, int tileHor, int tileVert)
+        {
+            return GetTileTransform(layer, tileHor + (tileVert * layer.width));
+        }
+
+        /// <summary>
+        /// This method returns an object containing transform information for the given tile
+        /// </summary>
+        /// <param name="layer">An entry of the TiledMap.layers array</param>
+        /// <param name="dataIndex">An index of the TiledLayer.data array</param>
+        public TileTransform GetTileTransform(TiledLayer layer, int dataIndex)
+        {
+            Flip flipRaw = (Flip)layer.dataRotationFlags[dataIndex];
+            switch ((Trans)flipRaw)
+            {
+                case Trans.Rotate_270:          return new TileTransform(flipRaw, Flip.None,      270, new Point(0, 1));
+                case Trans.Rotate_180:          return new TileTransform(flipRaw, Flip.None,      180, new Point(1, 1));
+                case Trans.Rotate_90:           return new TileTransform(flipRaw, Flip.None,       90, new Point(1, 0));
+                case Trans.Rotate_90AndFlip_H:  return new TileTransform(flipRaw, Flip.Horizontal, 90, new Point(1, 0));
+                case Trans.Flip_H:              return new TileTransform(flipRaw, Flip.Horizontal,  0, default);
+                case Trans.Flip_V:              return new TileTransform(flipRaw, Flip.Vertical,    0, default);
+                default:                        return new TileTransform(flipRaw, Flip.None,        0, default);
+            }
+        }
+
+        /// <summary>
+        /// Object containing a tile transform data
+        /// </summary>
+        public struct TileTransform
+        {
+            /// <summary>
+            /// Bitmap of flip states for the current tile
+            /// </summary>
+            public Flip flipRaw;
+
+            /// <summary>
+            /// Bitmap of flip states for the current tile.
+            /// Ignores flips that are translated into a rotation.
+            /// Use rawFlip to get the original flips.
+            /// </summary>
+            public Flip flip;
+
+            /// <summary>
+            /// Tile clockwise rotation in degrees
+            /// </summary>
+            public int rotation;
+
+            /// <summary>
+            /// Tile offset after a rotation around its upper-left corner.
+            /// Can be ignored if tile pivot is its center.
+            /// Multiply X and Y respectively for tileWidth and tileHeight to get the offset in pixels.
+            /// </summary>
+            public Point offset;
+
+            /// <summary>
+            /// Creates a TileTransform with the given parameters
+            /// </summary>
+            public TileTransform(Flip flipRaw, Flip flip, int rotation, Point offset)
+            {
+                this.flipRaw = flipRaw;
+                this.flip = flip;
+                this.rotation = rotation;
+                this.offset = offset;
+            }
         }
     }
 }
