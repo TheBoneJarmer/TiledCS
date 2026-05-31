@@ -8,3 +8,4 @@ out/
 
 *.nupkg
 *.snupkg
+/src/Example
