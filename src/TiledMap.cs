@@ -665,7 +665,7 @@ namespace TiledCS
                     continue;
                 }
 
-                var path = $"{srcFolder}/{objects[i].templateSource}";
+                var path = Path.GetFullPath(Path.Combine(srcFolder.FullName, objects[i].templateSource));
 
                 if (!templateCache.TryGetValue(path, out var template))
                 {
