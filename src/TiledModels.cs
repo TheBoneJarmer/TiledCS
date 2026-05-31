@@ -230,6 +230,11 @@ namespace TiledCS
         /// If an object was set to an ellipse shape, this property will be set
         /// </summary>
         public TiledEllipse ellipse;
+
+        /// <summary>
+        /// The relative path to the .tx template file this object was created from. Null if not a template instance.
+        /// </summary>
+        public string templateSource;
     }
 
     /// <summary>

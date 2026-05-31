@@ -519,6 +519,7 @@ namespace TiledCS
                 var nodePoint = node.SelectSingleNode("point");
                 var nodeEllipse = node.SelectSingleNode("ellipse");
                 var attrGid = node.Attributes["gid"];
+                var attrTemplate = node.Attributes["template"];
 
                 var obj = new TiledObject();
                 obj.id = int.Parse(node.Attributes["id"].Value);
@@ -527,6 +528,11 @@ namespace TiledCS
                 obj.type = node.Attributes["type"]?.Value;
                 obj.x = float.Parse(node.Attributes["x"].Value, CultureInfo.InvariantCulture);
                 obj.y = float.Parse(node.Attributes["y"].Value, CultureInfo.InvariantCulture);
+
+                if (attrTemplate != null)
+                {
+                    obj.templateSource = attrTemplate.Value;
+                }
 
                 if (attrGid != null)
                 {
@@ -595,6 +601,141 @@ namespace TiledCS
             
             tiledObject.dataRotationFlag = (byte)((hor | ver | dia) >> SHIFT_FLIP_FLAG_TO_BYTE);
             tiledObject.gid = (int)(rawID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG));
+        }
+
+        /* TEMPLATE METHODS */
+        /// <summary>
+        /// Resolves and applies template data to all template-instanced objects across all layers and groups.
+        /// Template property values are used as defaults; any values explicitly set on the instance take priority.
+        /// </summary>
+        /// <param name="src">The path to the tmx file, used to resolve relative template paths</param>
+        /// <exception cref="TiledException">Thrown when a referenced template file could not be found</exception>
+        public void ApplyTemplates(string src)
+        {
+            var info = new FileInfo(src);
+            var srcFolder = info.Directory;
+            var templateCache = new Dictionary<string, TiledTemplate>();
+
+            if (Layers != null)
+            {
+                foreach (var layer in Layers)
+                {
+                    ApplyTemplatesToObjects(layer.objects, srcFolder, templateCache);
+                }
+            }
+
+            if (Groups != null)
+            {
+                ApplyTemplatesToGroups(Groups, srcFolder, templateCache);
+            }
+        }
+
+        private void ApplyTemplatesToGroups(TiledGroup[] groups, DirectoryInfo srcFolder, Dictionary<string, TiledTemplate> templateCache)
+        {
+            foreach (var group in groups)
+            {
+                ApplyTemplatesToObjects(group.objects, srcFolder, templateCache);
+
+                if (group.groups != null)
+                {
+                    ApplyTemplatesToGroups(group.groups, srcFolder, templateCache);
+                }
+
+                if (group.layers != null)
+                {
+                    foreach (var layer in group.layers)
+                    {
+                        ApplyTemplatesToObjects(layer.objects, srcFolder, templateCache);
+                    }
+                }
+            }
+        }
+
+        private void ApplyTemplatesToObjects(TiledObject[] objects, DirectoryInfo srcFolder, Dictionary<string, TiledTemplate> templateCache)
+        {
+            if (objects == null)
+            {
+                return;
+            }
+
+            for (var i = 0; i < objects.Length; i++)
+            {
+                if (objects[i].templateSource == null)
+                {
+                    continue;
+                }
+
+                var path = $"{srcFolder}/{objects[i].templateSource}";
+
+                if (!templateCache.TryGetValue(path, out var template))
+                {
+                    if (!File.Exists(path))
+                    {
+                        throw new TiledException($"Cannot locate template '{path}'. Please make sure the source folder is correct.");
+                    }
+
+                    template = new TiledTemplate(path);
+                    templateCache[path] = template;
+                }
+
+                MergeTemplateIntoObject(ref objects[i], template);
+            }
+        }
+
+        private void MergeTemplateIntoObject(ref TiledObject obj, TiledTemplate template)
+        {
+            if (template.Object == null)
+            {
+                return;
+            }
+
+            var t = template.Object;
+
+            if (obj.name == null)    obj.name    = t.name;
+            if (obj.@class == null)  obj.@class  = t.@class;
+            if (obj.type == null)    obj.type    = t.type;
+            if (obj.width == 0)      obj.width   = t.width;
+            if (obj.height == 0)     obj.height  = t.height;
+            if (obj.gid == 0)        obj.gid     = t.gid;
+            if (obj.gid == t.gid)    obj.dataRotationFlag = t.dataRotationFlag;
+            if (obj.polygon == null) obj.polygon = t.polygon;
+            if (obj.point == null)   obj.point   = t.point;
+            if (obj.ellipse == null) obj.ellipse = t.ellipse;
+
+            // Merge properties: template values are defaults, instance values override by name
+            if (t.properties != null)
+            {
+                if (obj.properties == null)
+                {
+                    obj.properties = t.properties;
+                }
+                else
+                {
+                    var merged = new List<TiledProperty>(t.properties);
+
+                    foreach (var instanceProp in obj.properties)
+                    {
+                        var found = false;
+
+                        for (var i = 0; i < merged.Count; i++)
+                        {
+                            if (merged[i].name == instanceProp.name)
+                            {
+                                merged[i] = instanceProp;
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (!found)
+                        {
+                            merged.Add(instanceProp);
+                        }
+                    }
+
+                    obj.properties = merged.ToArray();
+                }
+            }
         }
 
         /* HELPER METHODS */
