@@ -696,6 +696,7 @@ namespace TiledCS
             if (obj.type == null)    obj.type    = t.type;
             if (obj.width == 0)      obj.width   = t.width;
             if (obj.height == 0)     obj.height  = t.height;
+            if (obj.rotation == null) obj.rotation = t.rotation;
             if (obj.gid == 0)        obj.gid     = t.gid;
             if (obj.gid == t.gid)    obj.dataRotationFlag = t.dataRotationFlag;
             if (obj.polygon == null) obj.polygon = t.polygon;

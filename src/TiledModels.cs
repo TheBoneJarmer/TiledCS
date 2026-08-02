@@ -183,9 +183,14 @@ namespace TiledCS
         public float y;
 
         /// <summary>
-        /// The object's rotation
+        /// The object's rotation in degrees clockwise. Null if not explicitly set in either the instance or its template.
         /// </summary>
-        public float rotation;
+        public float? rotation;
+
+        /// <summary>
+        /// The object's rotation in degrees clockwise, defaulting to 0 if not explicitly set.
+        /// </summary>
+        public float RotationOrDefault => rotation ?? 0f;
 
         /// <summary>
         /// The object's width in pixels
